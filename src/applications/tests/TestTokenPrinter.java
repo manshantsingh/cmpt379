@@ -2,6 +2,7 @@ package applications.tests;
 
 import static applications.tests.FixtureDefinitions.TOKEN_PRINTER_EXPECTED_FILENAME;
 import static applications.tests.FixtureDefinitions.TOKEN_PRINTER_INPUT_FILENAME;
+import static applications.tests.FixtureDefinitions.TOKEN_PRINTER_INPUT_FILENAME_W_C;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -16,6 +17,14 @@ public class TestTokenPrinter extends FileFixturesTestCase {
 	public void testTokenPrinter() throws Exception {
 		String actualOutput =	tokenPrinterOutput(TOKEN_PRINTER_INPUT_FILENAME);
 		String expectedOutput = getContents(TOKEN_PRINTER_EXPECTED_FILENAME);
+		System.out.println(actualOutput);
+		assertEquals(expectedOutput, actualOutput);
+	}
+
+	public void testTokenPrinterWithComments() throws Exception {
+		String actualOutput =	tokenPrinterOutput(TOKEN_PRINTER_INPUT_FILENAME_W_C);
+		String expectedOutput = getContents(TOKEN_PRINTER_EXPECTED_FILENAME);
+		System.out.println(actualOutput);
 		assertEquals(expectedOutput, actualOutput);
 	}
 

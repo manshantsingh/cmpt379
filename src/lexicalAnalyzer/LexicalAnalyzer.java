@@ -35,6 +35,10 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	protected Token findNextToken() {
 		LocatedChar ch = nextNonWhitespaceChar();
 		
+		while(ch.isCommentStart()) {
+			ch = endOfCommentNonWhiteSpaceChar();
+		}
+
 		if(ch.isDigit()) {
 			return scanNumber(ch);
 		}
@@ -53,7 +57,6 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		}
 	}
 
-
 	private LocatedChar nextNonWhitespaceChar() {
 		LocatedChar ch = input.next();
 		while(ch.isWhitespace()) {
@@ -62,7 +65,19 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		return ch;
 	}
 	
-	
+	private LocatedChar endOfCommentNonWhiteSpaceChar() {
+		LocatedChar ch = input.next();
+		while(!ch.isCommentEnd()) {
+			ch = input.next();
+		}
+		ch = input.next();
+		while(ch.isWhitespace()) {
+			ch = input.next();
+		}
+		return ch;
+	}
+
+
 	//////////////////////////////////////////////////////////////////////////////
 	// Integer lexical analysis	
 
