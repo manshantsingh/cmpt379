@@ -9,6 +9,7 @@ import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
+import parseTree.nodeTypes.FloatConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IntegerConstantNode;
 import parseTree.nodeTypes.NewlineNode;
@@ -309,6 +310,9 @@ public class Parser {
 		if(startsIntNumber(nowReading)) {
 			return parseIntNumber();
 		}
+		if(startsFloatNumber(nowReading)) {
+			return parseFloatNumber();
+		}
 		if(startsIdentifier(nowReading)) {
 			return parseIdentifier();
 		}
@@ -319,7 +323,10 @@ public class Parser {
 		return syntaxErrorNode("literal");
 	}
 	private boolean startsLiteral(Token token) {
-		return startsIntNumber(token) || startsIdentifier(token) || startsBooleanConstant(token);
+		return startsIntNumber(token) ||
+				startsFloatNumber(token) ||
+				startsIdentifier(token) ||
+				startsBooleanConstant(token);
 	}
 
 	// number (terminal)
@@ -331,7 +338,18 @@ public class Parser {
 		return new IntegerConstantNode(previouslyRead);
 	}
 	private boolean startsIntNumber(Token token) {
-		return token instanceof NumberToken;
+		return token instanceof IntegerConstantToken;
+	}
+	
+	private ParseNode parseFloatNumber() {
+		if(!startsFloatNumber(nowReading)) {
+			return syntaxErrorNode("float constant");
+		}
+		readToken();
+		return new FloatConstantNode(previouslyRead);
+	}
+	private boolean startsFloatNumber(Token token) {
+		return token instanceof FloatConstantToken;
 	}
 
 	// identifier (terminal)
