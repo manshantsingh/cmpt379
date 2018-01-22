@@ -42,7 +42,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		if(ch.isDigit()) {
 			return scanNumber(ch);
 		}
-		else if(ch.isLowerCase()) {
+		else if(ch.isAlphaOrUnderscore()) {
 			return scanIdentifier(ch);
 		}
 		else if(isPunctuatorStart(ch)) {
@@ -116,7 +116,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	}
 	private void appendSubsequentLowercase(StringBuffer buffer) {
 		LocatedChar c = input.next();
-		while(c.isLowerCase()) {
+		while(c.isIdentifierSubsequentCharacter()) {
 			buffer.append(c.getCharacter());
 			c = input.next();
 		}
