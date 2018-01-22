@@ -13,12 +13,22 @@ exec {
 	const ncoins := quarters + dimes + nickels + pennies.
 	print ncoins, _n_.
     
-	const moredimes := dimes > nickels.
-	print moredimes, _n_.
+	#const moredimes := dimes > nickels.
+	#print moredimes, _n_.
 
 	const boot := _true_.
 	const boof := _false_.
     
 	print boot; boof, _n_.
 	print boot, boof, _n_.
+
+	const avogadro := 6.022E+23.
+	const pi := 3.14159.
+	const twoPi := pi + pi.
+	print twoPi; _n_.
+	print avogadro; _n_.
+	print pi; _n_.
+
+	const Another$amp1e := avogadro * pi + twoPi * twoPi.
+	print Another$amp1e, _n_.
 }
