@@ -34,4 +34,10 @@ exec {
 
 	const literals := 5 * 7 - 10.
 	print literals, _n_.
+
+	const testDivideI := 4 / 2 * 6 + 1.
+	print testDivideI, _n_.
+
+	const testDivideF := 4.1 / 2.0 * 6.1 - -1.4E-1.
+	print testDivideF, _n_.
 }

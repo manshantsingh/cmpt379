@@ -282,6 +282,11 @@ public class ASMCodeGenerator {
 				code.add(opcode);
 				// type-dependent! (opcode is different for floats and for ints)
 			}
+			else if(variant instanceof SimpleCodeGenerator) {
+				SimpleCodeGenerator generator = (SimpleCodeGenerator) variant;
+				ASMCodeFragment fragment = generator.generate(node);
+				code.append(fragment);
+			}
 			else {
 				// TODO: Throw Exception
 			}
