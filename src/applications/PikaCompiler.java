@@ -13,7 +13,7 @@ import lexicalAnalyzer.Scanner;
 import parseTree.ParseNode;
 import parser.Parser;
 import semanticAnalyzer.SemanticAnalyzer;
-import tokens.Tokens;
+import tokens.*;
 
 public class PikaCompiler extends PikaApplication {
 	/** Compiles a Pika file.

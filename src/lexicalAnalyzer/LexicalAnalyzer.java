@@ -2,12 +2,13 @@ package lexicalAnalyzer;
 
 
 import logging.PikaLogger;
-
+import parseTree.nodeTypes.FloatConstantNode;
 import inputHandler.InputHandler;
 import inputHandler.LocatedChar;
 import inputHandler.LocatedCharStream;
 import inputHandler.PushbackCharStream;
 import inputHandler.TextLocation;
+import tokens.FloatConstantToken;
 import tokens.IdentifierToken;
 import tokens.LextantToken;
 import tokens.NullToken;
@@ -15,6 +16,8 @@ import tokens.IntegerConstantToken;
 import tokens.Token;
 
 import static lexicalAnalyzer.PunctuatorScanningAids.*;
+
+import java.util.ArrayList;
 
 public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	public static LexicalAnalyzer make(String filename) {
@@ -39,10 +42,11 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			ch = endOfCommentNonWhiteSpaceChar();
 		}
 
-		if(ch.isDigit()) {
-			return scanNumber(ch);
+		if(ch.isNumberStart()) {
+			Token token = scanNumber(ch);
+			if(token != null) return token;
 		}
-		else if(ch.isAlphaOrUnderscore()) {
+		if(ch.isAlphaOrUnderscore()) {
 			return scanIdentifier(ch);
 		}
 		else if(isPunctuatorStart(ch)) {
@@ -82,19 +86,75 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	// Integer lexical analysis	
 
 	private Token scanNumber(LocatedChar firstChar) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(firstChar.getCharacter());
-		appendSubsequentDigits(buffer);
-		
-		return IntegerConstantToken.make(firstChar.getLocation(), buffer.toString());
-	}
-	private void appendSubsequentDigits(StringBuffer buffer) {
+		ArrayList<LocatedChar> list = new ArrayList<LocatedChar>();
+		if(firstChar.isPlusOrMinus()) {
+			list.add(firstChar);
+		}
+		else {
+			input.pushback(firstChar);
+		}
+		boolean b = appendSubsequentDigits(list);
 		LocatedChar c = input.next();
+		if(c.isDecimal()) {
+			list.add(c);
+			b = appendSubsequentDigits(list);
+			if(b) {
+				c = input.next();
+				if(c.getCharacter() == 'E') {
+					list.add(c);
+					c=input.next();
+					if(c.isPlusOrMinus()) {
+						list.add(c);
+					}
+					else {
+						input.pushback(c);
+					}
+					b = appendSubsequentDigits(list);
+				}
+				else input.pushback(c);
+				if(b) {
+					return FloatConstantToken.make(firstChar.getLocation(), locatedCharListToString(list));
+				}
+			}
+			else {
+				if(!b && list.size()>1) {
+					input.pushback(list.get(list.size()-1));
+					list.remove(list.size()-1);
+					return IntegerConstantToken.make(firstChar.getLocation(), locatedCharListToString(list));
+				}
+			}
+		}
+		else {
+			if(b && list.size()>0) {
+				return IntegerConstantToken.make(firstChar.getLocation(), locatedCharListToString(list));
+			}
+		}
+
+		// Note: we are ignoring the last character here since findNextToken
+		//       has already scanned it
+		for(int i=list.size()-1; i>0; i--) {
+			input.pushback(list.get(i));
+		}
+		return null;
+	}
+	private boolean appendSubsequentDigits(ArrayList<LocatedChar> list) {
+		LocatedChar c = input.next();
+		boolean found=false;
 		while(c.isDigit()) {
-			buffer.append(c.getCharacter());
+			list.add(c);
 			c = input.next();
+			found=true;
 		}
 		input.pushback(c);
+		return found;
+	}
+
+	private String locatedCharListToString(ArrayList<LocatedChar> list) {
+		StringBuffer buffer = new StringBuffer();
+		for(LocatedChar c: list) {
+			buffer.append(c.getCharacter());
+		}
+		return buffer.toString();
 	}
 	
 	
@@ -104,7 +164,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	private Token scanIdentifier(LocatedChar firstChar) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(firstChar.getCharacter());
-		appendSubsequentLowercase(buffer);
+		appendSubsequentIdentifierCharacters(buffer);
 
 		String lexeme = buffer.toString();
 		if(Keyword.isAKeyword(lexeme)) {
@@ -114,7 +174,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			return IdentifierToken.make(firstChar.getLocation(), lexeme);
 		}
 	}
-	private void appendSubsequentLowercase(StringBuffer buffer) {
+	private void appendSubsequentIdentifierCharacters(StringBuffer buffer) {
 		LocatedChar c = input.next();
 		while(c.isIdentifierSubsequentCharacter()) {
 			buffer.append(c.getCharacter());

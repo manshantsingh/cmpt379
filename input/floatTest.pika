@@ -3,4 +3,6 @@ exec {
 	const pi := 3.14159.
 	const twoPi := pi + pi.
 	print twoPi; _n_.
+	print avogadro; _n_.
+	print pi; _n_.
 }

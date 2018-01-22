@@ -56,6 +56,15 @@ public class LocatedChar {
 	public boolean isIdentifierSubsequentCharacter() {
 		return isAlphaOrUnderscore() || isDigit() || character == '$';
 	}
+	public boolean isNumberStart() {
+		return isDigit() || isPlusOrMinus() || isDecimal();
+	}
+	public boolean isPlusOrMinus() {
+		return character == '+' || character == '-';
+	}
+	public boolean isDecimal() {
+		return character == '.';
+	}
 	public boolean isDigit() {
 		return Character.isDigit(character);
 	}
