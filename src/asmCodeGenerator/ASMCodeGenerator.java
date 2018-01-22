@@ -276,8 +276,15 @@ public class ASMCodeGenerator {
 			code.append(arg1);
 			code.append(arg2);
 			
-			ASMOpcode opcode = opcodeForOperator(node.getOperator());
-			code.add(opcode);							// type-dependent! (opcode is different for floats and for ints)
+			Object variant = node.getSignature().getVariant();
+			if(variant instanceof ASMOpcode) {
+				ASMOpcode opcode = (ASMOpcode) variant;
+				code.add(opcode);
+				// type-dependent! (opcode is different for floats and for ints)
+			}
+			else {
+				// TODO: Throw Exception
+			}
 		}
 		private ASMOpcode opcodeForOperator(Lextant lextant) {
 			assert(lextant instanceof Punctuator);
