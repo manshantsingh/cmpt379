@@ -4,7 +4,7 @@ exec {
 	const nickels  :=  7.
 	const pennies  := 17.
     
-	const value := quarters * 25 +
+	const value := quarters * 25 -
     			 dimes    * 10 +
     			 nickels  *  5 +
     			 pennies.
@@ -22,7 +22,7 @@ exec {
 	print boot; boof, _n_.
 	print boot, boof, _n_.
 
-	const avogadro := 6.022E+23.
+	const avogadro := -6.022E+23.
 	const pi := 3.14159.
 	const twoPi := pi + pi.
 	print twoPi; _n_.
@@ -31,4 +31,7 @@ exec {
 
 	const Another$amp1e := avogadro * pi + twoPi * twoPi.
 	print Another$amp1e, _n_.
+
+	const literals := 5 * 7 - 10.
+	print literals, _n_.
 }
