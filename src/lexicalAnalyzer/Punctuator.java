@@ -9,13 +9,27 @@ public enum Punctuator implements Lextant {
 	SUBTRACT("-"),
 	MULTIPLY("*"),
 	DIVIDE("/"),
+
 	GREATER(">"),
+	GREATER_EQUAL(">="),
+	LESS("<"),
+	LESS_EQUAL("<="),
+	EQUALITY("=="),
+	INEQUALITY("!="),
+
 	ASSIGN(":="),
 	SEPARATOR(","),
 	SPACE(";"),
-	TERMINATOR("."), 
+	TERMINATOR("."),
+
 	OPEN_BRACE("{"),
 	CLOSE_BRACE("}"),
+	OPEN_ROUND("("),
+	CLOSE_ROUND(")"),
+	OPEN_SQUARE("["),
+	CLOSE_SQUARE("]"),
+	PIPE("|"),
+
 	NULL_PUNCTUATOR("");
 
 	private String lexeme;

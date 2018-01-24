@@ -2,7 +2,6 @@ package lexicalAnalyzer;
 
 
 import logging.PikaLogger;
-import parseTree.nodeTypes.FloatConstantNode;
 import inputHandler.InputHandler;
 import inputHandler.LocatedChar;
 import inputHandler.LocatedCharStream;

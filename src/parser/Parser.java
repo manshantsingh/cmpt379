@@ -6,6 +6,7 @@ import logging.PikaLogger;
 import parseTree.*;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
+import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
@@ -267,7 +268,7 @@ public class Parser {
 		return left;
 	}
 	private boolean startsAdditiveExpression(Token token) {
-		return startsLiteral(token);
+		return startsMultiplicativeExpression(token);
 	}	
 
 	// multiplicativeExpression -> atomicExpression [MULT atomicExpression]*  (left-assoc)
@@ -290,15 +291,21 @@ public class Parser {
 		return startsAtomicExpression(token);
 	}
 	
-	// atomicExpression -> literal
+	// atomicExpression -> literal or bracketed expression
 	private ParseNode parseAtomicExpression() {
 		if(!startsAtomicExpression(nowReading)) {
 			return syntaxErrorNode("atomic expression");
 		}
-		return parseLiteral();
+		if(startsLiteral(nowReading)) {
+			return parseLiteral();
+		}
+		else if(startsBracket(nowReading)) {
+			return parseBracket();
+		}
+		return syntaxErrorNode("atomic expression");
 	}
 	private boolean startsAtomicExpression(Token token) {
-		return startsLiteral(token);
+		return startsLiteral(token) || startsBracket(token);
 	}
 	
 	// literal -> number | identifier | booleanConstant
@@ -327,6 +334,44 @@ public class Parser {
 				startsFloatNumber(token) ||
 				startsIdentifier(token) ||
 				startsBooleanConstant(token);
+	}
+
+	private boolean startsBracket(Token token) {
+		return token.isLextant(Punctuator.OPEN_ROUND, Punctuator.OPEN_SQUARE);
+	}
+
+	private ParseNode parseBracket() {
+		if(!startsBracket(nowReading)) {
+			return syntaxErrorNode("bracket expression");
+		}
+		Token open = nowReading;
+		expect(Punctuator.OPEN_ROUND, Punctuator.OPEN_SQUARE);
+		ParseNode exp = parseExpression();
+		if(open.isLextant(Punctuator.OPEN_ROUND)) {
+			expect(Punctuator.CLOSE_ROUND);
+			return exp;
+		}
+		else if(open.isLextant(Punctuator.OPEN_SQUARE)) {
+			expect(Punctuator.PIPE);
+			if(!startsType(nowReading)) {
+				return syntaxErrorNode("cast type");
+			}
+			CastNode node = CastNode.make(nowReading, exp);
+			readToken();
+			expect(Punctuator.CLOSE_SQUARE);
+			return node;
+		}
+		return syntaxErrorNode("bracket expression");
+	}
+
+	private boolean startsType(Token token) {
+		return token.isLextant(
+				Keyword.BOOLEAN,
+				Keyword.CHARACTER,
+				Keyword.STRING,
+				Keyword.INTEGER,
+				Keyword.FLOAT
+		);
 	}
 
 	// number (terminal)

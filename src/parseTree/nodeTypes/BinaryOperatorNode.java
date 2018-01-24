@@ -17,6 +17,7 @@ public class BinaryOperatorNode extends ParseNode {
 
 	public void setSignature(FunctionSignature signature) {
 		this.signature = signature;
+		setType(signature.resultType());
 	}
 
 	public BinaryOperatorNode(Token token) {

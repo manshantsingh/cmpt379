@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import asmCodeGenerator.EmptyCodeGenerator;
 import asmCodeGenerator.FloatingDivideCodeGenerator;
 import asmCodeGenerator.IntegerDivideCodeGenerator;
 import asmCodeGenerator.codeStorage.ASMOpcode;
@@ -90,6 +91,13 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		new FunctionSignatures(Punctuator.DIVIDE,
 		    new FunctionSignature(new IntegerDivideCodeGenerator(), PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
 		    new FunctionSignature(new FloatingDivideCodeGenerator(), PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.FLOAT)
+		);
+
+		new FunctionSignatures(Punctuator.PIPE,
+		    new FunctionSignature(ASMOpcode.ConvertF, PrimitiveType.INTEGER, PrimitiveType.FLOAT),
+		    new FunctionSignature(new EmptyCodeGenerator(), PrimitiveType.INTEGER, PrimitiveType.CHARACTER),
+		    new FunctionSignature(ASMOpcode.ConvertI, PrimitiveType.INTEGER, PrimitiveType.FLOAT)
+		    // TODO: int/char to bool and any cast to itself
 		);
 
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.

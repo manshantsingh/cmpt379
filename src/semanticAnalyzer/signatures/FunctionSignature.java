@@ -2,6 +2,8 @@ package semanticAnalyzer.signatures;
 
 import java.util.List;
 
+import asmCodeGenerator.EmptyCodeGenerator;
+import asmCodeGenerator.codeStorage.ASMOpcode;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import lexicalAnalyzer.Lextant;
@@ -89,6 +91,9 @@ public class FunctionSignature {
 	private static FunctionSignature multiplySignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER);
 	private static FunctionSignature greaterSignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN);
 
+	public static FunctionSignature INT_TO_FLOAT = new FunctionSignature(ASMOpcode.ConvertF, PrimitiveType.INTEGER, PrimitiveType.FLOAT);
+	public static FunctionSignature INT_TO_CHAR = new FunctionSignature(new EmptyCodeGenerator(), PrimitiveType.INTEGER, PrimitiveType.CHARACTER);
+	public static FunctionSignature FLOAT_TO_INT = new FunctionSignature(ASMOpcode.ConvertI, PrimitiveType.INTEGER, PrimitiveType.FLOAT);
 	
 	// the switch here is ugly compared to polymorphism.  This should perhaps be a method on Lextant.
 	public static FunctionSignature signatureOf(Lextant lextant) {

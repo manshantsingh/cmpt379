@@ -1,14 +1,17 @@
 package semanticAnalyzer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import lexicalAnalyzer.Lextant;
+import lexicalAnalyzer.Punctuator;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
+import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
@@ -96,13 +99,53 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		FunctionSignature signature = signatures.acceptingSignature(childTypes);
 		
 		if(signature.accepts(childTypes)) {
-			node.setType(signature.resultType());
 			node.setSignature(signature);
 		}
 		else {
 			typeCheckError(node, childTypes);
 			node.setType(PrimitiveType.ERROR);
 		}
+	}
+	@Override
+	public void visitLeave(CastNode node) {
+		assert node.nChildren() == 1;
+
+		Type from  = node.child(0).getType();
+		Type to = node.getResultType();
+		System.out.println("from: "+from+", to: "+to);
+		if(from == to) {
+			node.setType(from);
+			return;
+		}
+		if(from == PrimitiveType.INTEGER) {
+			if(to == PrimitiveType.FLOAT) {
+				node.setSignature(FunctionSignature.INT_TO_FLOAT);
+				return;
+			}
+			if(to == PrimitiveType.CHARACTER) {
+				node.setSignature(FunctionSignature.INT_TO_CHAR);
+				return;
+			}
+			if(to == PrimitiveType.BOOLEAN) {
+				// TODO: do the bool
+				return;
+			}
+		}
+		if(from == PrimitiveType.FLOAT) {
+			if(to == PrimitiveType.INTEGER) {
+				node.setSignature(FunctionSignature.FLOAT_TO_INT);
+				return;
+			}
+		}
+		if(from == PrimitiveType.CHARACTER) {
+			if(to == PrimitiveType.BOOLEAN) {
+				// TODO: do the bool
+				return;
+			}
+			// TODO: Confirm char to int conversions
+		}
+		typeCheckError(node, Arrays.asList(from, to));
+		node.setType(PrimitiveType.ERROR);
 	}
 	private Lextant operatorFor(BinaryOperatorNode node) {
 		LextantToken token = (LextantToken) node.getToken();
