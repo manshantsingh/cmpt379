@@ -41,6 +41,6 @@ exec {
 	const testDivideF := 4.1 / 2.0 * 6.1 - -1.4E-1.
 	print testDivideF, _n_.
 
-	const bracket := [ 4 + 4 | float ] * 2.0.
+	const bracket := [ 4 + 4 | float ] * 2.2.
 	print bracket, _n_.
 }

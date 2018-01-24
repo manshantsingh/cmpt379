@@ -11,6 +11,7 @@ import lexicalAnalyzer.Punctuator;
 import parseTree.*;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
+import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.FloatConstantNode;
@@ -20,6 +21,7 @@ import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
+import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
@@ -223,6 +225,15 @@ public class ASMCodeGenerator {
 
 		///////////////////////////////////////////////////////////////////////////
 		// expressions
+		public void visitLeave(CastNode node) {
+			newValueCode(node);
+			ASMCodeFragment arg1 = removeValueCode(node.child(0));
+
+			code.append(arg1);
+
+			callFunctionSignature(node, node.getSignature());
+		}
+
 		public void visitLeave(BinaryOperatorNode node) {
 			Lextant operator = node.getOperator();
 
@@ -276,7 +287,11 @@ public class ASMCodeGenerator {
 			code.append(arg1);
 			code.append(arg2);
 			
-			Object variant = node.getSignature().getVariant();
+			callFunctionSignature(node, node.getSignature());
+		}
+
+		private void callFunctionSignature(ParseNode node, FunctionSignature signature) {
+			Object variant = signature.getVariant();
 			if(variant instanceof ASMOpcode) {
 				ASMOpcode opcode = (ASMOpcode) variant;
 				code.add(opcode);
@@ -291,6 +306,7 @@ public class ASMCodeGenerator {
 				// TODO: Throw Exception
 			}
 		}
+
 		private ASMOpcode opcodeForOperator(Lextant lextant) {
 			assert(lextant instanceof Punctuator);
 			Punctuator punctuator = (Punctuator)lextant;
