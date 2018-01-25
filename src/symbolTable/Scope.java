@@ -62,19 +62,19 @@ public class Scope {
 
 ///////////////////////////////////////////////////////////////////////
 //bindings
-	public Binding createBinding(IdentifierNode identifierNode, Type type) {
+	public Binding createBinding(IdentifierNode identifierNode, Type type, boolean constant) {
 		Token token = identifierNode.getToken();
 		symbolTable.errorIfAlreadyDefined(token);
 
 		String lexeme = token.getLexeme();
-		Binding binding = allocateNewBinding(type, token.getLocation(), lexeme);	
+		Binding binding = allocateNewBinding(type, token.getLocation(), lexeme, constant);
 		symbolTable.install(lexeme, binding);
 
 		return binding;
 	}
-	private Binding allocateNewBinding(Type type, TextLocation textLocation, String lexeme) {
+	private Binding allocateNewBinding(Type type, TextLocation textLocation, String lexeme, boolean constant) {
 		MemoryLocation memoryLocation = allocator.allocate(type.getSize());
-		return new Binding(type, textLocation, memoryLocation, lexeme);
+		return new Binding(type, textLocation, memoryLocation, lexeme, constant);
 	}
 	
 ///////////////////////////////////////////////////////////////////////
@@ -102,9 +102,9 @@ public class Scope {
 			return "scope: the-null-scope";
 		}
 		@Override
-		public Binding createBinding(IdentifierNode identifierNode, Type type) {
+		public Binding createBinding(IdentifierNode identifierNode, Type type, boolean constant) {
 			unscopedIdentifierError(identifierNode.getToken());
-			return super.createBinding(identifierNode, type);
+			return super.createBinding(identifierNode, type, constant);
 		}
 		// subscopes of null scope need their own strategy.  Assumes global block is static.
 		public Scope createSubscope() {

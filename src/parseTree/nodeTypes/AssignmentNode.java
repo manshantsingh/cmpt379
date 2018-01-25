@@ -7,43 +7,30 @@ import lexicalAnalyzer.Lextant;
 import tokens.LextantToken;
 import tokens.Token;
 
-public class DeclarationNode extends ParseNode {
+public class AssignmentNode extends ParseNode {
 
-	public DeclarationNode(Token token) {
+	public AssignmentNode(Token token) {
 		super(token);
-		assert(token.isLextant(Keyword.CONST, Keyword.VAR));
 	}
 
-	public DeclarationNode(ParseNode node) {
+	public AssignmentNode(ParseNode node) {
 		super(node);
 	}
-	
-	
-	////////////////////////////////////////////////////////////
-	// attributes
 
-	public Lextant getDeclarationType() {
-		return lextantToken().getLextant();
-	}
-	public LextantToken lextantToken() {
-		return (LextantToken)token;
-	}	
-	
-	
 	////////////////////////////////////////////////////////////
 	// convenience factory
-	
-	public static DeclarationNode withChildren(Token token, ParseNode declaredName, ParseNode initializer) {
-		DeclarationNode node = new DeclarationNode(token);
+
+	public static AssignmentNode withChildren(ParseNode declaredName, ParseNode initializer) {
+		AssignmentNode node = new AssignmentNode(declaredName.getToken());
 		node.appendChild(declaredName);
 		node.appendChild(initializer);
 		return node;
 	}
-	
-	
+
+
 	///////////////////////////////////////////////////////////
 	// boilerplate for visitors
-			
+
 	public void accept(ParseNodeVisitor visitor) {
 		visitor.visitEnter(this);
 		visitChildren(visitor);

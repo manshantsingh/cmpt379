@@ -1,5 +1,6 @@
 package parseTree;
 
+import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
@@ -31,6 +32,9 @@ public interface ParseNodeVisitor {
 
 	void visitEnter(DeclarationNode node);
 	void visitLeave(DeclarationNode node);
+
+	void visitEnter(AssignmentNode node);
+	void visitLeave(AssignmentNode node);
 
 	
 	void visitEnter(ParseNode node);
@@ -87,7 +91,13 @@ public interface ParseNodeVisitor {
 		}
 		public void visitLeave(DeclarationNode node) {
 			defaultVisitLeave(node);
-		}					
+		}
+		public void visitEnter(AssignmentNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(AssignmentNode node) {
+			defaultVisitLeave(node);
+		}
 		public void visitEnter(MainBlockNode node) {
 			defaultVisitEnter(node);
 		}

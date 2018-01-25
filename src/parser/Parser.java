@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import logging.PikaLogger;
 import parseTree.*;
+import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
@@ -104,6 +105,9 @@ public class Parser {
 		if(startsDeclaration(nowReading)) {
 			return parseDeclaration();
 		}
+		if(startsAssignment(nowReading)) {
+			return parseAssignment();
+		}
 		if(startsPrintStatement(nowReading)) {
 			return parsePrintStatement();
 		}
@@ -111,7 +115,8 @@ public class Parser {
 	}
 	private boolean startsStatement(Token token) {
 		return startsPrintStatement(token) ||
-			   startsDeclaration(token);
+				startsAssignment(token) ||
+				startsDeclaration(token);
 	}
 	
 	// printStmt -> PRINT printExpressionList .
@@ -212,10 +217,23 @@ public class Parser {
 		return DeclarationNode.withChildren(declarationToken, identifier, initializer);
 	}
 	private boolean startsDeclaration(Token token) {
-		return token.isLextant(Keyword.CONST);
+		return token.isLextant(Keyword.CONST, Keyword.VAR);
 	}
 
+	private ParseNode parseAssignment() {
+		if(!startsAssignment(nowReading)) {
+			return syntaxErrorNode("assignment");
+		}
+		ParseNode identifier = parseIdentifier();
+		expect(Punctuator.ASSIGN);
+		ParseNode initializer = parseExpression();
+		expect(Punctuator.TERMINATOR);
+		return AssignmentNode.withChildren(identifier, initializer);
+	}
 
+	private boolean startsAssignment(Token token) {
+		return startsIdentifier(token);
+	}
 	
 	///////////////////////////////////////////////////////////
 	// expressions

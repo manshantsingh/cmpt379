@@ -3,10 +3,12 @@ package semanticAnalyzer;
 import java.util.Arrays;
 import java.util.List;
 
+import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
+import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
@@ -82,7 +84,25 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		node.setType(declarationType);
 		
 		identifier.setType(declarationType);
-		addBinding(identifier, declarationType);
+		addBinding(identifier, declarationType, node.getToken().isLextant(Keyword.CONST));
+	}
+	@Override
+	public void visitLeave(AssignmentNode node) {
+		IdentifierNode identifier = (IdentifierNode) node.child(0);
+		ParseNode assignment = node.child(1);
+		Type identifierType = identifier.getType();
+		Type assignmentType = assignment.getType();
+		if(identifier.getBinding().isConstant()) {
+			assignmentToConstant(identifier.getToken());
+			node.setType(PrimitiveType.ERROR);
+		}
+		if(identifierType != assignmentType) {
+			assignmentTypeMismatchError(identifier.getToken(), identifierType, assignmentType);
+			node.setType(PrimitiveType.ERROR);
+		}
+		else {
+			node.setType(identifierType);
+		}
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -112,7 +132,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 		Type from  = node.child(0).getType();
 		Type to = node.getResultType();
-		System.out.println("from: "+from+", to: "+to);
 		if(from == to) {
 			node.setType(from);
 			return;
@@ -200,9 +219,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		ParseNode parent = node.getParent();
 		return (parent instanceof DeclarationNode) && (node == parent.child(0));
 	}
-	private void addBinding(IdentifierNode identifierNode, Type type) {
+	private void addBinding(IdentifierNode identifierNode, Type type, boolean constant) {
 		Scope scope = identifierNode.getLocalScope();
-		Binding binding = scope.createBinding(identifierNode, type);
+		Binding binding = scope.createBinding(identifierNode, type, constant);
 		identifierNode.setBinding(binding);
 	}
 	
@@ -217,6 +236,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	private void castTypeCheckError(ParseNode node, Type from, Type to) {
 		logError("Cannot cast from "+from+" to "+to+" at " + node.getToken().getLocation());
+	}
+	private void assignmentToConstant(Token token) {
+		logError("Cannot write to const variable \""+
+				token.getLexeme()+"\" at "+token.getLocation());
+	}
+	private void assignmentTypeMismatchError(Token token, Type expected, Type received) {
+		logError("Expected type "+expected+" for "+token.getLexeme()+
+				", but received "+received+" at "+token.getLocation());
 	}
 	private void logError(String message) {
 		PikaLogger log = PikaLogger.getLogger("compiler.semanticAnalyzer");
