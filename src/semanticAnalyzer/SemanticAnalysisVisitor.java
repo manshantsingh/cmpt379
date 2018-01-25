@@ -1,11 +1,9 @@
 package semanticAnalyzer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import lexicalAnalyzer.Lextant;
-import lexicalAnalyzer.Punctuator;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;

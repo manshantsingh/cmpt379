@@ -43,6 +43,9 @@ public class FunctionSignature {
 	public Type resultType() {
 		return resultType;
 	}
+	public Type[] getParams() {
+		return paramTypes;
+	}
 	public boolean isNull() {
 		return false;
 	}

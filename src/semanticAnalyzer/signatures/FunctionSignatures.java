@@ -100,6 +100,20 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		    // TODO: int/char to bool and any cast to itself
 		);
 
+		for(Punctuator cmp: Punctuator.COMPARISONS) {
+			FunctionSignature i = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN);
+			FunctionSignature c = new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN);
+			FunctionSignature f = new FunctionSignature(1, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.BOOLEAN);
+			FunctionSignature b = new FunctionSignature(1, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN);
+
+			if(cmp == Punctuator.EQUALITY || cmp == Punctuator.INEQUALITY) {
+				new FunctionSignatures(cmp, i, c, f, b);
+			}
+			else {
+				new FunctionSignatures(cmp, i, c, f);
+			}
+		}
+
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.
 		// Then, we give that key two signatures: one an (INT x INT -> INT) and the other
 		// a (FLOAT x FLOAT -> FLOAT).  Each signature has a "whichVariant" parameter where

@@ -45,8 +45,7 @@ public enum Punctuator implements Lextant {
 	public Token prototype() {
 		return prototype;
 	}
-	
-	
+
 	public static Punctuator forLexeme(String lexeme) {
 		for(Punctuator punctuator: values()) {
 			if(punctuator.lexeme.equals(lexeme)) {
@@ -54,6 +53,19 @@ public enum Punctuator implements Lextant {
 			}
 		}
 		return NULL_PUNCTUATOR;
+	}
+
+	public static final Punctuator COMPARISONS[] = new Punctuator[] {
+			GREATER, GREATER_EQUAL,
+			LESS, LESS_EQUAL,
+			EQUALITY, INEQUALITY
+	};
+
+	public static boolean isComparison(Lextant lextant) {
+		for(Punctuator cmp: COMPARISONS) {
+			if(cmp == lextant) return true;
+		}
+		return false;
 	}
 	
 /*

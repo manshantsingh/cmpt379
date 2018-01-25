@@ -125,6 +125,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		}
 		else {
 			if(b && list.size()>0) {
+				input.pushback(c);
 				return IntegerConstantToken.make(firstChar.getLocation(), locatedCharListToString(list));
 			}
 		}
@@ -181,41 +182,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		}
 		input.pushback(c);
 	}
-	
-	
-	//////////////////////////////////////////////////////////////////////////////
-	// Punctuator lexical analysis	
-	// old method left in to show a simple scanning method.
-	// current method is the algorithm object PunctuatorScanner.java
 
-	@SuppressWarnings("unused")
-	private Token oldScanPunctuator(LocatedChar ch) {
-		TextLocation location = ch.getLocation();
-		
-		switch(ch.getCharacter()) {
-		case '*':
-			return LextantToken.make(location, "*", Punctuator.MULTIPLY);
-		case '+':
-			return LextantToken.make(location, "+", Punctuator.ADD);
-		case '>':
-			return LextantToken.make(location, ">", Punctuator.GREATER);
-		case ':':
-			if(ch.getCharacter()=='=') {
-				return LextantToken.make(location, ":=", Punctuator.ASSIGN);
-			}
-			else {
-				throw new IllegalArgumentException("found : not followed by = in scanOperator");
-			}
-		case ',':
-			return LextantToken.make(location, ",", Punctuator.SEPARATOR);
-		case ';':
-			return LextantToken.make(location, ";", Punctuator.TERMINATOR);
-		default:
-			throw new IllegalArgumentException("bad LocatedChar " + ch + "in scanOperator");
-		}
-	}
-
-	
 
 	//////////////////////////////////////////////////////////////////////////////
 	// Character-classification routines specific to Pika scanning.	

@@ -13,8 +13,8 @@ exec {
 	const ncoins := quarters + dimes + nickels + pennies.
 	print ncoins, _n_.
     
-	#const moredimes := dimes > nickels.
-	#print moredimes, _n_.
+	const moredimes := dimes > nickels.
+	print moredimes, _n_.
 
 	const boot := _true_.
 	const boof := _false_.
@@ -43,4 +43,6 @@ exec {
 
 	const bracket := [ 4 + 4 | float ] * 2.2.
 	print bracket, _n_.
+
+	print _false_ == _false_, _n_.
 }

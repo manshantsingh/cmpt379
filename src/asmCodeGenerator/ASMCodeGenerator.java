@@ -237,19 +237,21 @@ public class ASMCodeGenerator {
 		public void visitLeave(BinaryOperatorNode node) {
 			Lextant operator = node.getOperator();
 
-			if(operator == Punctuator.GREATER) {
-				visitComparisonOperatorNode(node, operator);
+			if(Punctuator.isComparison(operator)) {
+				visitComparisonOperatorNode(node, (Punctuator) operator);
 			}
 			else {
 				visitNormalBinaryOperatorNode(node);
 			}
 		}
 		private void visitComparisonOperatorNode(BinaryOperatorNode node,
-				Lextant operator) {
+				Punctuator cmp) {
 
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 			
+			Type type = node.getSignature().getParams()[0];
+
 			Labeller labeller = new Labeller("compare");
 			
 			String startLabel = labeller.newLabel("arg1");
@@ -265,10 +267,79 @@ public class ASMCodeGenerator {
 			code.add(Label, arg2Label);
 			code.append(arg2);
 			code.add(Label, subLabel);
-			code.add(Subtract);
-			
-			code.add(JumpPos, trueLabel);
-			code.add(Jump, falseLabel);
+
+			// TODO: char and string type
+			if(type == PrimitiveType.INTEGER) {
+				code.add(Subtract);
+				switch(cmp) {
+				case GREATER:
+					code.add(JumpPos, trueLabel);
+					code.add(Jump, falseLabel);
+					break;
+				case GREATER_EQUAL:
+					code.add(JumpNeg, falseLabel);
+					code.add(Jump, trueLabel);
+					break;
+				case LESS:
+					code.add(JumpNeg, trueLabel);
+					code.add(Jump, falseLabel);
+					break;
+				case LESS_EQUAL:
+					code.add(JumpPos, falseLabel);
+					code.add(Jump, trueLabel);
+					break;
+				case EQUALITY:
+					code.add(JumpFalse, trueLabel);
+					code.add(Jump, falseLabel);
+					break;
+				case INEQUALITY:
+					code.add(JumpTrue, trueLabel);
+					code.add(Jump, falseLabel);
+					break;
+				}
+			}
+			else if(type == PrimitiveType.FLOAT) {
+				code.add(FSubtract);
+				switch(cmp) {
+				case GREATER:
+					code.add(JumpFPos, trueLabel);
+					code.add(Jump, falseLabel);
+					break;
+				case GREATER_EQUAL:
+					code.add(JumpFNeg, falseLabel);
+					code.add(Jump, trueLabel);
+					break;
+				case LESS:
+					code.add(JumpFNeg, trueLabel);
+					code.add(Jump, falseLabel);
+					break;
+				case LESS_EQUAL:
+					code.add(JumpFPos, falseLabel);
+					code.add(Jump, trueLabel);
+					break;
+				case EQUALITY:
+					code.add(JumpFZero, trueLabel);
+					code.add(Jump, falseLabel);
+					break;
+				case INEQUALITY:
+					code.add(JumpFZero, falseLabel);
+					code.add(Jump, trueLabel);
+					break;
+				}
+			}
+			else if(type == PrimitiveType.BOOLEAN) {
+				code.add(Subtract);
+				switch(cmp) {
+				case EQUALITY:
+					code.add(JumpFalse, trueLabel);
+					code.add(Jump, falseLabel);
+					break;
+				case INEQUALITY:
+					code.add(JumpTrue, trueLabel);
+					code.add(Jump, falseLabel);
+					break;
+				}
+			}
 
 			code.add(Label, trueLabel);
 			code.add(PushI, 1);
