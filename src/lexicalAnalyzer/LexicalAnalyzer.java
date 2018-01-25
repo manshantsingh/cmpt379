@@ -205,6 +205,9 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		appendSubsequentIdentifierCharacters(buffer);
 
 		String lexeme = buffer.toString();
+		if(lexeme.length()>32) {
+			LexicalError(firstChar, "identifier can have at most 32 characters");
+		}
 		if(Keyword.isAKeyword(lexeme)) {
 			return LextantToken.make(firstChar.getLocation(), lexeme, Keyword.forLexeme(lexeme));
 		}
