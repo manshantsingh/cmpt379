@@ -44,5 +44,5 @@ exec {
 	const bracket := [ 4 + 4 | float ] * 2.2.
 	print bracket, _n_.
 
-	print _false_ == _false_, _n_.
+	print 3 == 3, _n_.
 }

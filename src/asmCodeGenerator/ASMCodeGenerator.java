@@ -12,6 +12,7 @@ import parseTree.*;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
+import parseTree.nodeTypes.CharacterConstantNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.FloatConstantNode;
@@ -144,7 +145,7 @@ public class ASMCodeGenerator {
 			else if(node.getType() == PrimitiveType.FLOAT) {
 				code.add(LoadF);
 			}
-			else if(node.getType() == PrimitiveType.BOOLEAN) {
+			else if(node.getType() == PrimitiveType.BOOLEAN || node.getType() == PrimitiveType.CHARACTER) {
 				code.add(LoadC);
 			}	
 			else {
@@ -215,7 +216,7 @@ public class ASMCodeGenerator {
 			if(type == PrimitiveType.FLOAT) {
 				return StoreF;
 			}
-			if(type == PrimitiveType.BOOLEAN) {
+			if(type == PrimitiveType.BOOLEAN || type == PrimitiveType.CHARACTER) {
 				return StoreC;
 			}
 			assert false: "Type " + type + " unimplemented in opcodeForStore()";
@@ -268,8 +269,8 @@ public class ASMCodeGenerator {
 			code.append(arg2);
 			code.add(Label, subLabel);
 
-			// TODO: char and string type
-			if(type == PrimitiveType.INTEGER) {
+			// TODO: confirm char and string type
+			if(type == PrimitiveType.INTEGER || type == PrimitiveType.CHARACTER) {
 				code.add(Subtract);
 				switch(cmp) {
 				case GREATER:
@@ -411,6 +412,11 @@ public class ASMCodeGenerator {
 			newValueCode(node);
 			
 			code.add(PushF, node.getValue());
+		}
+		public void visit(CharacterConstantNode node) {
+			newValueCode(node);
+
+			code.add(PushI, node.getValue());
 		}
 	}
 

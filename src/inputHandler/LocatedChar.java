@@ -50,11 +50,11 @@ public class LocatedChar {
 	//////////////////////////////////////////////////////////////////////////////
 	// delegates
 	
-	public boolean isAlphaOrUnderscore() {
+	public boolean isIdentifierStart() {
 		return Character.isLowerCase(character) || Character.isUpperCase(character) || character == '_';
 	}
 	public boolean isIdentifierSubsequentCharacter() {
-		return isAlphaOrUnderscore() || isDigit() || character == '$';
+		return isIdentifierStart() || isDigit() || character == '$';
 	}
 	public boolean isNumberStart() {
 		return isDigit() || isPlusOrMinus() || isDecimal();
@@ -72,11 +72,27 @@ public class LocatedChar {
 		return Character.isWhitespace(character);
 	}
 
-	public boolean isCommentStart() {
+	public boolean isCommentMarker() {
 		return character == '#';
 	}
 
+	public boolean isCharacterMarker() {
+		return character == '^';
+	}
+
+	public boolean isStringMarker() {
+		return character == '"';
+	}
+
 	public boolean isCommentEnd() {
-		return character == '#' || character =='\n';
+		return isCommentMarker() || isNewline();
+	}
+
+	public boolean isStringEnd() {
+		return isStringMarker() || isNewline();
+	}
+
+	public boolean isNewline() {
+		return character == '\n';
 	}
 }

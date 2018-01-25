@@ -7,6 +7,7 @@ import parseTree.*;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
+import parseTree.nodeTypes.CharacterConstantNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
@@ -314,11 +315,14 @@ public class Parser {
 			return syntaxErrorNode("literal");
 		}
 		
-		if(startsIntNumber(nowReading)) {
-			return parseIntNumber();
+		if(startsIntConstant(nowReading)) {
+			return parseIntConstant();
 		}
-		if(startsFloatNumber(nowReading)) {
-			return parseFloatNumber();
+		if(startsFloatConstant(nowReading)) {
+			return parseFloatConstant();
+		}
+		if(startsCharacterConstant(nowReading)) {
+			return parseCharacterConstant();
 		}
 		if(startsIdentifier(nowReading)) {
 			return parseIdentifier();
@@ -330,8 +334,9 @@ public class Parser {
 		return syntaxErrorNode("literal");
 	}
 	private boolean startsLiteral(Token token) {
-		return startsIntNumber(token) ||
-				startsFloatNumber(token) ||
+		return startsIntConstant(token) ||
+				startsFloatConstant(token) ||
+				startsCharacterConstant(token) ||
 				startsIdentifier(token) ||
 				startsBooleanConstant(token);
 	}
@@ -375,26 +380,37 @@ public class Parser {
 	}
 
 	// number (terminal)
-	private ParseNode parseIntNumber() {
-		if(!startsIntNumber(nowReading)) {
+	private ParseNode parseIntConstant() {
+		if(!startsIntConstant(nowReading)) {
 			return syntaxErrorNode("integer constant");
 		}
 		readToken();
 		return new IntegerConstantNode(previouslyRead);
 	}
-	private boolean startsIntNumber(Token token) {
+	private boolean startsIntConstant(Token token) {
 		return token instanceof IntegerConstantToken;
 	}
 	
-	private ParseNode parseFloatNumber() {
-		if(!startsFloatNumber(nowReading)) {
+	private ParseNode parseFloatConstant() {
+		if(!startsFloatConstant(nowReading)) {
 			return syntaxErrorNode("float constant");
 		}
 		readToken();
 		return new FloatConstantNode(previouslyRead);
 	}
-	private boolean startsFloatNumber(Token token) {
+	private boolean startsFloatConstant(Token token) {
 		return token instanceof FloatConstantToken;
+	}
+
+	private ParseNode parseCharacterConstant() {
+		if(!startsCharacterConstant(nowReading)) {
+			return syntaxErrorNode("character constant");
+		}
+		readToken();
+		return new CharacterConstantNode(previouslyRead);
+	}
+	private boolean startsCharacterConstant(Token token) {
+		return token instanceof CharacterConstantToken;
 	}
 
 	// identifier (terminal)

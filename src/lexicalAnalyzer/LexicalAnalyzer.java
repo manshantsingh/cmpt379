@@ -7,10 +7,12 @@ import inputHandler.LocatedChar;
 import inputHandler.LocatedCharStream;
 import inputHandler.PushbackCharStream;
 import inputHandler.TextLocation;
+import tokens.CharacterConstantToken;
 import tokens.FloatConstantToken;
 import tokens.IdentifierToken;
 import tokens.LextantToken;
 import tokens.NullToken;
+import tokens.StringConstantToken;
 import tokens.IntegerConstantToken;
 import tokens.Token;
 
@@ -36,28 +38,33 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	@Override
 	protected Token findNextToken() {
 		LocatedChar ch = nextNonWhitespaceChar();
-		
-		while(ch.isCommentStart()) {
+
+		while(ch.isCommentMarker()) {
 			ch = endOfCommentNonWhiteSpaceChar();
+		}
+
+		if(ch.isCharacterMarker()) {
+			return scanCharacter(ch);
+		}
+		if(ch.isStringMarker()) {
+			return scanString(ch);
+		}
+		if(ch.isIdentifierStart()) {
+			return scanIdentifier(ch);
 		}
 
 		if(ch.isNumberStart()) {
 			Token token = scanNumber(ch);
 			if(token != null) return token;
 		}
-		if(ch.isAlphaOrUnderscore()) {
-			return scanIdentifier(ch);
-		}
-		else if(isPunctuatorStart(ch)) {
+		if(isPunctuatorStart(ch)) {
 			return PunctuatorScanner.scan(ch, input);
 		}
-		else if(isEndOfInput(ch)) {
+		if(isEndOfInput(ch)) {
 			return NullToken.make(ch.getLocation());
 		}
-		else {
-			lexicalError(ch);
-			return findNextToken();
-		}
+		lexicalError(ch);
+		return findNextToken();
 	}
 
 	private LocatedChar nextNonWhitespaceChar() {
@@ -67,7 +74,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		}
 		return ch;
 	}
-	
+
 	private LocatedChar endOfCommentNonWhiteSpaceChar() {
 		LocatedChar ch = input.next();
 		while(!ch.isCommentEnd()) {
@@ -78,6 +85,37 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			ch = input.next();
 		}
 		return ch;
+	}
+
+	private Token scanCharacter(LocatedChar firstChar) {
+		LocatedChar ch = input.next();
+		char c = ch.getCharacter();
+		Token t =  CharacterConstantToken.make(firstChar.getLocation(), ""+c);
+		if(c<32 || c>126) {
+			LexicalError(ch, "invalid ascii character (valid encoding is decimal 32 to 126)");
+		}
+		LocatedChar end = input.next();
+		if(!end.isCharacterMarker()) {
+			LexicalError(ch, "missing '^' after");
+			input.pushback(end);
+		}
+		return t;
+	}
+
+	private Token scanString(LocatedChar firstChar) {
+		StringBuffer buffer = new StringBuffer();
+		LocatedChar ch = input.next();
+		LocatedChar lastValid = firstChar;
+		while(!ch.isStringEnd()) {
+			buffer.append(ch.getCharacter());
+			lastValid = ch;
+			ch = input.next();
+		}
+		if(!ch.isStringMarker()) {
+			LexicalError(lastValid, "missing '\"' after");
+			input.pushback(ch);
+		}
+		return StringConstantToken.make(firstChar.getLocation(), buffer.toString());
 	}
 
 
@@ -195,15 +233,17 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	private boolean isEndOfInput(LocatedChar lc) {
 		return lc == LocatedCharStream.FLAG_END_OF_INPUT;
 	}
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////////////
 	// Error-reporting	
 
 	private void lexicalError(LocatedChar ch) {
-		PikaLogger log = PikaLogger.getLogger("compiler.lexicalAnalyzer");
-		log.severe("Lexical error: invalid character " + ch);
+		LexicalError(ch, "invalid character");
 	}
 
-	
+	private void LexicalError(LocatedChar ch, String msg) {
+		PikaLogger log = PikaLogger.getLogger("compiler.lexicalAnalyzer");
+		log.severe("Lexical error: " + msg + " " + ch);
+	}
 }
