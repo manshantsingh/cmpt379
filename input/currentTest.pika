@@ -20,7 +20,7 @@ exec {
 	const boof := _false_.
     
 	print boot; boof, _n_.
-	print boot, boof, _n_.
+	print boot, _t_, _t_, boof, _n_.
 
 	const avogadro := -6.022E+23.
 	const pi := 3.14159.

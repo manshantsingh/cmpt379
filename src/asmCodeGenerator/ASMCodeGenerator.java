@@ -22,6 +22,7 @@ import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
+import parseTree.nodeTypes.TabSpaceNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
@@ -194,6 +195,11 @@ public class ASMCodeGenerator {
 		public void visit(SpaceNode node) {
 			newVoidCode(node);
 			code.add(PushD, RunTime.SPACE_PRINT_FORMAT);
+			code.add(Printf);
+		}
+		public void visit(TabSpaceNode node) {
+			newVoidCode(node);
+			code.add(PushD, RunTime.TAB_SPACE_PRINT_FORMAT);
 			code.add(Printf);
 		}
 		
