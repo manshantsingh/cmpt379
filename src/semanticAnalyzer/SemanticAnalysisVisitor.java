@@ -144,7 +144,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			}
 			// TODO: Confirm char to int conversions
 		}
-		typeCheckError(node, Arrays.asList(from, to));
+		castTypeCheckError(node, from, to);
 		node.setType(PrimitiveType.ERROR);
 	}
 	private Lextant operatorFor(BinaryOperatorNode node) {
@@ -207,6 +207,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		
 		logError("operator " + token.getLexeme() + " not defined for types " 
 				 + operandTypes  + " at " + token.getLocation());	
+	}
+	private void castTypeCheckError(ParseNode node, Type from, Type to) {
+		logError("Cannot cast from "+from+" to "+to+" at " + node.getToken().getLocation());
 	}
 	private void logError(String message) {
 		PikaLogger log = PikaLogger.getLogger("compiler.semanticAnalyzer");
