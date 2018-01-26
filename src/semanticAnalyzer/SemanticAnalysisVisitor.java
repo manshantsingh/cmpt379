@@ -5,6 +5,7 @@ import java.util.List;
 
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
+import lexicalAnalyzer.Punctuator;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
@@ -13,7 +14,7 @@ import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterConstantNode;
-import parseTree.nodeTypes.MainBlockNode;
+import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
@@ -23,6 +24,7 @@ import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
+import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.FunctionSignatures;
@@ -48,9 +50,11 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	public void visitLeave(ProgramNode node) {
 		leaveScope(node);
 	}
-	public void visitEnter(MainBlockNode node) {
+	public void visitEnter(BlockStatementsNode node) {
+		enterSubscope(node);
 	}
-	public void visitLeave(MainBlockNode node) {
+	public void visitLeave(BlockStatementsNode node) {
+		leaveScope(node);
 	}
 	
 	
@@ -59,8 +63,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	private void enterProgramScope(ParseNode node) {
 		Scope scope = Scope.createProgramScope();
 		node.setScope(scope);
-	}	
-	@SuppressWarnings("unused")
+	}
 	private void enterSubscope(ParseNode node) {
 		Scope baseScope = node.getLocalScope();
 		Scope scope = baseScope.createSubscope();
@@ -136,35 +139,16 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			node.setType(from);
 			return;
 		}
-		if(from == PrimitiveType.INTEGER) {
-			if(to == PrimitiveType.FLOAT) {
-				node.setSignature(FunctionSignature.INT_TO_FLOAT);
-				return;
-			}
-			if(to == PrimitiveType.CHARACTER) {
-				node.setSignature(FunctionSignature.INT_TO_CHAR);
-				return;
-			}
-			if(to == PrimitiveType.BOOLEAN) {
-				// TODO: do the bool
-				return;
-			}
+		List<Type> params = Arrays.asList(from);
+		FunctionSignature signature = FunctionSignatures.signaturesOf(Punctuator.PIPE).acceptingSignature(params,to);
+
+		if(signature.accepts(params, to)) {
+			node.setSignature(signature);
 		}
-		if(from == PrimitiveType.FLOAT) {
-			if(to == PrimitiveType.INTEGER) {
-				node.setSignature(FunctionSignature.FLOAT_TO_INT);
-				return;
-			}
+		else {
+			castTypeCheckError(node, from, to);
+			node.setType(PrimitiveType.ERROR);
 		}
-		if(from == PrimitiveType.CHARACTER) {
-			if(to == PrimitiveType.BOOLEAN) {
-				// TODO: do the bool
-				return;
-			}
-			// TODO: Confirm char to int conversions
-		}
-		castTypeCheckError(node, from, to);
-		node.setType(PrimitiveType.ERROR);
 	}
 	private Lextant operatorFor(BinaryOperatorNode node) {
 		LextantToken token = (LextantToken) node.getToken();
@@ -193,6 +177,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visit(CharacterConstantNode node) {
 		node.setType(PrimitiveType.CHARACTER);
+	}
+	@Override
+	public void visit(StringConstantNode node) {
+		node.setType(PrimitiveType.STRING);
 	}
 	@Override
 	public void visit(NewlineNode node) {

@@ -9,7 +9,7 @@ import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterConstantNode;
-import parseTree.nodeTypes.MainBlockNode;
+import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
@@ -19,6 +19,7 @@ import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
+import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
 import tokens.*;
 import lexicalAnalyzer.Keyword;
@@ -57,7 +58,7 @@ public class Parser {
 		ParseNode program = new ProgramNode(nowReading);
 		
 		expect(Keyword.EXEC);
-		ParseNode mainBlock = parseMainBlock();
+		ParseNode mainBlock = parseBlockStatements();
 		program.appendChild(mainBlock);
 		
 		if(!(nowReading instanceof NullToken)) {
@@ -75,11 +76,11 @@ public class Parser {
 	// mainBlock
 	
 	// mainBlock -> { statement* }
-	private ParseNode parseMainBlock() {
-		if(!startsMainBlock(nowReading)) {
+	private ParseNode parseBlockStatements() {
+		if(!startsBlockStatements(nowReading)) {
 			return syntaxErrorNode("mainBlock");
 		}
-		ParseNode mainBlock = new MainBlockNode(nowReading);
+		ParseNode mainBlock = new BlockStatementsNode(nowReading);
 		expect(Punctuator.OPEN_BRACE);
 		
 		while(startsStatement(nowReading)) {
@@ -89,7 +90,7 @@ public class Parser {
 		expect(Punctuator.CLOSE_BRACE);
 		return mainBlock;
 	}
-	private boolean startsMainBlock(Token token) {
+	private boolean startsBlockStatements(Token token) {
 		return token.isLextant(Punctuator.OPEN_BRACE);
 	}
 	
@@ -111,12 +112,16 @@ public class Parser {
 		if(startsPrintStatement(nowReading)) {
 			return parsePrintStatement();
 		}
+		if(startsBlockStatements(nowReading)) {
+			return parseBlockStatements();
+		}
 		return syntaxErrorNode("statement");
 	}
 	private boolean startsStatement(Token token) {
 		return startsPrintStatement(token) ||
 				startsAssignment(token) ||
-				startsDeclaration(token);
+				startsDeclaration(token) ||
+				startsBlockStatements(token);
 	}
 	
 	// printStmt -> PRINT printExpressionList .
@@ -348,6 +353,9 @@ public class Parser {
 		if(startsCharacterConstant(nowReading)) {
 			return parseCharacterConstant();
 		}
+		if(startsStringConstant(nowReading)) {
+			return parseStringConstant();
+		}
 		if(startsIdentifier(nowReading)) {
 			return parseIdentifier();
 		}
@@ -361,6 +369,7 @@ public class Parser {
 		return startsIntConstant(token) ||
 				startsFloatConstant(token) ||
 				startsCharacterConstant(token) ||
+				startsStringConstant(token) ||
 				startsIdentifier(token) ||
 				startsBooleanConstant(token);
 	}
@@ -435,6 +444,17 @@ public class Parser {
 	}
 	private boolean startsCharacterConstant(Token token) {
 		return token instanceof CharacterConstantToken;
+	}
+
+	private ParseNode parseStringConstant() {
+		if(!startsStringConstant(nowReading)) {
+			return syntaxErrorNode("string constant");
+		}
+		readToken();
+		return new StringConstantNode(previouslyRead);
+	}
+	private boolean startsStringConstant(Token token) {
+		return token instanceof StringConstantToken;
 	}
 
 	// identifier (terminal)

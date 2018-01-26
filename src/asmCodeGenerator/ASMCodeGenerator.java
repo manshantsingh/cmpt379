@@ -14,7 +14,7 @@ import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterConstantNode;
-import parseTree.nodeTypes.MainBlockNode;
+import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.FloatConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
@@ -23,6 +23,7 @@ import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
+import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.types.PrimitiveType;
@@ -141,7 +142,7 @@ public class ASMCodeGenerator {
 			}	
 		}
 		private void turnAddressIntoValue(ASMCodeFragment code, ParseNode node) {
-			if(node.getType() == PrimitiveType.INTEGER) {
+			if(node.getType() == PrimitiveType.INTEGER || node.getType() == PrimitiveType.STRING) {
 				code.add(LoadI);
 			}
 			else if(node.getType() == PrimitiveType.FLOAT) {
@@ -173,7 +174,7 @@ public class ASMCodeGenerator {
 				code.append(childCode);
 			}
 		}
-		public void visitLeave(MainBlockNode node) {
+		public void visitLeave(BlockStatementsNode node) {
 			newVoidCode(node);
 			for(ParseNode child : node.getChildren()) {
 				ASMCodeFragment childCode = removeVoidCode(child);
@@ -230,7 +231,7 @@ public class ASMCodeGenerator {
 		}
 
 		private ASMOpcode opcodeForStore(Type type) {
-			if(type == PrimitiveType.INTEGER) {
+			if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING) {
 				return StoreI;
 			}
 			if(type == PrimitiveType.FLOAT) {
@@ -361,6 +362,19 @@ public class ASMCodeGenerator {
 					break;
 				}
 			}
+			else if(type==PrimitiveType.STRING) {
+				code.add(Subtract);
+				switch(cmp) {
+				case EQUALITY:
+					code.add(JumpFalse, trueLabel);
+					code.add(Jump, falseLabel);
+					break;
+				case INEQUALITY:
+					code.add(JumpTrue, trueLabel);
+					code.add(Jump, falseLabel);
+					break;
+				}
+			}
 
 			code.add(Label, trueLabel);
 			code.add(PushI, 1);
@@ -395,7 +409,7 @@ public class ASMCodeGenerator {
 				code.append(fragment);
 			}
 			else {
-				// TODO: Throw Exception
+				// Do nothing
 			}
 		}
 
@@ -438,6 +452,15 @@ public class ASMCodeGenerator {
 
 			code.add(PushI, node.getValue());
 		}
-	}
+		public void visit(StringConstantNode node) {
+			newValueCode(node);
 
+			Labeller labeller = new Labeller("stringConst");
+			String strLabel = labeller.newLabel(node.getValue());
+
+			code.add(DLabel, strLabel);
+			code.add(PushD, strLabel);
+			code.add(DataS, node.getValue());
+		}
+	}
 }

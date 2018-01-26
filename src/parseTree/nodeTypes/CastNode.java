@@ -5,7 +5,6 @@ import parseTree.ParseNodeVisitor;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
-import tokens.FloatConstantToken;
 import tokens.LextantToken;
 import tokens.Token;
 

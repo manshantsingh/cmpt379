@@ -29,6 +29,18 @@ exec {
 	print avogadro; _n_.
 	print pi; _n_.
 
+	{
+		const wow:=5.6.
+		print wow,_t_,_n_.
+	}
+
+	{
+		const another:=5.6.
+		print another,_t_,_n_.
+		const wow:=5.6.
+		print wow,_t_,_n_.
+	}
+
 	const Another$amp1e := avogadro * pi + twoPi * twoPi.
 	print Another$amp1e, _n_.
 
@@ -47,4 +59,17 @@ exec {
 	print bracket, _n_.
 
 	print 3 == 3, _n_.
+
+	const h := ^h^.
+	print h, _n_.
+
+	var hehe := "hehe".
+	print hehe, _n_.
+
+	const lol:="this should work".
+	print lol, _n_.
+
+	hehe := lol.
+	print hehe == lol.
+
 }

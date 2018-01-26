@@ -5,8 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import asmCodeGenerator.EmptyCodeGenerator;
+import asmCodeGenerator.BooleanCastCodeGenerator;
 import asmCodeGenerator.FloatingDivideCodeGenerator;
+import asmCodeGenerator.IntegerCharacterCastCodeGenerator;
 import asmCodeGenerator.IntegerDivideCodeGenerator;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import lexicalAnalyzer.Punctuator;
@@ -38,6 +39,14 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 	public FunctionSignature acceptingSignature(List<Type> types) {
 		for(FunctionSignature functionSignature: this) {
 			if(functionSignature.accepts(types)) {
+				return functionSignature;
+			}
+		}
+		return FunctionSignature.nullInstance();
+	}
+	public FunctionSignature acceptingSignature(List<Type> types, Type returnType) {
+		for(FunctionSignature functionSignature: this) {
+			if(functionSignature.accepts(types, returnType)) {
 				return functionSignature;
 			}
 		}
@@ -95,9 +104,11 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 
 		new FunctionSignatures(Punctuator.PIPE,
 		    new FunctionSignature(ASMOpcode.ConvertF, PrimitiveType.INTEGER, PrimitiveType.FLOAT),
-		    new FunctionSignature(new EmptyCodeGenerator(), PrimitiveType.INTEGER, PrimitiveType.CHARACTER),
-		    new FunctionSignature(ASMOpcode.ConvertI, PrimitiveType.INTEGER, PrimitiveType.FLOAT)
-		    // TODO: int/char to bool and any cast to itself
+		    new FunctionSignature(ASMOpcode.ConvertI, PrimitiveType.FLOAT, PrimitiveType.INTEGER),
+		    new FunctionSignature(new IntegerCharacterCastCodeGenerator(), PrimitiveType.INTEGER, PrimitiveType.CHARACTER),
+		    new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.INTEGER),
+		    new FunctionSignature(new BooleanCastCodeGenerator(PrimitiveType.INTEGER), PrimitiveType.INTEGER, PrimitiveType.BOOLEAN),
+		    new FunctionSignature(new BooleanCastCodeGenerator(PrimitiveType.CHARACTER), PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN)
 		);
 
 		for(Punctuator cmp: Punctuator.COMPARISONS) {
@@ -105,9 +116,10 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 			FunctionSignature c = new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN);
 			FunctionSignature f = new FunctionSignature(1, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.BOOLEAN);
 			FunctionSignature b = new FunctionSignature(1, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN);
+			FunctionSignature s = new FunctionSignature(1, PrimitiveType.STRING, PrimitiveType.STRING, PrimitiveType.BOOLEAN);
 
 			if(cmp == Punctuator.EQUALITY || cmp == Punctuator.INEQUALITY) {
-				new FunctionSignatures(cmp, i, c, f, b);
+				new FunctionSignatures(cmp, i, c, f, b, s);
 			}
 			else {
 				new FunctionSignatures(cmp, i, c, f);

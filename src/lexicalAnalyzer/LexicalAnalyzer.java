@@ -6,7 +6,6 @@ import inputHandler.InputHandler;
 import inputHandler.LocatedChar;
 import inputHandler.LocatedCharStream;
 import inputHandler.PushbackCharStream;
-import inputHandler.TextLocation;
 import tokens.CharacterConstantToken;
 import tokens.FloatConstantToken;
 import tokens.IdentifierToken;
