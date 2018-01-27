@@ -290,7 +290,6 @@ public class ASMCodeGenerator {
 			code.append(arg2);
 			code.add(Label, subLabel);
 
-			// TODO: confirm char and string type
 			if(type == PrimitiveType.INTEGER || type == PrimitiveType.CHARACTER) {
 				code.add(Subtract);
 				switch(cmp) {

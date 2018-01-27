@@ -1,75 +1,16 @@
 exec {
-	const quarters :=  6.
-	const dimes    :=  3.
-	const nickels  :=  7.
-	const pennies  := 17.
-    
-	const value := quarters * 25 -
-    			 dimes    * 10 +
-    			 nickels  *  5 +
-    			 pennies.
-	print value, _n_.
-    
-	const ncoins := quarters + dimes + nickels + pennies.
-	print ncoins, _n_.
-    
-	const moredimes := dimes > nickels.
-	print moredimes, _n_.
+	# const heh:=10.
+	# print heh*2, _n_.
+	# print heh*2 + 3 - 3 * 3, _n_.
+	# print [heh*2+(3- 3)*3|float]*.2,_n_.const lol:=4.
+	const a:=[9+ +9|float]+(+9.9+ +.9+ +9.9E9)+ +9.9E+9+ +.9E9+ +.9E+9.print a.
+	# print heh*2 + -3 - 3 * -3, _n_.
 
-	const boot := _true_.
-	const boof := _false_.
-    
-	print boot; boof, _n_.
-	print boot, _t_, _t_, boof, _n_.
+	# var hi :=220.
+	# var charhi:=[ hi | char ].
 
-	const avogadro := -6.022E+23.
-	const pi := 3.14159.
-	const twoPi := pi + pi.
-	print twoPi; _n_.
-	print avogadro; _n_.
-	print pi; _n_.
+	# print hi,charhi, _n_.
+	# print _n_.
 
-	{
-		const wow:=5.6.
-		print wow,_t_,_n_.
-	}
-
-	{
-		const another:=5.6.
-		print another,_t_,_n_.
-		const wow:=5.6.
-		print wow,_t_,_n_.
-	}
-
-	const Another$amp1e := avogadro * pi + twoPi * twoPi.
-	print Another$amp1e, _n_.
-
-	const literals := 5 * 7 - 10.
-	print literals, _n_.
-
-	const testDivideI := 4 / 2 * 6 + 1.
-	print testDivideI, _n_.
-
-	const testDivideF := 4.1 / 2.0 * 6.1 - -1.4E-1.
-	print testDivideF, _n_.
-
-	var bracket := [ 4 + 4 | float ] * 2.2.
-	print bracket, _n_.
-	bracket := 3.1.
-	print bracket, _n_.
-
-	print 3 == 3, _n_.
-
-	const h := ^h^.
-	print h, _n_.
-
-	var hehe := "hehe".
-	print hehe, _n_.
-
-	const lol:="this should work".
-	print lol, _n_.
-
-	hehe := lol.
-	print hehe == lol.
-
+	#heh:=10.
 }

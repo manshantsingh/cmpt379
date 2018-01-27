@@ -161,12 +161,11 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			}
 		}
 		else {
+			input.pushback(c);
 			if(b && list.size()>0) {
-				input.pushback(c);
 				return IntegerConstantToken.make(firstChar.getLocation(), locatedCharListToString(list));
 			}
 		}
-
 		// Note: we are ignoring the last character here since findNextToken
 		//       has already scanned it
 		for(int i=list.size()-1; i>0; i--) {
