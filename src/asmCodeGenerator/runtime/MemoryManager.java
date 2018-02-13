@@ -7,7 +7,7 @@ import asmCodeGenerator.Labeller;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 
 public class MemoryManager {
-	// Debug Mode. DEBUGGING Adds debug code and executes insertDebugMain when the program is initiailzed.
+	// Debug Mode. DEBUGGING Adds debug code and executes insertDebugMain when the program is initialized.
 	// Debug Mode. DEBUGGING2 does not insertDebugMain, but prints allocation diagnostics.
 	private static final boolean DEBUGGING = false;
 	private static final boolean DEBUGGING2 = false;		// does not insertDebugMain
@@ -428,10 +428,14 @@ public class MemoryManager {
 		frag.add(Subtract);								// [... block]
 		storeITo(frag, MMGR_DEALLOC_BLOCK);				// [...]
 		
-		// firstFree.prev = block
+		// if(firstFree != 0) { firstFree.prev = block }
+		String bypassLabel = "-mmgr-bypass-firstFree";
+		loadIFrom(frag, MEM_MANAGER_FIRST_FREE_BLOCK);
+		frag.add(JumpFalse, bypassLabel);
 		loadIFrom(frag, MMGR_DEALLOC_BLOCK);
 		loadIFrom(frag, MEM_MANAGER_FIRST_FREE_BLOCK);	// [... block firstFree]
-		writeTagPointer(frag);											
+		writeTagPointer(frag);		
+		frag.add(Label, bypassLabel);
 
 		// block.prev = 0
 		frag.add(PushI, 0);
@@ -452,7 +456,7 @@ public class MemoryManager {
 		// block.avail2 = 1;
 		frag.add(PushI, 1);						// [... 1]
 		loadIFrom(frag, MMGR_DEALLOC_BLOCK);	// [... 1 block]
-		tailTag(frag);						// [... 1 blockTail]
+		tailTag(frag);						    // [... 1 blockTail]
 		writeTagAvailable(frag);
 
 		// firstFree = block
