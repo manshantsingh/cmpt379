@@ -1,5 +1,6 @@
-package asmCodeGenerator;
+package asmCodeGenerator.operators;
 
+import asmCodeGenerator.SimpleCodeGenerator;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;

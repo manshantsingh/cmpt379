@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import asmCodeGenerator.BooleanCastCodeGenerator;
-import asmCodeGenerator.FloatingDivideCodeGenerator;
-import asmCodeGenerator.IntegerCharacterCastCodeGenerator;
-import asmCodeGenerator.IntegerDivideCodeGenerator;
 import asmCodeGenerator.codeStorage.ASMOpcode;
+import asmCodeGenerator.operators.BooleanCastCodeGenerator;
+import asmCodeGenerator.operators.FloatingDivideCodeGenerator;
+import asmCodeGenerator.operators.IntegerCharacterCastCodeGenerator;
+import asmCodeGenerator.operators.IntegerDivideCodeGenerator;
 import lexicalAnalyzer.Punctuator;
 import semanticAnalyzer.types.Type;
 import semanticAnalyzer.types.PrimitiveType;
