@@ -9,6 +9,7 @@ import lexicalAnalyzer.Punctuator;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
+import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
@@ -91,20 +92,20 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	@Override
 	public void visitLeave(AssignmentNode node) {
-		IdentifierNode identifier = (IdentifierNode) node.child(0);
+		ParseNode target = node.child(0);
 		ParseNode assignment = node.child(1);
-		Type identifierType = identifier.getType();
+		Type targetType = target.getType();
 		Type assignmentType = assignment.getType();
-		if(identifier.getBinding().isConstant()) {
-			assignmentToConstant(identifier.getToken());
+		if(target instanceof IdentifierNode && ((IdentifierNode)target).getBinding().isConstant()) {
+			assignmentToConstant(target.getToken());
 			node.setType(PrimitiveType.ERROR);
 		}
-		if(identifierType != assignmentType) {
-			assignmentTypeMismatchError(identifier.getToken(), identifierType, assignmentType);
+		if(!targetType.equivalent(assignmentType)) {
+			assignmentTypeMismatchError(target.getToken(), targetType, assignmentType);
 			node.setType(PrimitiveType.ERROR);
 		}
 		else {
-			node.setType(identifierType);
+			node.setType(targetType);
 		}
 	}
 
@@ -153,6 +154,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	private Lextant operatorFor(BinaryOperatorNode node) {
 		LextantToken token = (LextantToken) node.getToken();
 		return token.getLextant();
+	}
+
+	public void visitLeave(ArrayNode node) {
+		// TODO
 	}
 
 

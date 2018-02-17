@@ -1,5 +1,6 @@
 package semanticAnalyzer.types;
 
+import tokens.LextantToken;
 
 public enum PrimitiveType implements Type {
 	BOOLEAN(1),
@@ -33,5 +34,8 @@ public enum PrimitiveType implements Type {
 	}
 	public Type getConcreteType() {
 		return this;
+	}
+	public static PrimitiveType fromTypeVariable(LextantToken token) {
+		return valueOf(token.getLextant().toString());
 	}
 }

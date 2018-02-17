@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import logging.PikaLogger;
 import parseTree.*;
+import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
@@ -21,6 +22,9 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
+import semanticAnalyzer.types.Array;
+import semanticAnalyzer.types.PrimitiveType;
+import semanticAnalyzer.types.Type;
 import tokens.*;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
@@ -98,7 +102,7 @@ public class Parser {
 	///////////////////////////////////////////////////////////
 	// statements
 	
-	// statement-> declaration | printStmt
+	// statement-> declaration | assignment | printStmt | block
 	private ParseNode parseStatement() {
 		if(!startsStatement(nowReading)) {
 			return syntaxErrorNode("statement");
@@ -229,7 +233,7 @@ public class Parser {
 		if(!startsAssignment(nowReading)) {
 			return syntaxErrorNode("assignment");
 		}
-		ParseNode identifier = parseIdentifier();
+		ParseNode identifier = parseTargetable();
 		expect(Punctuator.ASSIGN);
 		ParseNode initializer = parseExpression();
 		expect(Punctuator.TERMINATOR);
@@ -332,10 +336,13 @@ public class Parser {
 		else if(startsBracket(nowReading)) {
 			return parseBracket();
 		}
+		else if(startsEmptyArrayCreation(nowReading)) {
+			return parseEmptyArrayCreation();
+		}
 		return syntaxErrorNode("atomic expression");
 	}
 	private boolean startsAtomicExpression(Token token) {
-		return startsLiteral(token) || startsBracket(token);
+		return startsLiteral(token) || startsBracket(token) || startsEmptyArrayCreation(token);
 	}
 	
 	// literal -> number | identifier | booleanConstant
@@ -357,7 +364,7 @@ public class Parser {
 			return parseStringConstant();
 		}
 		if(startsIdentifier(nowReading)) {
-			return parseIdentifier();
+			return parseTargetable();
 		}
 		if(startsBooleanConstant(nowReading)) {
 			return parseBooleanConstant();
@@ -372,6 +379,51 @@ public class Parser {
 				startsStringConstant(token) ||
 				startsIdentifier(token) ||
 				startsBooleanConstant(token);
+	}
+
+	private boolean startsEmptyArrayCreation(Token token) {
+		return token.isLextant(Keyword.NEW_KEYWORD);
+	}
+
+	private ParseNode parseEmptyArrayCreation() {
+		if(!startsEmptyArrayCreation(nowReading)) {
+			return syntaxErrorNode("empty array creation expression");
+		}
+		expect(Keyword.NEW_KEYWORD);
+		Token newToken = previouslyRead;
+		Type type = parseTypeVariable();
+		expect(Punctuator.OPEN_ROUND);
+		ParseNode exp = parseExpression();
+		expect(Punctuator.CLOSE_ROUND);
+		if(type instanceof Array) {
+			return ArrayNode.make(newToken, type, exp);
+		}
+		return syntaxErrorNode("empty array creation expression");
+	}
+
+	private Type parseTypeVariable() {
+		if(!startsType(nowReading)) {
+			syntaxError(nowReading, "expecting a type");
+			readToken();
+			return null;
+		}
+		if(startsArrayType(nowReading)) {
+			readToken();
+			Type subType = parseTypeVariable();
+			expect(Punctuator.CLOSE_SQUARE);
+			if(subType == null) {
+				return null;
+			}
+			return new Array(subType);
+		}
+		if(startsPrimativeType(nowReading)) {
+			readToken();
+			return PrimitiveType.fromTypeVariable((LextantToken) previouslyRead);
+		}
+		// Theoretically should not reach here
+		syntaxError(nowReading, "expecting a type");
+		readToken();
+		return null;
 	}
 
 	private boolean startsBracket(Token token) {
@@ -407,7 +459,6 @@ public class Parser {
 	}
 
 	private boolean startsArrayType(Token token) {
-		// TODO: still gotta use it
 		return token.isLextant(Punctuator.OPEN_SQUARE);
 	}
 
@@ -476,6 +527,19 @@ public class Parser {
 	}
 	private boolean startsIdentifier(Token token) {
 		return token instanceof IdentifierToken;
+	}
+
+	private ParseNode parseTargetable() {
+		ParseNode node = parseIdentifier();
+		while(nowReading.isLextant(Punctuator.OPEN_SQUARE)) {
+			Token token = LextantToken.artificial(nowReading, Punctuator.ARRAY_INDEXING);
+			readToken();
+			ParseNode index = parseExpression();
+
+			node = BinaryOperatorNode.withChildren(token, node, index);
+			expect(Punctuator.CLOSE_SQUARE);
+		}
+		return node;
 	}
 
 	// boolean constant (terminal)

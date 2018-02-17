@@ -29,8 +29,7 @@ public class CastNode extends ParseNode {
 	public CastNode(Token token) {
 		super(token);
 		assert(token instanceof LextantToken);
-		LextantToken l=(LextantToken) token;
-		resultType = PrimitiveType.valueOf(l.getLextant().toString());
+		resultType = PrimitiveType.fromTypeVariable((LextantToken) token);
 	}
 
 	public CastNode(ParseNode node) {

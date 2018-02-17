@@ -30,6 +30,8 @@ public class RecordsCodeGenerator {
 
 		writeIBaseOffset(code, RECORD_CREATION_TEMPORARY, ARRAY_SUBELEMENT_SIZE_OFFSET, subTypeSize);
 		writeIPtrOffset(code, RECORD_CREATION_TEMPORARY, ARRAY_LENGTH_OFFSET);
+
+		Macros.loadIFrom(code, RECORD_CREATION_TEMPORARY);
 	}
 
 	private static void createRecord(ASMCodeFragment code, int typeCode, int statusFlags) {

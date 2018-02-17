@@ -10,6 +10,7 @@ import asmCodeGenerator.runtime.RunTime;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
 import parseTree.*;
+import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
@@ -27,12 +28,14 @@ import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
 import semanticAnalyzer.signatures.FunctionSignature;
+import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
 import symbolTable.Scope;
 import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
+import static asmCodeGenerator.ASMConstants.*;
 
 // do not call the code generator if any errors have occurred during analysis.
 public class ASMCodeGenerator {
@@ -144,13 +147,14 @@ public class ASMCodeGenerator {
 			}	
 		}
 		private void turnAddressIntoValue(ASMCodeFragment code, ParseNode node) {
-			if(node.getType() == PrimitiveType.INTEGER || node.getType() == PrimitiveType.STRING) {
+			Type type = node.getType();
+			if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING || type instanceof Array) {
 				code.add(LoadI);
 			}
-			else if(node.getType() == PrimitiveType.FLOAT) {
+			else if(type == PrimitiveType.FLOAT) {
 				code.add(LoadF);
 			}
-			else if(node.getType() == PrimitiveType.BOOLEAN || node.getType() == PrimitiveType.CHARACTER) {
+			else if(type == PrimitiveType.BOOLEAN || type == PrimitiveType.CHARACTER) {
 				code.add(LoadC);
 			}	
 			else {
@@ -233,7 +237,7 @@ public class ASMCodeGenerator {
 		}
 
 		private ASMOpcode opcodeForStore(Type type) {
-			if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING) {
+			if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING || type instanceof Array) {
 				return StoreI;
 			}
 			if(type == PrimitiveType.FLOAT) {
@@ -387,14 +391,42 @@ public class ASMCodeGenerator {
 
 		}
 		private void visitNormalBinaryOperatorNode(BinaryOperatorNode node) {
-			newValueCode(node);
-			ASMCodeFragment arg1 = removeValueCode(node.child(0));
+			ParseNode firstChild = node.child(0);
+			if(firstChild.getType() instanceof Array) {
+				newAddressCode(node);
+			}
+			else {
+				newValueCode(node);
+			}
+
+			ASMCodeFragment arg1 = removeValueCode(firstChild);
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 			
 			code.append(arg1);
 			code.append(arg2);
 			
 			callFunctionSignature(node, node.getSignature());
+		}
+
+		public void visitLeave(ArrayNode node) {
+			newValueCode(node);
+			if(node.getSizeExpression() != null) {
+				ASMCodeFragment arg1 = removeValueCode(node.child(0));
+				code.append(arg1);
+				int statusFlags;
+				Type subType = node.getType().getSubType();
+				if(subType instanceof Array || subType == PrimitiveType.STRING) {
+					statusFlags = ARRAY_STATUS_WITH_REFERENCE_SUBTYPE;
+				}
+				else {
+					statusFlags = ARRAY_STATUS_WITHOUT_REFERENCE_SUBTYPE;
+				}
+				RecordsCodeGenerator.createEmptyArrayRecord(code, statusFlags, subType.getSize());
+			}
+			else {
+				// TODO
+				System.out.println("TODO: more todo");
+			}
 		}
 
 		private void callFunctionSignature(ParseNode node, FunctionSignature signature) {

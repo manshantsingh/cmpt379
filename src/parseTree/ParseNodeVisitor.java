@@ -1,5 +1,6 @@
 package parseTree;
 
+import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
@@ -46,6 +47,9 @@ public interface ParseNodeVisitor {
 
 	void visitEnter(ProgramNode node);
 	void visitLeave(ProgramNode node);
+
+	void visitEnter(ArrayNode node);
+	void visitLeave(ArrayNode node);
 
 
 	// leaf nodes: visitLeaf only
@@ -122,6 +126,12 @@ public interface ParseNodeVisitor {
 			defaultVisitEnter(node);
 		}
 		public void visitLeave(ProgramNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(ArrayNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(ArrayNode node) {
 			defaultVisitLeave(node);
 		}
 		

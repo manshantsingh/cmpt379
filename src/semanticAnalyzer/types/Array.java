@@ -10,8 +10,8 @@ public class Array implements Type {
 
 	@Override
 	public int getSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		// TODO confirm this again
+		return 4;
 	}
 
 	@Override
@@ -33,5 +33,9 @@ public class Array implements Type {
 
 	public Type getConcreteType() {
 		return new Array(subType.getConcreteType());
+	}
+
+	public String toString() {
+		return infoString();
 	}
 }
