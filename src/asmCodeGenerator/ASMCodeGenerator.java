@@ -5,6 +5,7 @@ import java.util.Map;
 
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMOpcode;
+import asmCodeGenerator.runtime.MemoryManager;
 import asmCodeGenerator.runtime.RunTime;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
@@ -48,11 +49,12 @@ public class ASMCodeGenerator {
 	
 	public ASMCodeFragment makeASM() {
 		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
-		
+
+		code.append( MemoryManager.codeForInitialization() );
 		code.append( RunTime.getEnvironment() );
 		code.append( globalVariableBlockASM() );
 		code.append( programASM() );
-//		code.append( MemoryManager.codeForAfterApplication() );
+		code.append( MemoryManager.codeForAfterApplication() );
 		
 		return code;
 	}

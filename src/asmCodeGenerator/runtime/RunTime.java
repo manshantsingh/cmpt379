@@ -2,6 +2,7 @@ package asmCodeGenerator.runtime;
 import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 
+import asmCodeGenerator.Labeller;
 import asmCodeGenerator.Macros;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 public class RunTime {
@@ -27,9 +28,15 @@ public class RunTime {
 
 	public static final String NULL_ARRAY_RUNTIME_ERROR = "$$a-null-array-runtime_error";
 	public static final String INDEX_OUT_OF_BOUND_ARRAY_RUNTIME_ERROR = "$$a-index-out-of-bound-runtime_error";
+	public static final String NEGATIVE_LENGTH_ARRAY_RUNTIME_ERROR = "$$a-negative-length-runtime_error";
 
-	public static final String ARRAY_INDEXING_ARRAY = "$a-indexing-array";
-	public static final String ARRAY_INDEXING_INDEX = "$a-indexing-index";
+	public static final String RECORD_CREATION_TEMPORARY = "$$record-create-temporary";
+	public static final String ARRAY_INDEXING_ARRAY = "$$a-indexing-array";
+	public static final String ARRAY_INDEXING_INDEX = "$$a-indexing-index";
+
+	public static final String CLEAR_N_BYTES = "$procedure-clear-n-bytes";
+	public static final String CLEAR_N_BYTES_RETURN_ADDRESS = "$procedure-clear-n-bytes-ret-addr";
+
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
@@ -37,14 +44,27 @@ public class RunTime {
 		result.append(stringsForPrintf());
 		result.append(runtimeErrors());
 		result.append(temporaryVariables());
+		result.append(additionalSubroutines());
 		result.add(DLabel, USABLE_MEMORY_START);
 		return result;
 	}
 	
 	private ASMCodeFragment temporaryVariables() {
 		ASMCodeFragment frag  = new ASMCodeFragment(GENERATES_VOID);
+
+		Macros.declareI(frag, RECORD_CREATION_TEMPORARY);
+
 		Macros.declareI(frag, ARRAY_INDEXING_ARRAY);
 		Macros.declareI(frag, ARRAY_INDEXING_INDEX);
+
+		Macros.declareI(frag, CLEAR_N_BYTES_RETURN_ADDRESS);
+
+		return frag;
+	}
+
+	private ASMCodeFragment additionalSubroutines() {
+		ASMCodeFragment frag  = new ASMCodeFragment(GENERATES_VOID);
+		frag.append(clearBytes());
 		return frag;
 	}
 
@@ -93,6 +113,7 @@ public class RunTime {
 
 		nullArrayError(frag);
 		indexOutOfBoundArrayError(frag);
+		negativeLengthArrayError(frag);
 		
 		return frag;
 	}
@@ -152,8 +173,54 @@ public class RunTime {
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 
+	private void negativeLengthArrayError(ASMCodeFragment frag) {
+		String negativeLengthArrayErrorMessage = "$errors-negative-length-array";
+
+		frag.add(DLabel, negativeLengthArrayErrorMessage);
+		frag.add(DataS, "array negative length");
+
+		frag.add(Label, NEGATIVE_LENGTH_ARRAY_RUNTIME_ERROR);
+		frag.add(PushD, negativeLengthArrayErrorMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
 	public static ASMCodeFragment getEnvironment() {
 		RunTime rt = new RunTime();
 		return rt.environmentASM();
+	}
+
+	private ASMCodeFragment clearBytes() {
+		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
+		frag.add(Label, CLEAR_N_BYTES);
+		Macros.storeITo(frag, CLEAR_N_BYTES_RETURN_ADDRESS);	// [ ... BaseAddr, numBytes ]
+		Labeller labeller = new Labeller("Clear-n-bytes");
+		String top = labeller.newLabel("top");
+		String middle = labeller.newLabel("middle");
+		String end = labeller.newLabel("end");
+
+		frag.add(Label, top);
+		frag.add(Duplicate);
+		frag.add(JumpPos, middle);
+		frag.add(Jump, end);
+
+		frag.add(Label, middle);
+		frag.add(PushI, 1);
+		frag.add(Subtract);
+		frag.add(Exchange);
+		frag.add(Duplicate);
+		frag.add(PushI, 0);
+		frag.add(StoreC);
+		frag.add(PushI, 1);
+		frag.add(Add);
+		frag.add(Exchange);
+		frag.add(Jump, top);
+
+		frag.add(Label, end);
+		frag.add(Pop);
+		frag.add(Pop);
+		Macros.loadIFrom(frag, CLEAR_N_BYTES_RETURN_ADDRESS);
+		frag.add(Return);
+
+		return frag;
 	}
 }
