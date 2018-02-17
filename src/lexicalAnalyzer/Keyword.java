@@ -19,6 +19,7 @@ public enum Keyword implements Lextant {
 	STRING("string"),
 	INTEGER("int"),
 	FLOAT("float"),
+	RATIONAL("rat"),
 
 	NULL_KEYWORD("");
 

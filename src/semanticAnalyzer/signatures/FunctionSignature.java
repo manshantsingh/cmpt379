@@ -4,6 +4,7 @@ import java.util.List;
 
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
+import semanticAnalyzer.types.TypeVariable;
 
 //immutable
 public class FunctionSignature {
@@ -37,7 +38,7 @@ public class FunctionSignature {
 		return whichVariant;
 	}
 	public Type resultType() {
-		return resultType;
+		return resultType.getConcreteType();
 	}
 	public Type[] getParams() {
 		return paramTypes;
@@ -51,6 +52,8 @@ public class FunctionSignature {
 	// main query
 
 	public boolean accepts(List<Type> types) {
+		TypeVariable.resetTypeVariable();
+
 		if(types.size() != paramTypes.length) {
 			return false;
 		}
@@ -62,23 +65,16 @@ public class FunctionSignature {
 		}
 		return true;
 	}
-	public boolean accepts(List<Type> types, Type returnType) {
-		if(types.size() != paramTypes.length) {
-			return false;
-		}
 
-		for(int i=0; i<paramTypes.length; i++) {
-			if(!(assignableTo(paramTypes[i], types.get(i)) && resultType==returnType)) {
-				return false;
-			}
-		}		
-		return true;
+	public boolean accepts(List<Type> types, Type returnType) {
+		return resultType() == returnType && accepts(types);
 	}
+
 	private boolean assignableTo(Type variableType, Type valueType) {
 		if(valueType == PrimitiveType.ERROR && ALL_TYPES_ACCEPT_ERROR_TYPES) {
 			return true;
 		}	
-		return variableType.equals(valueType);
+		return variableType.equivalent(valueType);
 	}
 	
 	// Null object pattern

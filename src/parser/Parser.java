@@ -403,6 +403,15 @@ public class Parser {
 	}
 
 	private boolean startsType(Token token) {
+		return startsPrimativeType(token) || startsArrayType(token);
+	}
+
+	private boolean startsArrayType(Token token) {
+		// TODO: still gotta use it
+		return token.isLextant(Punctuator.OPEN_SQUARE);
+	}
+
+	private boolean startsPrimativeType(Token token) {
 		return token.isLextant(
 				Keyword.BOOLEAN,
 				Keyword.CHARACTER,

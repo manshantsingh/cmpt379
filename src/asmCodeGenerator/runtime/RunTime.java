@@ -1,6 +1,8 @@
 package asmCodeGenerator.runtime;
 import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
+
+import asmCodeGenerator.Macros;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 public class RunTime {
 	public static final String EAT_LOCATION_ZERO      	= "$eat-location-zero";		// helps us distinguish null pointers from real ones.
@@ -17,20 +19,35 @@ public class RunTime {
 	public static final String GLOBAL_MEMORY_BLOCK    	= "$global-memory-block";
 	public static final String USABLE_MEMORY_START    	= "$usable-memory-start";
 	public static final String MAIN_PROGRAM_LABEL     	= "$$main";
-	
+
 	public static final String GENERAL_RUNTIME_ERROR = "$$general-runtime-error";
+
 	public static final String INTEGER_DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$i-divide-by-zero";
 	public static final String FLOATING_DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$f-divide-by-zero";
+
+	public static final String NULL_ARRAY_RUNTIME_ERROR = "$$a-null-array-runtime_error";
+	public static final String INDEX_OUT_OF_BOUND_ARRAY_RUNTIME_ERROR = "$$a-index-out-of-bound-runtime_error";
+
+	public static final String ARRAY_INDEXING_ARRAY = "$a-indexing-array";
+	public static final String ARRAY_INDEXING_INDEX = "$a-indexing-index";
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
 		result.append(jumpToMain());
 		result.append(stringsForPrintf());
 		result.append(runtimeErrors());
+		result.append(temporaryVariables());
 		result.add(DLabel, USABLE_MEMORY_START);
 		return result;
 	}
 	
+	private ASMCodeFragment temporaryVariables() {
+		ASMCodeFragment frag  = new ASMCodeFragment(GENERATES_VOID);
+		Macros.declareI(frag, ARRAY_INDEXING_ARRAY);
+		Macros.declareI(frag, ARRAY_INDEXING_INDEX);
+		return frag;
+	}
+
 	private ASMCodeFragment jumpToMain() {
 		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
 		frag.add(Jump, MAIN_PROGRAM_LABEL);
@@ -70,8 +87,12 @@ public class RunTime {
 		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
 		
 		generalRuntimeError(frag);
+
 		integerDivideByZeroError(frag);
 		floatingDivideByZeroError(frag);
+
+		nullArrayError(frag);
+		indexOutOfBoundArrayError(frag);
 		
 		return frag;
 	}
@@ -109,6 +130,27 @@ public class RunTime {
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 
+	private void nullArrayError(ASMCodeFragment frag) {
+		String nullArrayErrorMessage = "$errors-null-array";
+
+		frag.add(DLabel, nullArrayErrorMessage);
+		frag.add(DataS, "null array");
+
+		frag.add(Label, NULL_ARRAY_RUNTIME_ERROR);
+		frag.add(PushD, nullArrayErrorMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
+	private void indexOutOfBoundArrayError(ASMCodeFragment frag) {
+		String indexOutOfBoundArrayErrorMessage = "$errors-index-out-of-bound-array";
+
+		frag.add(DLabel, indexOutOfBoundArrayErrorMessage);
+		frag.add(DataS, "array index out of bound");
+
+		frag.add(Label, INDEX_OUT_OF_BOUND_ARRAY_RUNTIME_ERROR);
+		frag.add(PushD, indexOutOfBoundArrayErrorMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
 
 	public static ASMCodeFragment getEnvironment() {
 		RunTime rt = new RunTime();

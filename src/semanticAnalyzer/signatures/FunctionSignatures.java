@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import asmCodeGenerator.codeStorage.ASMOpcode;
+import asmCodeGenerator.operators.ArrayIndexingCodeGenerator;
 import asmCodeGenerator.operators.BooleanCastCodeGenerator;
 import asmCodeGenerator.operators.FloatingDivideCodeGenerator;
 import asmCodeGenerator.operators.IntegerCharacterCastCodeGenerator;
 import asmCodeGenerator.operators.IntegerDivideCodeGenerator;
 import lexicalAnalyzer.Punctuator;
 import semanticAnalyzer.types.Type;
+import semanticAnalyzer.types.TypeVariable;
+import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 
 
@@ -125,6 +128,11 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 				new FunctionSignatures(cmp, i, c, f);
 			}
 		}
+
+		TypeVariable S = TypeVariable.getInstance();
+		new FunctionSignatures(Punctuator.ARRAY_INDEXING,
+			new FunctionSignature(new ArrayIndexingCodeGenerator(), new Array(S), PrimitiveType.INTEGER, S)
+		);
 
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.
 		// Then, we give that key two signatures: one an (INT x INT -> INT) and the other

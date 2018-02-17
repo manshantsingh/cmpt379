@@ -7,8 +7,9 @@ public enum PrimitiveType implements Type {
 	STRING(4),
 	INTEGER(4),
 	FLOAT(8),
+	RATIONAL(8),
 	ERROR(0),			// use as a value when a syntax error has occurred
-	NO_TYPE(0, "");		// use as a value when no type has been assigned.
+	NO_TYPE(0, "");	// use as a value when no type has been assigned.
 	
 	private int sizeInBytes;
 	private String infoString;
@@ -26,5 +27,11 @@ public enum PrimitiveType implements Type {
 	}
 	public String infoString() {
 		return infoString;
+	}
+	public boolean equivalent(Type other) {
+		return this == other;
+	}
+	public Type getConcreteType() {
+		return this;
 	}
 }
