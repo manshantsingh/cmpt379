@@ -1,6 +1,7 @@
 exec {
 const arrBig:= new [[int]](10).
 arrBig[0]:= new [int](10).
+arrBig[1]:= new [int](3).
 const arr := arrBig[0].
 arr[0] := 5.
 print arr[0];arr[1],_n_.
@@ -9,5 +10,6 @@ arr[1] := 2.
 arrBig[0][0]:= 101.
 
 print arr[0];arr[1],_n_.
-print arrBig[0][0];arrBig[0][1],_n_.
+print arrBig[0][7];arrBig[0][1],_n_.
+print [arr[0]|bool] || [arr[100]|bool],_n_.
 }

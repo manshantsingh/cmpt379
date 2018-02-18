@@ -257,9 +257,7 @@ public class ASMCodeGenerator {
 			newValueCode(node);
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 
-			code.append(arg1);
-
-			callFunctionSignature(node, node.getSignature());
+			callFunctionSignature(node, node.getSignature(), arg1);
 		}
 
 		public void visitLeave(BinaryOperatorNode node) {
@@ -402,10 +400,37 @@ public class ASMCodeGenerator {
 			ASMCodeFragment arg1 = removeValueCode(firstChild);
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 			
-			code.append(arg1);
-			code.append(arg2);
-			
-			callFunctionSignature(node, node.getSignature());
+			callFunctionSignature(node, node.getSignature(), arg1, arg2);
+		}
+
+		private void callFunctionSignature(ParseNode node, FunctionSignature signature, ASMCodeFragment... args) {
+			Object variant = signature.getVariant();
+			if(variant instanceof ASMOpcode) {
+				appendAllArgs(args);
+				ASMOpcode opcode = (ASMOpcode) variant;
+				code.add(opcode);
+				// type-dependent! (opcode is different for floats and for ints)
+			}
+			else if(variant instanceof SimpleCodeGenerator) {
+				appendAllArgs(args);
+				SimpleCodeGenerator generator = (SimpleCodeGenerator) variant;
+				ASMCodeFragment fragment = generator.generate(node);
+				code.append(fragment);
+			}
+			else if(variant instanceof FullCodeGenerator) {
+				FullCodeGenerator generator = (FullCodeGenerator) variant;
+				ASMCodeFragment fragment = generator.generate(node, args);
+				code.append(fragment);
+			}
+			else {
+				// Do nothing
+			}
+		}
+
+		private void appendAllArgs(ASMCodeFragment... args) {
+			for(ASMCodeFragment frag: args) {
+				code.append(frag);
+			}
 		}
 
 		public void visitLeave(ArrayNode node) {
@@ -426,23 +451,6 @@ public class ASMCodeGenerator {
 			else {
 				// TODO
 				System.out.println("TODO: more todo");
-			}
-		}
-
-		private void callFunctionSignature(ParseNode node, FunctionSignature signature) {
-			Object variant = signature.getVariant();
-			if(variant instanceof ASMOpcode) {
-				ASMOpcode opcode = (ASMOpcode) variant;
-				code.add(opcode);
-				// type-dependent! (opcode is different for floats and for ints)
-			}
-			else if(variant instanceof SimpleCodeGenerator) {
-				SimpleCodeGenerator generator = (SimpleCodeGenerator) variant;
-				ASMCodeFragment fragment = generator.generate(node);
-				code.append(fragment);
-			}
-			else {
-				// Do nothing
 			}
 		}
 

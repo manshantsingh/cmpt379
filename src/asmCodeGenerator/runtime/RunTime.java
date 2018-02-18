@@ -35,7 +35,7 @@ public class RunTime {
 	public static final String ARRAY_INDEXING_INDEX = "$$a-indexing-index";
 
 	public static final String CLEAR_N_BYTES = "$procedure-clear-n-bytes";
-	public static final String CLEAR_N_BYTES_RETURN_ADDRESS = "$procedure-clear-n-bytes-ret-addr";
+	public static final String CLONE_N_BYTES = "$procedure-clone-n-bytes";
 
 
 	private ASMCodeFragment environmentASM() {
@@ -57,13 +57,12 @@ public class RunTime {
 		Macros.declareI(frag, ARRAY_INDEXING_ARRAY);
 		Macros.declareI(frag, ARRAY_INDEXING_INDEX);
 
-		Macros.declareI(frag, CLEAR_N_BYTES_RETURN_ADDRESS);
-
 		return frag;
 	}
 
 	private ASMCodeFragment additionalSubroutines() {
 		ASMCodeFragment frag  = new ASMCodeFragment(GENERATES_VOID);
+		frag.append(cloneBytes());
 		frag.append(clearBytes());
 		return frag;
 	}
@@ -189,14 +188,65 @@ public class RunTime {
 		return rt.environmentASM();
 	}
 
-	private ASMCodeFragment clearBytes() {
-		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
-		frag.add(Label, CLEAR_N_BYTES);
-		Macros.storeITo(frag, CLEAR_N_BYTES_RETURN_ADDRESS);	// [ ... BaseAddr, numBytes ]
-		Labeller labeller = new Labeller("Clear-n-bytes");
+	private ASMCodeFragment cloneBytes() {
+		Labeller labeller = new Labeller("clone-n-bytes");
+
+		String returnPtr = labeller.newLabel("return-ptr");
+		String fromAddr = labeller.newLabel("fromAddr");
+		String toAddr = labeller.newLabel("toAddr");
+
 		String top = labeller.newLabel("top");
 		String middle = labeller.newLabel("middle");
 		String end = labeller.newLabel("end");
+
+		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
+		Macros.declareI(frag, returnPtr);
+		Macros.declareI(frag, fromAddr);
+		Macros.declareI(frag, toAddr);
+
+		frag.add(Label, CLONE_N_BYTES);
+		Macros.storeITo(frag, returnPtr);	// [... nBytes fromAddr toAddr]
+		Macros.storeITo(frag, toAddr);
+		Macros.storeITo(frag, fromAddr);
+
+		frag.add(Label, top);	// [... nBytes]
+		frag.add(Duplicate);
+		frag.add(JumpPos, middle);
+		frag.add(Pop);
+		frag.add(Jump, end);
+
+		frag.add(Label, middle);	// [... nBytes]
+		Macros.loadIFrom(frag, fromAddr);
+		Macros.loadIFrom(frag, toAddr);
+		frag.add(Duplicate);
+		Macros.loadIFrom(frag, fromAddr);	// [... nBytes fromAddr toAddr toAddr fromAddr]
+		frag.add(LoadC);
+		frag.add(StoreC);	// [... nBytes fromAddr toAddr]
+		frag.add(PushI, 1);
+		frag.add(Add);
+		Macros.storeITo(frag, toAddr);	// [... nBytes fromAddr]
+		frag.add(PushI, 1);
+		frag.add(Add);
+		Macros.storeITo(frag, fromAddr);	// [... nBytes]
+		frag.add(Jump, top);
+
+		frag.add(Label, end);
+
+		return frag;
+	}
+
+	private ASMCodeFragment clearBytes() {
+		Labeller labeller = new Labeller("Clear-n-bytes");
+		String returnPtr = labeller.newLabel("return-ptr");
+		String top = labeller.newLabel("top");
+		String middle = labeller.newLabel("middle");
+		String end = labeller.newLabel("end");
+
+		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
+		Macros.declareI(frag, returnPtr);
+
+		frag.add(Label, CLEAR_N_BYTES);
+		Macros.storeITo(frag, returnPtr);	// [ ... BaseAddr, numBytes ]
 
 		frag.add(Label, top);
 		frag.add(Duplicate);
@@ -218,7 +268,7 @@ public class RunTime {
 		frag.add(Label, end);
 		frag.add(Pop);
 		frag.add(Pop);
-		Macros.loadIFrom(frag, CLEAR_N_BYTES_RETURN_ADDRESS);
+		Macros.loadIFrom(frag, returnPtr);
 		frag.add(Return);
 
 		return frag;

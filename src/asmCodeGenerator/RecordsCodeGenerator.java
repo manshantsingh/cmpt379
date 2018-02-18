@@ -9,6 +9,7 @@ import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 
 public class RecordsCodeGenerator {
 
+	// [... nElms] => [... recordPtr]
 	public static void createEmptyArrayRecord(ASMCodeFragment code, int statusFlags, int subTypeSize) {
 		code.add(Duplicate);
 		code.add(JumpNeg, NEGATIVE_LENGTH_ARRAY_RUNTIME_ERROR);
@@ -20,20 +21,23 @@ public class RecordsCodeGenerator {
 		code.add(PushI, ARRAY_HEADER_OFFSET);
 		code.add(Add);
 
+		// [... nElms valSize recordSize]
 		createRecord(code, ARRAY_TYPE_ID, statusFlags);
 
 		Macros.loadIFrom(code, RECORD_CREATION_TEMPORARY);
 		code.add(PushI, ARRAY_HEADER_OFFSET);
 		code.add(Add);
-		code.add(Exchange);
+		code.add(Exchange); // [... nElms firstRecordPtr bytesForElements]
 		code.add(Call, CLEAR_N_BYTES);
 
+		// [... nElms]
 		writeIBaseOffset(code, RECORD_CREATION_TEMPORARY, ARRAY_SUBELEMENT_SIZE_OFFSET, subTypeSize);
 		writeIPtrOffset(code, RECORD_CREATION_TEMPORARY, ARRAY_LENGTH_OFFSET);
 
 		Macros.loadIFrom(code, RECORD_CREATION_TEMPORARY);
 	}
 
+	// [... size] => [...]
 	private static void createRecord(ASMCodeFragment code, int typeCode, int statusFlags) {
 		code.add(Call, MEM_MANAGER_ALLOCATE);
 		Macros.storeITo(code, RECORD_CREATION_TEMPORARY);

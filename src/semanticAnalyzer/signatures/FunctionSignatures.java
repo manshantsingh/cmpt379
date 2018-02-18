@@ -11,6 +11,8 @@ import asmCodeGenerator.operators.BooleanCastCodeGenerator;
 import asmCodeGenerator.operators.FloatingDivideCodeGenerator;
 import asmCodeGenerator.operators.IntegerCharacterCastCodeGenerator;
 import asmCodeGenerator.operators.IntegerDivideCodeGenerator;
+import asmCodeGenerator.operators.LogicalNotCodeGenerator;
+import asmCodeGenerator.operators.ShortCircuitCodeGenerator;
 import lexicalAnalyzer.Punctuator;
 import semanticAnalyzer.types.Type;
 import semanticAnalyzer.types.TypeVariable;
@@ -128,6 +130,16 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 				new FunctionSignatures(cmp, i, c, f);
 			}
 		}
+
+		new FunctionSignatures(Punctuator.LOGICAL_AND,
+		    new FunctionSignature(new ShortCircuitCodeGenerator(true), PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
+		);
+		new FunctionSignatures(Punctuator.LOGICAL_OR,
+		    new FunctionSignature(new ShortCircuitCodeGenerator(false), PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
+		);
+		new FunctionSignatures(Punctuator.LOGICAL_NOT,
+		    new FunctionSignature(new LogicalNotCodeGenerator(), PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
+		);
 
 		TypeVariable S = TypeVariable.getInstance();
 		new FunctionSignatures(Punctuator.ARRAY_INDEXING,
