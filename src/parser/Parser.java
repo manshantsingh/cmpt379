@@ -6,7 +6,7 @@ import logging.PikaLogger;
 import parseTree.*;
 import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
-import parseTree.nodeTypes.BinaryOperatorNode;
+import parseTree.nodeTypes.OperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterConstantNode;
@@ -275,7 +275,7 @@ public class Parser {
 			readToken();
 			ParseNode right = parseLogicalAndExpression();
 
-			left = BinaryOperatorNode.withChildren(compareToken, left, right);
+			left = OperatorNode.withChildren(compareToken, left, right);
 		}
 		return left;
 	}
@@ -294,7 +294,7 @@ public class Parser {
 			readToken();
 			ParseNode right = parseComparisonExpression();
 
-			left = BinaryOperatorNode.withChildren(compareToken, left, right);
+			left = OperatorNode.withChildren(compareToken, left, right);
 		}
 		return left;
 	}
@@ -314,7 +314,7 @@ public class Parser {
 			readToken();
 			ParseNode right = parseAdditiveExpression();
 			
-			left = BinaryOperatorNode.withChildren(compareToken, left, right);
+			left = OperatorNode.withChildren(compareToken, left, right);
 		}
 		return left;
 
@@ -335,7 +335,7 @@ public class Parser {
 			readToken();
 			ParseNode right = parseMultiplicativeExpression();
 			
-			left = BinaryOperatorNode.withChildren(additiveToken, left, right);
+			left = OperatorNode.withChildren(additiveToken, left, right);
 		}
 		return left;
 	}
@@ -355,7 +355,7 @@ public class Parser {
 			readToken();
 			ParseNode right = parseAtomicExpression();
 			
-			left = BinaryOperatorNode.withChildren(multiplicativeToken, left, right);
+			left = OperatorNode.withChildren(multiplicativeToken, left, right);
 		}
 		return left;
 	}
@@ -574,7 +574,7 @@ public class Parser {
 			readToken();
 			ParseNode index = parseExpression();
 
-			node = BinaryOperatorNode.withChildren(token, node, index);
+			node = OperatorNode.withChildren(token, node, index);
 			expect(Punctuator.CLOSE_SQUARE);
 		}
 		return node;

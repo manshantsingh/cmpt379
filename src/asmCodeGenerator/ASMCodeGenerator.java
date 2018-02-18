@@ -13,7 +13,7 @@ import lexicalAnalyzer.Punctuator;
 import parseTree.*;
 import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
-import parseTree.nodeTypes.BinaryOperatorNode;
+import parseTree.nodeTypes.OperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterConstantNode;
@@ -28,7 +28,6 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
-import parseTree.nodeTypes.UnaryOperatorNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
@@ -262,24 +261,17 @@ public class ASMCodeGenerator {
 			callFunctionSignature(node, node.getSignature(), arg1);
 		}
 
-		public void visitLeave(UnaryOperatorNode node) {
-			newValueCode(node);
-			ASMCodeFragment arg1 = removeValueCode(node.child(0));
-
-			callFunctionSignature(node, node.getSignature(), arg1);
-		}
-
-		public void visitLeave(BinaryOperatorNode node) {
+		public void visitLeave(OperatorNode node) {
 			Lextant operator = node.getOperator();
 
 			if(Punctuator.isComparison(operator)) {
 				visitComparisonOperatorNode(node, (Punctuator) operator);
 			}
 			else {
-				visitNormalBinaryOperatorNode(node);
+				visitNormalOperatorNode(node);
 			}
 		}
-		private void visitComparisonOperatorNode(BinaryOperatorNode node,
+		private void visitComparisonOperatorNode(OperatorNode node,
 				Punctuator cmp) {
 
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
@@ -397,18 +389,20 @@ public class ASMCodeGenerator {
 			code.add(Label, joinLabel);
 
 		}
-		private void visitNormalBinaryOperatorNode(BinaryOperatorNode node) {
+		private void visitNormalOperatorNode(OperatorNode node) {
 			if(node.getSignature().getVariant() instanceof ArrayIndexingCodeGenerator) {
 				newAddressCode(node);
 			}
 			else {
 				newValueCode(node);
 			}
-
-			ASMCodeFragment arg1 = removeValueCode(node.child(0));
-			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 			
-			callFunctionSignature(node, node.getSignature(), arg1, arg2);
+			ASMCodeFragment[] args = new ASMCodeFragment[node.getChildren().size()];
+			for(int i=0;i<args.length;i++) {
+				args[i] = removeValueCode(node.child(i));
+			}
+
+			callFunctionSignature(node, node.getSignature(), args);
 		}
 
 		private void callFunctionSignature(ParseNode node, FunctionSignature signature, ASMCodeFragment... args) {

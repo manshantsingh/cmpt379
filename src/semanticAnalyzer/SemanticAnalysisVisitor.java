@@ -12,7 +12,7 @@ import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
-import parseTree.nodeTypes.BinaryOperatorNode;
+import parseTree.nodeTypes.OperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterConstantNode;
@@ -28,7 +28,6 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
-import parseTree.nodeTypes.UnaryOperatorNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.types.PrimitiveType;
@@ -114,14 +113,23 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	///////////////////////////////////////////////////////////////////////////
 	// expressions
 	@Override
-	public void visitLeave(UnaryOperatorNode node) {
-		assert node.nChildren() == 1;
-		visitOperator(node);
-	}
-	@Override
-	public void visitLeave(BinaryOperatorNode node) {
-		assert node.nChildren() == 2;
-		visitOperator(node);
+	public void visitLeave(OperatorNode node) {
+		List<Type> childTypes = new ArrayList<Type>();
+		for(ParseNode child: node.getChildren()) {
+			childTypes.add(child.getType());
+		}
+
+		Lextant operator = ((LextantToken) node.getToken()).getLextant();
+		FunctionSignatures signatures = FunctionSignatures.signaturesOf(operator);
+		FunctionSignature signature = signatures.acceptingSignature(childTypes);
+		
+		if(signature.accepts(childTypes)) {
+			node.setSignature(signature);
+		}
+		else {
+			typeCheckError(node, childTypes);
+			node.setType(PrimitiveType.ERROR);
+		}
 	}
 	@Override
 	public void visitLeave(CastNode node) {
@@ -141,29 +149,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 		else {
 			castTypeCheckError(node, from, to);
-			node.setType(PrimitiveType.ERROR);
-		}
-	}
-	private void visitOperator(ParseNode node) {
-		List<Type> childTypes = new ArrayList<Type>();
-		for(ParseNode child: node.getChildren()) {
-			childTypes.add(child.getType());
-		}
-
-		Lextant operator = ((LextantToken) node.getToken()).getLextant();
-		FunctionSignatures signatures = FunctionSignatures.signaturesOf(operator);
-		FunctionSignature signature = signatures.acceptingSignature(childTypes);
-		
-		if(signature.accepts(childTypes)) {
-			if(node instanceof UnaryOperatorNode) {
-				((UnaryOperatorNode) node).setSignature(signature);
-			}
-			else if(node instanceof BinaryOperatorNode) {
-				((BinaryOperatorNode) node).setSignature(signature);
-			}
-		}
-		else {
-			typeCheckError(node, childTypes);
 			node.setType(PrimitiveType.ERROR);
 		}
 	}

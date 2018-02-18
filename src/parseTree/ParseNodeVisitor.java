@@ -2,7 +2,7 @@ package parseTree;
 
 import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
-import parseTree.nodeTypes.BinaryOperatorNode;
+import parseTree.nodeTypes.OperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterConstantNode;
@@ -18,17 +18,14 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
-import parseTree.nodeTypes.UnaryOperatorNode;
 
 // Visitor pattern with pre- and post-order visits
 public interface ParseNodeVisitor {
 	
 	// non-leaf nodes: visitEnter and visitLeave
-	void visitEnter(UnaryOperatorNode node);
-	void visitLeave(UnaryOperatorNode node);
 
-	void visitEnter(BinaryOperatorNode node);
-	void visitLeave(BinaryOperatorNode node);
+	void visitEnter(OperatorNode node);
+	void visitLeave(OperatorNode node);
 	
 	void visitEnter(CastNode node);
 	void visitLeave(CastNode node);
@@ -82,17 +79,10 @@ public interface ParseNodeVisitor {
 			defaultVisit(node);
 		}
 
-		public void visitEnter(UnaryOperatorNode node) {
+		public void visitEnter(OperatorNode node) {
 			defaultVisitEnter(node);
 		}
-		public void visitLeave(UnaryOperatorNode node) {
-			defaultVisitLeave(node);
-		}
-
-		public void visitEnter(BinaryOperatorNode node) {
-			defaultVisitEnter(node);
-		}
-		public void visitLeave(BinaryOperatorNode node) {
+		public void visitLeave(OperatorNode node) {
 			defaultVisitLeave(node);
 		}
 
