@@ -18,6 +18,9 @@ public enum Keyword implements Lextant {
 	LENGTH("length"),
 	CLONE("clone"),
 
+	IF("if"),
+	WHILE("while"),
+
 	BOOLEAN("bool"),
 	CHARACTER("char"),
 	STRING("string"),

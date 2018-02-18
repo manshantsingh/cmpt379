@@ -377,10 +377,16 @@ public class Parser {
 		else if(startsEmptyArrayCreation(nowReading)) {
 			return parseEmptyArrayCreation();
 		}
+		else if(startsUnaryOperatorExpression(nowReading)) {
+			return parseUnaryOperatorExpression();
+		}
 		return syntaxErrorNode("atomic expression");
 	}
 	private boolean startsAtomicExpression(Token token) {
-		return startsLiteral(token) || startsBracket(token) || startsEmptyArrayCreation(token);
+		return startsLiteral(token) ||
+				startsBracket(token) ||
+				startsEmptyArrayCreation(token) ||
+				startsUnaryOperatorExpression(token);
 	}
 	
 	// literal -> number | identifier | booleanConstant
@@ -473,7 +479,7 @@ public class Parser {
 			return syntaxErrorNode("bracket expression");
 		}
 		Token open = nowReading;
-		expect(Punctuator.OPEN_ROUND, Punctuator.OPEN_SQUARE);
+		readToken();
 		ParseNode exp = parseExpression();
 		if(open.isLextant(Punctuator.OPEN_ROUND)) {
 			expect(Punctuator.CLOSE_ROUND);
@@ -490,6 +496,19 @@ public class Parser {
 			return node;
 		}
 		return syntaxErrorNode("bracket expression");
+	}
+
+	private boolean startsUnaryOperatorExpression(Token token) {
+		return token.isLextant(Punctuator.LOGICAL_NOT, Keyword.CLONE, Keyword.LENGTH);
+	}
+
+	private ParseNode parseUnaryOperatorExpression() {
+		if(!startsUnaryOperatorExpression(nowReading)) {
+			return syntaxErrorNode("Unary operator expression");
+		}
+		Token operator = nowReading;
+		readToken();
+		return OperatorNode.withChildren(operator, parseAtomicExpression());
 	}
 
 	private boolean startsType(Token token) {
