@@ -15,6 +15,7 @@ import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
+import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
@@ -22,6 +23,7 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
+import parseTree.nodeTypes.WhileStatementNode;
 import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
@@ -79,10 +81,10 @@ public class Parser {
 	///////////////////////////////////////////////////////////
 	// mainBlock
 	
-	// mainBlock -> { statement* }
+	// blockStatement -> { statement* }
 	private ParseNode parseBlockStatements() {
 		if(!startsBlockStatements(nowReading)) {
-			return syntaxErrorNode("mainBlock");
+			return syntaxErrorNode("Block statement");
 		}
 		ParseNode mainBlock = new BlockStatementsNode(nowReading);
 		expect(Punctuator.OPEN_BRACE);
@@ -96,6 +98,40 @@ public class Parser {
 	}
 	private boolean startsBlockStatements(Token token) {
 		return token.isLextant(Punctuator.OPEN_BRACE);
+	}
+
+	private ParseNode parseIfStatement() {
+		if(!startsIfStatement(nowReading)) {
+			return syntaxErrorNode("If statement");
+		}
+		IfStatementNode node = new IfStatementNode(nowReading);
+		readToken();
+		expect(Punctuator.OPEN_ROUND);
+		node.appendChild(parseExpression());
+		expect(Punctuator.CLOSE_ROUND);
+		node.appendChild(parseBlockStatements());
+		if(nowReading.isLextant(Keyword.ELSE)) {
+			readToken();
+			node.appendChild(parseBlockStatements());
+		}
+		return node;
+	}
+	private boolean startsIfStatement(Token token) {
+		return token.isLextant(Keyword.IF);
+	}
+
+	private ParseNode parseWhileStatement() {
+		if(!startsWhileStatement(nowReading)) {
+			return syntaxErrorNode("While statement");
+		}
+		Token whileKeyword = nowReading;
+		readToken();
+		ParseNode condition = parseExpression();
+		ParseNode blockStatement = parseBlockStatements();
+		return WhileStatementNode.make(whileKeyword, condition, blockStatement);
+	}
+	private boolean startsWhileStatement(Token token) {
+		return token.isLextant(Keyword.WHILE);
 	}
 	
 	
@@ -119,13 +155,21 @@ public class Parser {
 		if(startsBlockStatements(nowReading)) {
 			return parseBlockStatements();
 		}
+		if(startsIfStatement(nowReading)) {
+			return parseIfStatement();
+		}
+		if(startsWhileStatement(nowReading)) {
+			return parseWhileStatement();
+		}
 		return syntaxErrorNode("statement");
 	}
 	private boolean startsStatement(Token token) {
 		return startsPrintStatement(token) ||
 				startsAssignment(token) ||
 				startsDeclaration(token) ||
-				startsBlockStatements(token);
+				startsBlockStatements(token) ||
+				startsIfStatement(token) ||
+				startsWhileStatement(token);
 	}
 	
 	// printStmt -> PRINT printExpressionList .

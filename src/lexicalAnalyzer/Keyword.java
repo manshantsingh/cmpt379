@@ -19,6 +19,7 @@ public enum Keyword implements Lextant {
 	CLONE("clone"),
 
 	IF("if"),
+	ELSE("else"),
 	WHILE("while"),
 
 	BOOLEAN("bool"),

@@ -21,6 +21,7 @@ import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.FloatConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
+import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
@@ -28,6 +29,7 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
+import parseTree.nodeTypes.WhileStatementNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
@@ -195,6 +197,47 @@ public class ASMCodeGenerator {
 		public void visitLeave(PrintStatementNode node) {
 			newVoidCode(node);
 			new PrintStatementGenerator(code, this).generate(node);	
+		}
+		public void visitLeave(IfStatementNode node) {
+			newVoidCode(node);
+
+			ASMCodeFragment conditionCode = removeValueCode(node.child(0));
+			ASMCodeFragment blockCode = removeVoidCode(node.child(1));
+
+			Labeller labeller = new Labeller("if");
+			String elseLabel = labeller.newLabel("else");
+			String end = labeller.newLabel("end");
+
+			code.append(conditionCode);
+			code.add(JumpFalse, elseLabel);
+			code.append(blockCode);
+			code.add(Jump, end);
+
+			code.add(Label, elseLabel);
+			if(node.getChildren().size()>2) {
+				ASMCodeFragment elseBlock = removeVoidCode(node.child(2));
+				code.append(elseBlock);
+			}
+
+			code.add(Label, end);
+		}
+		public void visitLeave(WhileStatementNode node) {
+			newVoidCode(node);
+
+			ASMCodeFragment conditionCode = removeValueCode(node.child(0));
+			ASMCodeFragment blockCode = removeVoidCode(node.child(1));
+
+			Labeller labeller = new Labeller("while");
+			String top = labeller.newLabel("top");
+			String end = labeller.newLabel("end");
+
+			code.add(Label, top);
+			code.append(conditionCode);
+			code.add(JumpFalse, end);
+			code.append(blockCode);
+			code.add(Jump, top);
+
+			code.add(Label, end);
 		}
 		public void visit(NewlineNode node) {
 			newVoidCode(node);

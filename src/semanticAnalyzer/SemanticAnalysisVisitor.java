@@ -21,6 +21,7 @@ import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
+import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
@@ -28,6 +29,7 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
+import parseTree.nodeTypes.WhileStatementNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.types.PrimitiveType;
@@ -79,6 +81,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	// statements and declarations
 	@Override
 	public void visitLeave(PrintStatementNode node) {
+	}
+	@Override
+	public void visitLeave(IfStatementNode node) {
+		assertCorrectType(node, PrimitiveType.BOOLEAN, node.child(0).getType());
+	}
+	@Override
+	public void visitLeave(WhileStatementNode node) {
+		assertCorrectType(node, PrimitiveType.BOOLEAN, node.child(0).getType());
 	}
 	@Override
 	public void visitLeave(DeclarationNode node) {
@@ -217,6 +227,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	
 	///////////////////////////////////////////////////////////////////////////
 	// error logging/printing
+
+	private void assertCorrectType(ParseNode node, Type expected, Type received) {
+		if(!expected.equivalent(received)) {
+			logError("expected " + expected + " for " + node.getToken().getLexeme()
+					+ " but received " + received
+					+ " at " + node.getToken().getLocation());
+		}
+	}
 
 	private void typeCheckError(ParseNode node, List<Type> operandTypes) {
 		Token token = node.getToken();
