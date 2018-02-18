@@ -18,11 +18,15 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
+import parseTree.nodeTypes.UnaryOperatorNode;
 
 // Visitor pattern with pre- and post-order visits
 public interface ParseNodeVisitor {
 	
 	// non-leaf nodes: visitEnter and visitLeave
+	void visitEnter(UnaryOperatorNode node);
+	void visitLeave(UnaryOperatorNode node);
+
 	void visitEnter(BinaryOperatorNode node);
 	void visitLeave(BinaryOperatorNode node);
 	
@@ -76,6 +80,13 @@ public interface ParseNodeVisitor {
 		}		
 		public void defaultVisitForLeaf(ParseNode node) {
 			defaultVisit(node);
+		}
+
+		public void visitEnter(UnaryOperatorNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(UnaryOperatorNode node) {
+			defaultVisitLeave(node);
 		}
 
 		public void visitEnter(BinaryOperatorNode node) {

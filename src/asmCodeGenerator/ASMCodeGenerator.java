@@ -5,6 +5,7 @@ import java.util.Map;
 
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMOpcode;
+import asmCodeGenerator.operators.ArrayIndexingCodeGenerator;
 import asmCodeGenerator.runtime.MemoryManager;
 import asmCodeGenerator.runtime.RunTime;
 import lexicalAnalyzer.Lextant;
@@ -27,6 +28,7 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
+import parseTree.nodeTypes.UnaryOperatorNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
@@ -260,6 +262,13 @@ public class ASMCodeGenerator {
 			callFunctionSignature(node, node.getSignature(), arg1);
 		}
 
+		public void visitLeave(UnaryOperatorNode node) {
+			newValueCode(node);
+			ASMCodeFragment arg1 = removeValueCode(node.child(0));
+
+			callFunctionSignature(node, node.getSignature(), arg1);
+		}
+
 		public void visitLeave(BinaryOperatorNode node) {
 			Lextant operator = node.getOperator();
 
@@ -389,15 +398,14 @@ public class ASMCodeGenerator {
 
 		}
 		private void visitNormalBinaryOperatorNode(BinaryOperatorNode node) {
-			ParseNode firstChild = node.child(0);
-			if(firstChild.getType() instanceof Array) {
+			if(node.getSignature().getVariant() instanceof ArrayIndexingCodeGenerator) {
 				newAddressCode(node);
 			}
 			else {
 				newValueCode(node);
 			}
 
-			ASMCodeFragment arg1 = removeValueCode(firstChild);
+			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 			
 			callFunctionSignature(node, node.getSignature(), arg1, arg2);

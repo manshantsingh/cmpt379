@@ -1,5 +1,6 @@
 package semanticAnalyzer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
+import parseTree.nodeTypes.UnaryOperatorNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.types.PrimitiveType;
@@ -112,23 +114,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	///////////////////////////////////////////////////////////////////////////
 	// expressions
 	@Override
+	public void visitLeave(UnaryOperatorNode node) {
+		assert node.nChildren() == 1;
+		visitOperator(node);
+	}
+	@Override
 	public void visitLeave(BinaryOperatorNode node) {
 		assert node.nChildren() == 2;
-		ParseNode left  = node.child(0);
-		ParseNode right = node.child(1);
-		List<Type> childTypes = Arrays.asList(left.getType(), right.getType());
-		
-		Lextant operator = operatorFor(node);
-		FunctionSignatures signatures = FunctionSignatures.signaturesOf(operator);
-		FunctionSignature signature = signatures.acceptingSignature(childTypes);
-		
-		if(signature.accepts(childTypes)) {
-			node.setSignature(signature);
-		}
-		else {
-			typeCheckError(node, childTypes);
-			node.setType(PrimitiveType.ERROR);
-		}
+		visitOperator(node);
 	}
 	@Override
 	public void visitLeave(CastNode node) {
@@ -151,9 +144,28 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			node.setType(PrimitiveType.ERROR);
 		}
 	}
-	private Lextant operatorFor(BinaryOperatorNode node) {
-		LextantToken token = (LextantToken) node.getToken();
-		return token.getLextant();
+	private void visitOperator(ParseNode node) {
+		List<Type> childTypes = new ArrayList<Type>();
+		for(ParseNode child: node.getChildren()) {
+			childTypes.add(child.getType());
+		}
+
+		Lextant operator = ((LextantToken) node.getToken()).getLextant();
+		FunctionSignatures signatures = FunctionSignatures.signaturesOf(operator);
+		FunctionSignature signature = signatures.acceptingSignature(childTypes);
+		
+		if(signature.accepts(childTypes)) {
+			if(node instanceof UnaryOperatorNode) {
+				((UnaryOperatorNode) node).setSignature(signature);
+			}
+			else if(node instanceof BinaryOperatorNode) {
+				((BinaryOperatorNode) node).setSignature(signature);
+			}
+		}
+		else {
+			typeCheckError(node, childTypes);
+			node.setType(PrimitiveType.ERROR);
+		}
 	}
 
 	public void visitLeave(ArrayNode node) {
