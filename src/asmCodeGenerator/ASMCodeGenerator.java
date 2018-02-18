@@ -407,31 +407,31 @@ public class ASMCodeGenerator {
 
 		private void callFunctionSignature(ParseNode node, FunctionSignature signature, ASMCodeFragment... args) {
 			Object variant = signature.getVariant();
+
+			if(variant instanceof FullCodeGenerator) {
+				FullCodeGenerator generator = (FullCodeGenerator) variant;
+				ASMCodeFragment fragment = generator.generate(node, args);
+				code.append(fragment);
+				return;
+			}
+
+			// append all arguments
+			for(ASMCodeFragment frag: args) {
+				code.append(frag);
+			}
+
 			if(variant instanceof ASMOpcode) {
-				appendAllArgs(args);
 				ASMOpcode opcode = (ASMOpcode) variant;
 				code.add(opcode);
 				// type-dependent! (opcode is different for floats and for ints)
 			}
 			else if(variant instanceof SimpleCodeGenerator) {
-				appendAllArgs(args);
 				SimpleCodeGenerator generator = (SimpleCodeGenerator) variant;
 				ASMCodeFragment fragment = generator.generate(node);
 				code.append(fragment);
 			}
-			else if(variant instanceof FullCodeGenerator) {
-				FullCodeGenerator generator = (FullCodeGenerator) variant;
-				ASMCodeFragment fragment = generator.generate(node, args);
-				code.append(fragment);
-			}
 			else {
 				// Do nothing
-			}
-		}
-
-		private void appendAllArgs(ASMCodeFragment... args) {
-			for(ASMCodeFragment frag: args) {
-				code.append(frag);
 			}
 		}
 
