@@ -12,4 +12,10 @@ arrBig[0][0]:= 0.
 print arr[0];arr[1],_n_.
 print arrBig[0][7];arrBig[0][1],_n_.
 print ![arr[0]|bool] || [arr[100]|bool],_n_.
+
+var brr := clone arr.
+print "should be true: ", length brr == length arr, _n_.
+brr[0] := 365.
+print arr[0] ; brr[0] , _n_.
+print "should be false: ", brr == arr, _n_.
 }

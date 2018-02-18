@@ -276,18 +276,18 @@ public class ASMCodeGenerator {
 
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
-			
-			Type type = node.getSignature().getParams()[0];
+
+			Type type = node.child(0).getType();
 
 			Labeller labeller = new Labeller("compare");
-			
+
 			String startLabel = labeller.newLabel("arg1");
 			String arg2Label  = labeller.newLabel("arg2");
 			String subLabel   = labeller.newLabel("sub");
 			String trueLabel  = labeller.newLabel("true");
 			String falseLabel = labeller.newLabel("false");
 			String joinLabel  = labeller.newLabel("join");
-			
+
 			newValueCode(node);
 			code.add(Label, startLabel);
 			code.append(arg1);
@@ -366,7 +366,7 @@ public class ASMCodeGenerator {
 					break;
 				}
 			}
-			else if(type==PrimitiveType.STRING) {
+			else if(type==PrimitiveType.STRING || type instanceof Array) {
 				code.add(Subtract);
 				switch(cmp) {
 				case EQUALITY:
@@ -378,6 +378,9 @@ public class ASMCodeGenerator {
 					code.add(Jump, falseLabel);
 					break;
 				}
+			}
+			else {
+				System.out.println("Some unimplemented type got here: " + type);
 			}
 
 			code.add(Label, trueLabel);

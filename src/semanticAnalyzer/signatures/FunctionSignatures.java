@@ -6,13 +6,16 @@ import java.util.List;
 import java.util.Map;
 
 import asmCodeGenerator.codeStorage.ASMOpcode;
+import asmCodeGenerator.operators.ArrayCloneCodeGenerator;
 import asmCodeGenerator.operators.ArrayIndexingCodeGenerator;
+import asmCodeGenerator.operators.ArrayLengthCodeGenerator;
 import asmCodeGenerator.operators.BooleanCastCodeGenerator;
 import asmCodeGenerator.operators.FloatingDivideCodeGenerator;
 import asmCodeGenerator.operators.IntegerCharacterCastCodeGenerator;
 import asmCodeGenerator.operators.IntegerDivideCodeGenerator;
 import asmCodeGenerator.operators.LogicalNotCodeGenerator;
 import asmCodeGenerator.operators.ShortCircuitCodeGenerator;
+import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Punctuator;
 import semanticAnalyzer.types.Type;
 import semanticAnalyzer.types.TypeVariable;
@@ -116,21 +119,6 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		    new FunctionSignature(new BooleanCastCodeGenerator(PrimitiveType.CHARACTER), PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN)
 		);
 
-		for(Punctuator cmp: Punctuator.COMPARISONS) {
-			FunctionSignature i = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN);
-			FunctionSignature c = new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN);
-			FunctionSignature f = new FunctionSignature(1, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.BOOLEAN);
-			FunctionSignature b = new FunctionSignature(1, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN);
-			FunctionSignature s = new FunctionSignature(1, PrimitiveType.STRING, PrimitiveType.STRING, PrimitiveType.BOOLEAN);
-
-			if(cmp == Punctuator.EQUALITY || cmp == Punctuator.INEQUALITY) {
-				new FunctionSignatures(cmp, i, c, f, b, s);
-			}
-			else {
-				new FunctionSignatures(cmp, i, c, f);
-			}
-		}
-
 		new FunctionSignatures(Punctuator.LOGICAL_AND,
 		    new FunctionSignature(new ShortCircuitCodeGenerator(true), PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
 		);
@@ -145,6 +133,30 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		new FunctionSignatures(Punctuator.ARRAY_INDEXING,
 			new FunctionSignature(new ArrayIndexingCodeGenerator(), new Array(S), PrimitiveType.INTEGER, S)
 		);
+
+		new FunctionSignatures(Keyword.LENGTH,
+			new FunctionSignature(new ArrayLengthCodeGenerator(), new Array(S), PrimitiveType.INTEGER)
+		);
+
+		new FunctionSignatures(Keyword.CLONE,
+			new FunctionSignature(new ArrayCloneCodeGenerator(), new Array(S), new Array(S))
+		);
+
+		for(Punctuator cmp: Punctuator.COMPARISONS) {
+			FunctionSignature i = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN);
+			FunctionSignature c = new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN);
+			FunctionSignature f = new FunctionSignature(1, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.BOOLEAN);
+			FunctionSignature b = new FunctionSignature(1, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN);
+			FunctionSignature s = new FunctionSignature(1, PrimitiveType.STRING, PrimitiveType.STRING, PrimitiveType.BOOLEAN);
+			FunctionSignature a = new FunctionSignature(1, new Array(S), new Array(S), PrimitiveType.BOOLEAN);
+
+			if(cmp == Punctuator.EQUALITY || cmp == Punctuator.INEQUALITY) {
+				new FunctionSignatures(cmp, i, c, f, b, s, a);
+			}
+			else {
+				new FunctionSignatures(cmp, i, c, f);
+			}
+		}
 
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.
 		// Then, we give that key two signatures: one an (INT x INT -> INT) and the other

@@ -212,10 +212,11 @@ public class RunTime {
 		frag.add(Label, top);	// [... nBytes]
 		frag.add(Duplicate);
 		frag.add(JumpPos, middle);
-		frag.add(Pop);
 		frag.add(Jump, end);
 
 		frag.add(Label, middle);	// [... nBytes]
+		frag.add(PushI, 1);
+		frag.add(Subtract);
 		Macros.loadIFrom(frag, fromAddr);
 		Macros.loadIFrom(frag, toAddr);
 		frag.add(Duplicate);
@@ -231,6 +232,9 @@ public class RunTime {
 		frag.add(Jump, top);
 
 		frag.add(Label, end);
+		frag.add(Pop);
+		Macros.loadIFrom(frag, returnPtr);
+		frag.add(Return);
 
 		return frag;
 	}
