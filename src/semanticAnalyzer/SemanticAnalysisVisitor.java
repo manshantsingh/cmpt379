@@ -10,6 +10,7 @@ import lexicalAnalyzer.Punctuator;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
+import parseTree.SomeArbitaryOperatorNode;
 import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.OperatorNode;
@@ -107,16 +108,27 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		ParseNode assignment = node.child(1);
 		Type targetType = target.getType();
 		Type assignmentType = assignment.getType();
-		if(target instanceof IdentifierNode && ((IdentifierNode)target).getBinding().isConstant()) {
-			assignmentToConstant(target.getToken());
+
+		node.setType(targetType);
+
+		if(target instanceof IdentifierNode) {
+			if(((IdentifierNode)target).getBinding().isConstant()) {
+				assignmentToConstant(target.getToken());
+				node.setType(PrimitiveType.ERROR);
+			}
+		}
+		else if( !	(
+						target instanceof SomeArbitaryOperatorNode &&
+						((SomeArbitaryOperatorNode)target).getSignature().checkIfTargetable()
+					)
+			)
+		{
+			assignmentToUntargetableType(target.getToken());
 			node.setType(PrimitiveType.ERROR);
 		}
 		if(!targetType.equivalent(assignmentType)) {
 			assignmentTypeMismatchError(target.getToken(), targetType, assignmentType);
 			node.setType(PrimitiveType.ERROR);
-		}
-		else {
-			node.setType(targetType);
 		}
 	}
 
@@ -246,6 +258,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	private void assignmentToConstant(Token token) {
 		logError("Cannot write to const variable \""+
+				token.getLexeme()+"\" at "+token.getLocation());
+	}
+	private void assignmentToUntargetableType(Token token) {
+		logError("Expression is not a targetable type \""+
 				token.getLexeme()+"\" at "+token.getLocation());
 	}
 	private void assignmentTypeMismatchError(Token token, Type expected, Type received) {

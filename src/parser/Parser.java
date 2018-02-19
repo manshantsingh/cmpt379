@@ -277,7 +277,7 @@ public class Parser {
 		if(!startsAssignment(nowReading)) {
 			return syntaxErrorNode("assignment");
 		}
-		ParseNode identifier = parseTargetable();
+		ParseNode identifier = parseExpression(); // msk TODO
 		expect(Punctuator.ASSIGN);
 		ParseNode initializer = parseExpression();
 		expect(Punctuator.TERMINATOR);
@@ -285,7 +285,7 @@ public class Parser {
 	}
 
 	private boolean startsAssignment(Token token) {
-		return startsIdentifier(token);
+		return startsExpression(token);
 	}
 	
 	///////////////////////////////////////////////////////////
@@ -393,20 +393,40 @@ public class Parser {
 			return syntaxErrorNode("multiplicativeExpression");
 		}
 		
-		ParseNode left = parseAtomicExpression();
+		ParseNode left = parseArrayIndexExpression();
 		while(nowReading.isLextant(Punctuator.MULTIPLY, Punctuator.DIVIDE)) {
 			Token multiplicativeToken = nowReading;
 			readToken();
-			ParseNode right = parseAtomicExpression();
+			ParseNode right = parseArrayIndexExpression();
 			
 			left = OperatorNode.withChildren(multiplicativeToken, left, right);
 		}
 		return left;
 	}
 	private boolean startsMultiplicativeExpression(Token token) {
+		return startsArrayIndexExpression(token);
+	}
+
+	// multiplicativeExpression -> atomicExpression [MULT atomicExpression]*  (left-assoc)
+	private ParseNode parseArrayIndexExpression() {
+		if(!startsArrayIndexExpression(nowReading)) {
+			return syntaxErrorNode("Array Indexing Expression");
+		}
+
+		ParseNode left = parseAtomicExpression();
+		while(nowReading.isLextant(Punctuator.OPEN_SQUARE)) {
+			Token token = LextantToken.artificial(nowReading, Punctuator.ARRAY_INDEXING);
+			readToken();
+			ParseNode index = parseAtomicExpression();
+			expect(Punctuator.CLOSE_SQUARE);
+			left = OperatorNode.withChildren(token, left, index);
+		}
+		return left;
+	}
+	private boolean startsArrayIndexExpression(Token token) {
 		return startsAtomicExpression(token);
 	}
-	
+
 	// atomicExpression -> literal or bracketed expression
 	private ParseNode parseAtomicExpression() {
 		if(!startsAtomicExpression(nowReading)) {
@@ -452,7 +472,7 @@ public class Parser {
 			return parseStringConstant();
 		}
 		if(startsIdentifier(nowReading)) {
-			return parseTargetable();
+			return parseIdentifier();
 		}
 		if(startsBooleanConstant(nowReading)) {
 			return parseBooleanConstant();
@@ -536,7 +556,6 @@ public class Parser {
 			}
 			Token token = nowReading;
 			Type type = parseTypeVariable();
-			System.out.println("type: "+type+"at: "+token.fullString());
 			CastNode node = CastNode.make(token, exp, type);
 			expect(Punctuator.CLOSE_SQUARE);
 			return node;
@@ -633,18 +652,18 @@ public class Parser {
 		return token instanceof IdentifierToken;
 	}
 
-	private ParseNode parseTargetable() {
-		ParseNode node = parseIdentifier();
-		while(nowReading.isLextant(Punctuator.OPEN_SQUARE)) {
-			Token token = LextantToken.artificial(nowReading, Punctuator.ARRAY_INDEXING);
-			readToken();
-			ParseNode index = parseExpression();
-
-			node = OperatorNode.withChildren(token, node, index);
-			expect(Punctuator.CLOSE_SQUARE);
-		}
-		return node;
-	}
+//	private ParseNode parseTargetable() {
+//		ParseNode node = parseIdentifier();
+//		while(nowReading.isLextant(Punctuator.OPEN_SQUARE)) {
+//			Token token = LextantToken.artificial(nowReading, Punctuator.ARRAY_INDEXING);
+//			readToken();
+//			ParseNode index = parseExpression();
+//
+//			node = OperatorNode.withChildren(token, node, index);
+//			expect(Punctuator.CLOSE_SQUARE);
+//		}
+//		return node;
+//	}
 
 	// boolean constant (terminal)
 	private ParseNode parseBooleanConstant() {
@@ -667,7 +686,7 @@ public class Parser {
 	// otherwise, give a syntax error and read next token (to avoid endless looping).
 	private void expect(Lextant ...lextants ) {
 		if(!nowReading.isLextant(lextants)) {
-			System.out.println("now: "+nowReading.fullString()+"\nprev: "+previouslyRead.fullString());
+			System.out.println("now: "+nowReading.fullString());
 			syntaxError(nowReading, "expecting " + Arrays.toString(lextants));
 		}
 		readToken();

@@ -131,7 +131,7 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 
 		TypeVariable S = TypeVariable.getInstance();
 		new FunctionSignatures(Punctuator.ARRAY_INDEXING,
-			new FunctionSignature(new ArrayIndexingCodeGenerator(), new Array(S), PrimitiveType.INTEGER, S)
+			new FunctionSignature(new ArrayIndexingCodeGenerator(), new Array(S), PrimitiveType.INTEGER, S).setAsTargetable()
 		);
 
 		new FunctionSignatures(Keyword.LENGTH,

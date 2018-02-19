@@ -11,7 +11,8 @@ public class FunctionSignature {
 	private static final boolean ALL_TYPES_ACCEPT_ERROR_TYPES = true;
 	private Type resultType;
 	private Type[] paramTypes;
-	Object whichVariant;
+	private Object whichVariant;
+	private boolean isTargetable = false;
 	
 	
 	///////////////////////////////////////////////////////////////
@@ -30,6 +31,15 @@ public class FunctionSignature {
 		}
 	}
 	
+	public FunctionSignature setAsTargetable() {
+		isTargetable = true;
+		return this;
+	}
+
+	public boolean checkIfTargetable() {
+		return isTargetable;
+	}
+
 	
 	///////////////////////////////////////////////////////////////
 	// accessors
