@@ -146,9 +146,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		assert node.nChildren() == 1;
 
 		Type from  = node.child(0).getType();
-		Type to = node.getResultType();
-		if(from == to) {
-			node.setType(from);
+		Type to = node.getType();
+		if(from.equivalent(to)) {
 			return;
 		}
 		List<Type> params = Arrays.asList(from);

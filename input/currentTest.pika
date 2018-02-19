@@ -12,6 +12,7 @@ exec {
 	print arr[0];arr[1],_n_.
 	print arrBig[0][7];arrBig[0][1],_n_.
 	print ![arr[0]|bool] || [arr[100]|bool],_n_.
+	print [arr|[int]][0].
 
 	var brr := clone arr.
 	print "should be true: ", length brr == length arr, _n_.

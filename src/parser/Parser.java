@@ -385,7 +385,7 @@ public class Parser {
 	}
 	private boolean startsAdditiveExpression(Token token) {
 		return startsMultiplicativeExpression(token);
-	}	
+	}
 
 	// multiplicativeExpression -> atomicExpression [MULT atomicExpression]*  (left-assoc)
 	private ParseNode parseMultiplicativeExpression() {
@@ -534,8 +534,10 @@ public class Parser {
 			if(!startsType(nowReading)) {
 				return syntaxErrorNode("cast type");
 			}
-			CastNode node = CastNode.make(nowReading, exp);
-			readToken();
+			Token token = nowReading;
+			Type type = parseTypeVariable();
+			System.out.println("type: "+type+"at: "+token.fullString());
+			CastNode node = CastNode.make(token, exp, type);
 			expect(Punctuator.CLOSE_SQUARE);
 			return node;
 		}
@@ -569,7 +571,8 @@ public class Parser {
 				Keyword.CHARACTER,
 				Keyword.STRING,
 				Keyword.INTEGER,
-				Keyword.FLOAT
+				Keyword.FLOAT,
+				Keyword.RATIONAL
 		);
 	}
 
@@ -664,6 +667,7 @@ public class Parser {
 	// otherwise, give a syntax error and read next token (to avoid endless looping).
 	private void expect(Lextant ...lextants ) {
 		if(!nowReading.isLextant(lextants)) {
+			System.out.println("now: "+nowReading.fullString()+"\nprev: "+previouslyRead.fullString());
 			syntaxError(nowReading, "expecting " + Arrays.toString(lextants));
 		}
 		readToken();

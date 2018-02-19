@@ -3,7 +3,7 @@ from subprocess import PIPE
 from os.path import basename
 
 # Path to the compiler jar
-pika_compiler='C:/Users/HP/OneDrive/cmpt379/pika/qa/pika-1.jar'
+pika_compiler='C:/Users/HP/OneDrive/cmpt379/pika/qa/pika.jar'
 
 # Path to the emulator
 asm_emulator = 'C:/Users/HP/OneDrive/cmpt379/pika/ASM_Emulator/ASMEmu.exe'

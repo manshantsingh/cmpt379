@@ -11,7 +11,6 @@ import tokens.Token;
 public class CastNode extends ParseNode {
 
 	private FunctionSignature signature = FunctionSignature.nullInstance();
-	private Type resultType;
 
 	public FunctionSignature getSignature() {
 		return signature;
@@ -22,14 +21,8 @@ public class CastNode extends ParseNode {
 		setType(signature.resultType());
 	}
 	
-	public Type getResultType() {
-		return resultType;
-	}
-	
 	public CastNode(Token token) {
 		super(token);
-		assert(token instanceof LextantToken);
-		resultType = PrimitiveType.fromTypeVariable((LextantToken) token);
 	}
 
 	public CastNode(ParseNode node) {
@@ -42,9 +35,10 @@ public class CastNode extends ParseNode {
 		visitor.visitLeave(this);
 	}
 	
-	public static CastNode make(Token token, ParseNode exp) {
+	public static CastNode make(Token token, ParseNode exp, Type type) {
 		CastNode node = new CastNode(token);
 		node.appendChild(exp);
+		node.setType(type);
 		return node;
 	}
 }
