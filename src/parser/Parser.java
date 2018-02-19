@@ -393,18 +393,18 @@ public class Parser {
 			return syntaxErrorNode("multiplicativeExpression");
 		}
 		
-		ParseNode left = parseArrayIndexExpression();
+		ParseNode left = parseUnaryOperatorExpression();
 		while(nowReading.isLextant(Punctuator.MULTIPLY, Punctuator.DIVIDE)) {
 			Token multiplicativeToken = nowReading;
 			readToken();
-			ParseNode right = parseArrayIndexExpression();
+			ParseNode right = parseUnaryOperatorExpression();
 			
 			left = OperatorNode.withChildren(multiplicativeToken, left, right);
 		}
 		return left;
 	}
 	private boolean startsMultiplicativeExpression(Token token) {
-		return startsArrayIndexExpression(token);
+		return startsUnaryPrecedenceExpression(token);
 	}
 
 	// multiplicativeExpression -> atomicExpression [MULT atomicExpression]*  (left-assoc)
@@ -441,16 +441,12 @@ public class Parser {
 		else if(startsEmptyArrayCreation(nowReading)) {
 			return parseEmptyArrayCreation();
 		}
-		else if(startsUnaryOperatorExpression(nowReading)) {
-			return parseUnaryOperatorExpression();
-		}
 		return syntaxErrorNode("atomic expression");
 	}
 	private boolean startsAtomicExpression(Token token) {
 		return startsLiteral(token) ||
 				startsBracket(token) ||
-				startsEmptyArrayCreation(token) ||
-				startsUnaryOperatorExpression(token);
+				startsEmptyArrayCreation(token);
 	}
 	
 	// literal -> number | identifier | booleanConstant
@@ -563,17 +559,28 @@ public class Parser {
 		return syntaxErrorNode("bracket expression");
 	}
 
-	private boolean startsUnaryOperatorExpression(Token token) {
+	private boolean startsUnaryPrecedenceExpression(Token token) {
+		return startsExplicitUnaryOperatorExpression(token) ||
+				startsArrayIndexExpression(token);
+	}
+
+	private boolean startsExplicitUnaryOperatorExpression(Token token) {
 		return token.isLextant(Punctuator.LOGICAL_NOT, Keyword.CLONE, Keyword.LENGTH);
 	}
 
 	private ParseNode parseUnaryOperatorExpression() {
-		if(!startsUnaryOperatorExpression(nowReading)) {
+		if(!startsUnaryPrecedenceExpression(nowReading)) {
 			return syntaxErrorNode("Unary operator expression");
 		}
-		Token operator = nowReading;
-		readToken();
-		return OperatorNode.withChildren(operator, parseAtomicExpression());
+		if(startsExplicitUnaryOperatorExpression(nowReading)) {
+			Token operator = nowReading;
+			readToken();
+			return OperatorNode.withChildren(operator, parseUnaryOperatorExpression());
+		}
+		if(startsArrayIndexExpression(nowReading)) {
+			return parseArrayIndexExpression();
+		}
+		return syntaxErrorNode("Unary operator expression");
 	}
 
 	private boolean startsType(Token token) {
@@ -686,7 +693,11 @@ public class Parser {
 	// otherwise, give a syntax error and read next token (to avoid endless looping).
 	private void expect(Lextant ...lextants ) {
 		if(!nowReading.isLextant(lextants)) {
-			System.out.println("now: "+nowReading.fullString());
+			// MSK debug
+//			System.out.println("now: "+nowReading.fullString());
+//			for(StackTraceElement elm: Thread.currentThread().getStackTrace()) {
+//				System.out.println(elm);
+//			}
 			syntaxError(nowReading, "expecting " + Arrays.toString(lextants));
 		}
 		readToken();
