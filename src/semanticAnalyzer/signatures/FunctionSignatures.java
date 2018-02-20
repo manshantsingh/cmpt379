@@ -11,9 +11,12 @@ import asmCodeGenerator.operators.ArrayIndexingCodeGenerator;
 import asmCodeGenerator.operators.ArrayLengthCodeGenerator;
 import asmCodeGenerator.operators.BooleanCastCodeGenerator;
 import asmCodeGenerator.operators.FloatingDivideCodeGenerator;
+import asmCodeGenerator.operators.FormRationalCodeGenerator;
 import asmCodeGenerator.operators.IntegerCharacterCastCodeGenerator;
 import asmCodeGenerator.operators.IntegerDivideCodeGenerator;
 import asmCodeGenerator.operators.LogicalNotCodeGenerator;
+import asmCodeGenerator.operators.RationalAddSubtractCodeGenerator;
+import asmCodeGenerator.operators.RationalMultiplyDivideCodeGenerator;
 import asmCodeGenerator.operators.ShortCircuitCodeGenerator;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Punctuator;
@@ -92,22 +95,30 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 
 		new FunctionSignatures(Punctuator.ADD,
 		    new FunctionSignature(ASMOpcode.Add, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.FAdd, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.FLOAT)
+		    new FunctionSignature(ASMOpcode.FAdd, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.FLOAT),
+		    new FunctionSignature(new RationalAddSubtractCodeGenerator(true), PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
 		);
 		
 		new FunctionSignatures(Punctuator.SUBTRACT,
 		    new FunctionSignature(ASMOpcode.Subtract, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.FSubtract, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.FLOAT)
+		    new FunctionSignature(ASMOpcode.FSubtract, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.FLOAT),
+		    new FunctionSignature(new RationalAddSubtractCodeGenerator(false), PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
 		);
 
 		new FunctionSignatures(Punctuator.MULTIPLY,
 		    new FunctionSignature(ASMOpcode.Multiply, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.FMultiply, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.FLOAT)
+		    new FunctionSignature(ASMOpcode.FMultiply, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.FLOAT),
+		    new FunctionSignature(new RationalMultiplyDivideCodeGenerator(true), PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
 		);
 
 		new FunctionSignatures(Punctuator.DIVIDE,
 		    new FunctionSignature(new IntegerDivideCodeGenerator(), PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(new FloatingDivideCodeGenerator(), PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.FLOAT)
+		    new FunctionSignature(new FloatingDivideCodeGenerator(), PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.FLOAT),
+		    new FunctionSignature(new RationalMultiplyDivideCodeGenerator(false), PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
+		);
+
+		new FunctionSignatures(Punctuator.OVER,
+		    new FunctionSignature(new FormRationalCodeGenerator(), PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.RATIONAL)
 		);
 
 		new FunctionSignatures(Punctuator.PIPE,

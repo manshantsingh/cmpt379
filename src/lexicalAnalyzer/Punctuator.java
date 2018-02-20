@@ -10,6 +10,10 @@ public enum Punctuator implements Lextant {
 	MULTIPLY("*"),
 	DIVIDE("/"),
 
+	OVER("//"),
+	EXPRESS_OVER("///"),
+	RATIONALIZE("////"),
+
 	GREATER(">"),
 	GREATER_EQUAL(">="),
 	LESS("<"),

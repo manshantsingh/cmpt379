@@ -159,13 +159,21 @@ public class ASMCodeGenerator {
 			}
 			else if(type == PrimitiveType.BOOLEAN || type == PrimitiveType.CHARACTER) {
 				code.add(LoadC);
-			}	
+			}
+			else if(type == PrimitiveType.RATIONAL) {
+				code.add(Duplicate);
+				code.add(LoadI);
+				code.add(Exchange);	// [... numerator address]
+				code.add(PushI, 1);
+				code.add(Add);
+				code.add(LoadI);
+			}
 			else {
 				assert false : "node " + node;
 			}
 			code.markAsValue();
 		}
-		
+
 	    ////////////////////////////////////////////////////////////////////
         // ensures all types of ParseNode in given AST have at least a visitLeave	
 		public void visitLeave(ParseNode node) {
@@ -257,18 +265,14 @@ public class ASMCodeGenerator {
 		
 
 		public void visitLeave(DeclarationNode node) {
-			newVoidCode(node);
-			ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
-			ASMCodeFragment rvalue = removeValueCode(node.child(1));
-			
-			code.append(lvalue);
-			code.append(rvalue);
-			
-			Type type = node.getType();
-			code.add(opcodeForStore(type));
+			storeToLocation(node);
 		}
 
 		public void visitLeave(AssignmentNode node) {
+			storeToLocation(node);
+		}
+
+		private void storeToLocation(ParseNode node) {
 			newVoidCode(node);
 			ASMCodeFragment lvalue = removeAddressCode(node.child(0));
 			ASMCodeFragment rvalue = removeValueCode(node.child(1));
@@ -277,21 +281,31 @@ public class ASMCodeGenerator {
 			code.append(rvalue);
 
 			Type type = node.getType();
-			code.add(opcodeForStore(type));
-		}
 
-		private ASMOpcode opcodeForStore(Type type) {
 			if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING || type instanceof Array) {
-				return StoreI;
+				code.add(StoreI);
 			}
-			if(type == PrimitiveType.FLOAT) {
-				return StoreF;
+			else if(type == PrimitiveType.FLOAT) {
+				code.add(StoreF);
 			}
-			if(type == PrimitiveType.BOOLEAN || type == PrimitiveType.CHARACTER) {
-				return StoreC;
+			else if(type == PrimitiveType.BOOLEAN || type == PrimitiveType.CHARACTER) {
+				code.add(StoreC);
 			}
-			assert false: "Type " + type + " unimplemented in opcodeForStore()";
-			return null;
+			else if(type == PrimitiveType.RATIONAL) {
+				// [... Location numerator denominator]
+				Macros.storeITo(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
+				Macros.storeITo(code, RunTime.RATIONAL_NUMERATOR_TEMPORARY);
+				code.add(Duplicate);
+				code.add(PushI, 1);
+				code.add(Add);	// [... Location Location+1]
+				Macros.loadIFrom(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
+				code.add(StoreI);
+				Macros.loadIFrom(code, RunTime.RATIONAL_NUMERATOR_TEMPORARY);
+				code.add(StoreI);
+			}
+			else{
+				assert false: "Type " + type + " unimplemented in opcodeForStore()";
+			}
 		}
 
 

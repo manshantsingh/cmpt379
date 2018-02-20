@@ -25,6 +25,7 @@ public class RunTime {
 
 	public static final String INTEGER_DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$i-divide-by-zero";
 	public static final String FLOATING_DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$f-divide-by-zero";
+	public static final String RATIONAL_DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$r-divide-by-zero";
 
 	public static final String NULL_ARRAY_RUNTIME_ERROR = "$$a-null-array-runtime_error";
 	public static final String INDEX_OUT_OF_BOUND_ARRAY_RUNTIME_ERROR = "$$a-index-out-of-bound-runtime_error";
@@ -33,9 +34,13 @@ public class RunTime {
 	public static final String RECORD_CREATION_TEMPORARY = "$$record-create-temporary";
 	public static final String ARRAY_INDEXING_ARRAY = "$$a-indexing-array";
 	public static final String ARRAY_INDEXING_INDEX = "$$a-indexing-index";
+	public static final String RATIONAL_NUMERATOR_TEMPORARY = "$$r-numerator-temporary";
+	public static final String RATIONAL_DENOMINATOR_TEMPORARY = "$$r-denominator-temporary";
+	public static final String RATIONAL_COMMON_DENOMINATOR_TEMPORARY = "$$r-common-denominator-temporary";
 
 	public static final String CLEAR_N_BYTES = "$procedure-clear-n-bytes";
 	public static final String CLONE_N_BYTES = "$procedure-clone-n-bytes";
+	public static final String LOWEST_TERMS = "$procedure-lowest-terms";
 
 
 	private ASMCodeFragment environmentASM() {
@@ -57,11 +62,16 @@ public class RunTime {
 		Macros.declareI(frag, ARRAY_INDEXING_ARRAY);
 		Macros.declareI(frag, ARRAY_INDEXING_INDEX);
 
+		Macros.declareI(frag, RATIONAL_NUMERATOR_TEMPORARY);
+		Macros.declareI(frag, RATIONAL_DENOMINATOR_TEMPORARY);
+		Macros.declareI(frag, RATIONAL_COMMON_DENOMINATOR_TEMPORARY);
+
 		return frag;
 	}
 
 	private ASMCodeFragment additionalSubroutines() {
 		ASMCodeFragment frag  = new ASMCodeFragment(GENERATES_VOID);
+		frag.append(lowestTerms());
 		frag.append(cloneBytes());
 		frag.append(clearBytes());
 		return frag;
@@ -109,6 +119,7 @@ public class RunTime {
 
 		integerDivideByZeroError(frag);
 		floatingDivideByZeroError(frag);
+		rationalDivideByZeroError(frag);
 
 		nullArrayError(frag);
 		indexOutOfBoundArrayError(frag);
@@ -150,6 +161,17 @@ public class RunTime {
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 
+	private void rationalDivideByZeroError(ASMCodeFragment frag) {
+		String rationalDivideByZeroMessage = "$errors-rational-divide-by-zero";
+
+		frag.add(DLabel, rationalDivideByZeroMessage);
+		frag.add(DataS, "rational divide by zero");
+
+		frag.add(Label, RATIONAL_DIVIDE_BY_ZERO_RUNTIME_ERROR);
+		frag.add(PushD, rationalDivideByZeroMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
 	private void nullArrayError(ASMCodeFragment frag) {
 		String nullArrayErrorMessage = "$errors-null-array";
 
@@ -186,6 +208,97 @@ public class RunTime {
 	public static ASMCodeFragment getEnvironment() {
 		RunTime rt = new RunTime();
 		return rt.environmentASM();
+	}
+
+	private ASMCodeFragment lowestTerms() {
+		Labeller labeller = new Labeller("lowest-terms");
+
+		String returnPtr = labeller.newLabel("return-ptr");
+		String first = labeller.newLabel("first");
+		String second = labeller.newLabel("second");
+		String isNegative = labeller.newLabel("is-negative");
+
+		String denomNegative = labeller.newLabel("denom-negative");
+		String denomDone = labeller.newLabel("denom-done");
+		String numeratorNegative = labeller.newLabel("numerator-negative");
+		String numeratorDone = labeller.newLabel("numerator-done");
+		String signChangeNotNeeded = labeller.newLabel("sign-change-not-needed");
+
+		String top = labeller.newLabel("top");
+		String end = labeller.newLabel("end");
+
+		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
+		Macros.declareI(frag, returnPtr);
+		Macros.declareI(frag, first);
+		Macros.declareI(frag, second);
+		Macros.declareI(frag, isNegative);
+
+
+		frag.add(Label, LOWEST_TERMS);
+		Macros.storeITo(frag, returnPtr);	// [... first second]
+		frag.add(Duplicate);
+		frag.add(JumpFalse, RATIONAL_DIVIDE_BY_ZERO_RUNTIME_ERROR);	// [... first second]
+
+		frag.add(Duplicate);
+		frag.add(JumpNeg, denomNegative);
+		frag.add(PushI, 0);
+		frag.add(Jump, denomDone);
+		frag.add(Label, denomNegative);
+		frag.add(PushI, -1);
+		frag.add(Multiply);
+		frag.add(PushI, 1);
+		frag.add(Label, denomDone);
+		Macros.storeITo(frag, isNegative);	// [... first abs(second)]
+
+		frag.add(Duplicate);
+		Macros.storeITo(frag, second);
+		frag.add(Exchange);		// [... second first]
+
+		frag.add(Duplicate);
+		frag.add(JumpFalse, numeratorNegative);
+		frag.add(Jump, numeratorDone);
+		frag.add(Label, numeratorNegative);
+		frag.add(PushI, -1);
+		frag.add(Multiply);
+		Macros.loadIFrom(frag, isNegative);
+		frag.add(PushI, 1);
+		frag.add(Add);
+		Macros.storeITo(frag, isNegative);
+		frag.add(Label, numeratorDone);		// [... second abs(first)]
+
+		frag.add(Duplicate);
+		Macros.storeITo(frag, first);	// [... second first]
+
+		frag.add(Label, top);
+		Macros.loadIFrom(frag, first);
+		Macros.loadIFrom(frag, second);
+		frag.add(Remainder);
+		frag.add(Duplicate);
+		frag.add(JumpFalse, end);
+		Macros.loadIFrom(frag, second);
+		Macros.storeITo(frag, first);
+		Macros.storeITo(frag, second);
+		frag.add(Jump, top);
+
+		frag.add(Label, end);
+		frag.add(Pop);		// [... second first]
+		Macros.loadIFrom(frag, second);
+		frag.add(Divide);	// [... second first/gcd]
+		Macros.loadIFrom(frag, isNegative);
+		frag.add(PushI, 2);
+		frag.add(Remainder);	// [...  second  first/gcd  (1: sign change needed, 0: otherwise)]
+		frag.add(JumpFalse, signChangeNotNeeded);
+		frag.add(PushI, -1);
+		frag.add(Multiply);
+		frag.add(Label, signChangeNotNeeded);	// [... second first/gcd]
+		frag.add(Exchange);
+		Macros.loadIFrom(frag, second);
+		frag.add(Divide);	// [...  first/gcd  second/gcd]
+
+		Macros.loadIFrom(frag, returnPtr);
+		frag.add(Return);
+
+		return frag;
 	}
 
 	private ASMCodeFragment cloneBytes() {
