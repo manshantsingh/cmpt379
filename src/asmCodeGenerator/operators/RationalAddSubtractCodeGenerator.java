@@ -19,6 +19,20 @@ public class RationalAddSubtractCodeGenerator implements SimpleCodeGenerator {
 	@Override
 	public ASMCodeFragment generate(ParseNode node) {
 		ASMCodeFragment frag = new ASMCodeFragment(CodeType.GENERATES_VALUE);
+		commonDenominator(frag);
+		if(isAdd) {
+			frag.add(Add);
+		}
+		else {
+			frag.add(Subtract);
+		}
+		Macros.loadIFrom(frag, RATIONAL_COMMON_DENOMINATOR_TEMPORARY);	// [... nume denom]
+
+		frag.add(Call, LOWEST_TERMS);
+		return frag;
+	}
+
+	public static void commonDenominator(ASMCodeFragment frag) {
 		Macros.storeITo(frag, RATIONAL_DENOMINATOR_TEMPORARY);
 		Macros.storeITo(frag, RATIONAL_NUMERATOR_TEMPORARY);	// [... a b]
 		frag.add(Duplicate);
@@ -30,17 +44,7 @@ public class RationalAddSubtractCodeGenerator implements SimpleCodeGenerator {
 		frag.add(Exchange);		// [...  b*p  a]
 		Macros.loadIFrom(frag, RATIONAL_DENOMINATOR_TEMPORARY);
 		frag.add(Multiply);		// [...  b*p  a*q]
-		if(isAdd) {
-			frag.add(Add);
-		}
-		else {
-			frag.add(Exchange);
-			frag.add(Subtract);
-		}
-		Macros.loadIFrom(frag, RATIONAL_COMMON_DENOMINATOR_TEMPORARY);	// [... nume denom]
-
-		frag.add(Call, LOWEST_TERMS);
-		return frag;
+		frag.add(Exchange);
 	}
 
 }

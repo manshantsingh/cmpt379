@@ -157,15 +157,16 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 			FunctionSignature i = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN);
 			FunctionSignature c = new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN);
 			FunctionSignature f = new FunctionSignature(1, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.BOOLEAN);
+			FunctionSignature r = new FunctionSignature(1, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.BOOLEAN);
 			FunctionSignature b = new FunctionSignature(1, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN);
 			FunctionSignature s = new FunctionSignature(1, PrimitiveType.STRING, PrimitiveType.STRING, PrimitiveType.BOOLEAN);
 			FunctionSignature a = new FunctionSignature(1, new Array(S), new Array(S), PrimitiveType.BOOLEAN);
 
 			if(cmp == Punctuator.EQUALITY || cmp == Punctuator.INEQUALITY) {
-				new FunctionSignatures(cmp, i, c, f, b, s, a);
+				new FunctionSignatures(cmp, i, c, f, r, b, s, a);
 			}
 			else {
-				new FunctionSignatures(cmp, i, c, f);
+				new FunctionSignatures(cmp, i, c, f, r);
 			}
 		}
 

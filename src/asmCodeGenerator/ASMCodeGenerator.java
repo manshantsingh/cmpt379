@@ -6,6 +6,7 @@ import java.util.Map;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.operators.ArrayIndexingCodeGenerator;
+import asmCodeGenerator.operators.RationalAddSubtractCodeGenerator;
 import asmCodeGenerator.runtime.MemoryManager;
 import asmCodeGenerator.runtime.RunTime;
 import lexicalAnalyzer.Lextant;
@@ -164,7 +165,7 @@ public class ASMCodeGenerator {
 				code.add(Duplicate);
 				code.add(LoadI);
 				code.add(Exchange);	// [... numerator address]
-				code.add(PushI, 1);
+				code.add(PushI, PrimitiveType.RATIONAL.getSize());
 				code.add(Add);
 				code.add(LoadI);
 			}
@@ -249,17 +250,17 @@ public class ASMCodeGenerator {
 		}
 		public void visit(NewlineNode node) {
 			newVoidCode(node);
-			code.add(PushD, RunTime.NEWLINE_PRINT_FORMAT);
+			code.add(PushD, RunTime.NEWLINE_PRINT);
 			code.add(Printf);
 		}
 		public void visit(SpaceNode node) {
 			newVoidCode(node);
-			code.add(PushD, RunTime.SPACE_PRINT_FORMAT);
+			code.add(PushD, RunTime.SPACE_PRINT);
 			code.add(Printf);
 		}
 		public void visit(TabSpaceNode node) {
 			newVoidCode(node);
-			code.add(PushD, RunTime.TAB_SPACE_PRINT_FORMAT);
+			code.add(PushD, RunTime.TAB_SPACE_PRINT);
 			code.add(Printf);
 		}
 		
@@ -296,7 +297,7 @@ public class ASMCodeGenerator {
 				Macros.storeITo(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
 				Macros.storeITo(code, RunTime.RATIONAL_NUMERATOR_TEMPORARY);
 				code.add(Duplicate);
-				code.add(PushI, 1);
+				code.add(PushI, PrimitiveType.RATIONAL.getSize());
 				code.add(Add);	// [... Location Location+1]
 				Macros.loadIFrom(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
 				code.add(StoreI);
@@ -352,7 +353,15 @@ public class ASMCodeGenerator {
 			code.append(arg2);
 			code.add(Label, subLabel);
 
-			if(type == PrimitiveType.INTEGER || type == PrimitiveType.CHARACTER) {
+			if(type == PrimitiveType.RATIONAL) {
+				// remove the denominators and leave the numerator only
+				RationalAddSubtractCodeGenerator.commonDenominator(code);
+			}
+
+			if(		type == PrimitiveType.INTEGER ||
+					type == PrimitiveType.CHARACTER ||
+					type == PrimitiveType.RATIONAL)
+			{
 				code.add(Subtract);
 				switch(cmp) {
 				case GREATER:
