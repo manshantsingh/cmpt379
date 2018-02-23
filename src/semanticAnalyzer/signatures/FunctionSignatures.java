@@ -10,6 +10,8 @@ import asmCodeGenerator.operators.ArrayCloneCodeGenerator;
 import asmCodeGenerator.operators.ArrayIndexingCodeGenerator;
 import asmCodeGenerator.operators.ArrayLengthCodeGenerator;
 import asmCodeGenerator.operators.BooleanCastCodeGenerator;
+import asmCodeGenerator.operators.ExpressOverFloatCodeGenerator;
+import asmCodeGenerator.operators.ExpressOverRationalCodeGenerator;
 import asmCodeGenerator.operators.FloatingDivideCodeGenerator;
 import asmCodeGenerator.operators.FormRationalCodeGenerator;
 import asmCodeGenerator.operators.IntegerCharacterCastCodeGenerator;
@@ -119,6 +121,16 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 
 		new FunctionSignatures(Punctuator.OVER,
 		    new FunctionSignature(new FormRationalCodeGenerator(), PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.RATIONAL)
+		);
+
+		new FunctionSignatures(Punctuator.EXPRESS_OVER,
+			    new FunctionSignature(new ExpressOverRationalCodeGenerator(false), PrimitiveType.RATIONAL, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
+			    new FunctionSignature(new ExpressOverFloatCodeGenerator(false), PrimitiveType.FLOAT, PrimitiveType.INTEGER, PrimitiveType.INTEGER)
+		);
+
+		new FunctionSignatures(Punctuator.RATIONALIZE,
+		    new FunctionSignature(new ExpressOverRationalCodeGenerator(true), PrimitiveType.RATIONAL, PrimitiveType.INTEGER, PrimitiveType.RATIONAL),
+		    new FunctionSignature(new ExpressOverFloatCodeGenerator(true), PrimitiveType.FLOAT, PrimitiveType.INTEGER, PrimitiveType.RATIONAL)
 		);
 
 		new FunctionSignatures(Punctuator.PIPE,

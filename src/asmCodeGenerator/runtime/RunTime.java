@@ -3,6 +3,7 @@ import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 import static asmCodeGenerator.runtime.RunTime.NULL_ARRAY_RUNTIME_ERROR;
 
+import asmCodeGenerator.ASMCodeGenerator;
 import asmCodeGenerator.ASMConstants;
 
 import static asmCodeGenerator.ASMConstants.*;
@@ -274,7 +275,7 @@ public class RunTime {
 		Macros.declareI(code, returnPtr);
 		code.add(Label, LOAD_PRINT_RATIONAL);
 		Macros.storeITo(code, returnPtr);
-		loadFromAddress(code, PrimitiveType.RATIONAL);
+		ASMCodeGenerator.loadFromAddress(code, PrimitiveType.RATIONAL);
 		Macros.loadIFrom(code, returnPtr);
 
 		code.add(Label, PRINT_RATIONAL);
@@ -350,7 +351,7 @@ public class RunTime {
 
 		frag.add(Label, LOAD_PRINT_BOOLEAN);
 		frag.add(Exchange);
-		loadFromAddress(frag, PrimitiveType.BOOLEAN);
+		ASMCodeGenerator.loadFromAddress(frag, PrimitiveType.BOOLEAN);
 		frag.add(Exchange);
 
 		frag.add(Label, PRINT_BOOLEAN);
@@ -368,7 +369,7 @@ public class RunTime {
 		// string
 		frag.add(Label, LOAD_PRINT_STRING);
 		frag.add(Exchange);
-		loadFromAddress(frag, PrimitiveType.STRING);
+		ASMCodeGenerator.loadFromAddress(frag, PrimitiveType.STRING);
 		frag.add(Exchange);
 
 		frag.add(Label, PRINT_STRING);
@@ -382,7 +383,7 @@ public class RunTime {
 		// character
 		frag.add(Label, LOAD_PRINT_CHARACTER);
 		frag.add(Exchange);
-		loadFromAddress(frag, PrimitiveType.CHARACTER);
+		ASMCodeGenerator.loadFromAddress(frag, PrimitiveType.CHARACTER);
 		frag.add(Exchange);
 
 		frag.add(Label, PRINT_CHARACTER);
@@ -394,7 +395,7 @@ public class RunTime {
 		// float
 		frag.add(Label, LOAD_PRINT_FLOAT);
 		frag.add(Exchange);
-		loadFromAddress(frag, PrimitiveType.FLOAT);
+		ASMCodeGenerator.loadFromAddress(frag, PrimitiveType.FLOAT);
 		frag.add(Exchange);
 
 		frag.add(Label, PRINT_FLOAT);
@@ -406,7 +407,7 @@ public class RunTime {
 		// integer
 		frag.add(Label, LOAD_PRINT_INTEGER);
 		frag.add(Exchange);
-		loadFromAddress(frag, PrimitiveType.INTEGER);
+		ASMCodeGenerator.loadFromAddress(frag, PrimitiveType.INTEGER);
 		frag.add(Exchange);
 
 		frag.add(Label, PRINT_INTEGER);
@@ -436,7 +437,7 @@ public class RunTime {
 
 		frag.add(Label, LOAD_PRINT_ARRAY);
 		frag.add(Exchange);
-		loadFromAddress(frag, new Array(null));
+		ASMCodeGenerator.loadFromAddress(frag, new Array(null));
 		frag.add(Exchange);
 
 		frag.add(Label, PRINT_ARRAY);
@@ -697,28 +698,5 @@ public class RunTime {
 		frag.add(Return);
 
 		return frag;
-	}
-
-	public static void loadFromAddress(ASMCodeFragment code, Type type) {
-		if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING || type instanceof Array) {
-			code.add(LoadI);
-		}
-		else if(type == PrimitiveType.FLOAT) {
-			code.add(LoadF);
-		}
-		else if(type == PrimitiveType.BOOLEAN || type == PrimitiveType.CHARACTER) {
-			code.add(LoadC);
-		}
-		else if(type == PrimitiveType.RATIONAL) {
-			code.add(Duplicate);
-			code.add(LoadI);
-			code.add(Exchange);	// [... numerator address]
-			code.add(PushI, PrimitiveType.INTEGER.getSize());
-			code.add(Add);
-			code.add(LoadI);
-		}
-		else {
-			assert false : "unhandled type: " + type;
-		}
 	}
 }

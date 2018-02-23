@@ -1,6 +1,8 @@
 package asmCodeGenerator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
@@ -90,6 +92,55 @@ public class ASMCodeGenerator {
 		return visitor.removeRootCode(root);
 	}
 
+	public static void loadFromAddress(ASMCodeFragment code, Type type) {
+		if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING || type instanceof Array) {
+			code.add(LoadI);
+		}
+		else if(type == PrimitiveType.FLOAT) {
+			code.add(LoadF);
+		}
+		else if(type == PrimitiveType.BOOLEAN || type == PrimitiveType.CHARACTER) {
+			code.add(LoadC);
+		}
+		else if(type == PrimitiveType.RATIONAL) {
+			code.add(Duplicate);
+			code.add(LoadI);
+			code.add(Exchange);	// [... numerator address]
+			code.add(PushI, PrimitiveType.INTEGER.getSize());
+			code.add(Add);
+			code.add(LoadI);
+		}
+		else {
+			assert false : "unhandled type: " + type;
+		}
+	}
+
+	public static void storeToAddress(ASMCodeFragment code, Type type) {
+		if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING || type instanceof Array) {
+			code.add(StoreI);
+		}
+		else if(type == PrimitiveType.FLOAT) {
+			code.add(StoreF);
+		}
+		else if(type == PrimitiveType.BOOLEAN || type == PrimitiveType.CHARACTER) {
+			code.add(StoreC);
+		}
+		else if(type == PrimitiveType.RATIONAL) {
+			// [... Location numerator denominator]
+			Macros.storeITo(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
+			Macros.storeITo(code, RunTime.RATIONAL_NUMERATOR_TEMPORARY);
+			code.add(Duplicate);
+			code.add(PushI, PrimitiveType.INTEGER.getSize());
+			code.add(Add);	// [... Location Location+1]
+			Macros.loadIFrom(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
+			code.add(StoreI);
+			Macros.loadIFrom(code, RunTime.RATIONAL_NUMERATOR_TEMPORARY);
+			code.add(StoreI);
+		}
+		else{
+			assert false: "Type " + type + " unimplemented in opcodeForStore()";
+		}
+	}
 
 	protected class CodeVisitor extends ParseNodeVisitor.Default {
 		private Map<ParseNode, ASMCodeFragment> codeMap;
@@ -151,7 +202,7 @@ public class ASMCodeGenerator {
 			}	
 		}
 		private void turnAddressIntoValue(ASMCodeFragment code, ParseNode node) {
-			RunTime.loadFromAddress(code, node.getType());
+			loadFromAddress(code, node.getType());
 			code.markAsValue();
 		}
 
@@ -261,32 +312,7 @@ public class ASMCodeGenerator {
 			code.append(lvalue);
 			code.append(rvalue);
 
-			Type type = node.getType();
-
-			if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING || type instanceof Array) {
-				code.add(StoreI);
-			}
-			else if(type == PrimitiveType.FLOAT) {
-				code.add(StoreF);
-			}
-			else if(type == PrimitiveType.BOOLEAN || type == PrimitiveType.CHARACTER) {
-				code.add(StoreC);
-			}
-			else if(type == PrimitiveType.RATIONAL) {
-				// [... Location numerator denominator]
-				Macros.storeITo(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
-				Macros.storeITo(code, RunTime.RATIONAL_NUMERATOR_TEMPORARY);
-				code.add(Duplicate);
-				code.add(PushI, PrimitiveType.INTEGER.getSize());
-				code.add(Add);	// [... Location Location+1]
-				Macros.loadIFrom(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
-				code.add(StoreI);
-				Macros.loadIFrom(code, RunTime.RATIONAL_NUMERATOR_TEMPORARY);
-				code.add(StoreI);
-			}
-			else{
-				assert false: "Type " + type + " unimplemented in opcodeForStore()";
-			}
+			storeToAddress(code, node.getType());
 		}
 
 
@@ -486,22 +512,29 @@ public class ASMCodeGenerator {
 
 		public void visitLeave(ArrayNode node) {
 			newValueCode(node);
-			if(node.getSizeExpression() != null) {
+
+			Type subType = node.getType().getSubType();
+			int statusFlags;
+			if(subType instanceof Array || subType == PrimitiveType.STRING) {
+				// TODO: fix this for string in procedure call
+				statusFlags = ARRAY_STATUS_WITH_REFERENCE_SUBTYPE;
+			}
+			else {
+				statusFlags = ARRAY_STATUS_WITHOUT_REFERENCE_SUBTYPE;
+			}
+
+			if(node.isNewDeclaration()) {
 				ASMCodeFragment arg1 = removeValueCode(node.child(0));
 				code.append(arg1);
-				int statusFlags;
-				Type subType = node.getType().getSubType();
-				if(subType instanceof Array || subType == PrimitiveType.STRING) {
-					statusFlags = ARRAY_STATUS_WITH_REFERENCE_SUBTYPE;
-				}
-				else {
-					statusFlags = ARRAY_STATUS_WITHOUT_REFERENCE_SUBTYPE;
-				}
 				RecordsCodeGenerator.createEmptyArrayRecord(code, statusFlags, subType.getSize());
 			}
 			else {
-				// TODO
-				System.out.println("TODO: more todo");
+				List<ParseNode> list = node.getChildren();
+				ASMCodeFragment[] frags = new ASMCodeFragment[list.size()];
+				for(int i=0; i<frags.length; i++) {
+					frags[i] = removeValueCode(list.get(i));
+				}
+				RecordsCodeGenerator.createPopulatedArrayRecord(code, frags, statusFlags, subType);
 			}
 		}
 

@@ -33,6 +33,7 @@ import parseTree.nodeTypes.TabSpaceNode;
 import parseTree.nodeTypes.WhileStatementNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.FunctionSignatures;
+import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
@@ -175,7 +176,11 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 
 	public void visitLeave(ArrayNode node) {
-		// TODO
+		// TODO promotion stuff and typechecking
+		if(!node.isNewDeclaration()) {
+			Array arrayType = new Array(node.child(0).getType());
+			node.setType(arrayType);
+		}
 	}
 
 

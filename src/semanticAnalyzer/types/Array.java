@@ -11,7 +11,7 @@ public class Array implements Type {
 	@Override
 	public int getSize() {
 		// TODO confirm this again
-		return 4;
+		return PrimitiveType.STRING.getSize();
 	}
 
 	@Override

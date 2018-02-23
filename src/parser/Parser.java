@@ -1,5 +1,6 @@
 package parser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import logging.PikaLogger;
@@ -548,17 +549,36 @@ public class Parser {
 			return exp;
 		}
 		else if(open.isLextant(Punctuator.OPEN_SQUARE)) {
-			expect(Punctuator.PIPE);
-			if(!startsType(nowReading)) {
-				return syntaxErrorNode("cast type");
+			if(nowReading.isLextant(Punctuator.PIPE)) {
+				return parseCast(exp, open);
 			}
-			Token token = nowReading;
-			Type type = parseTypeVariable();
-			CastNode node = CastNode.make(token, exp, type);
-			expect(Punctuator.CLOSE_SQUARE);
-			return node;
+			if(nowReading.isLextant(Punctuator.SEPARATOR)) {
+				return parsePopulatedArray(exp, open);
+			}
+			return syntaxErrorNode("square bracket expression");
 		}
 		return syntaxErrorNode("bracket expression");
+	}
+
+	private ParseNode parseCast(ParseNode exp, Token token) {
+		readToken();
+		if(!startsType(nowReading)) {
+			return syntaxErrorNode("cast type");
+		}
+		Type type = parseTypeVariable();
+		expect(Punctuator.CLOSE_SQUARE);
+		return CastNode.make(token, exp, type);
+	}
+
+	private ParseNode parsePopulatedArray(ParseNode firstElm, Token token) {
+		ArrayList<ParseNode> list = new ArrayList<ParseNode>();
+		list.add(firstElm);
+		while(nowReading.isLextant(Punctuator.SEPARATOR)) {
+			readToken();
+			list.add(parseExpression());
+		}
+		expect(Punctuator.CLOSE_SQUARE);
+		return ArrayNode.make(token, list);
 	}
 
 	private boolean startsUnaryPrecedenceExpression(Token token) {
