@@ -151,27 +151,7 @@ public class ASMCodeGenerator {
 			}	
 		}
 		private void turnAddressIntoValue(ASMCodeFragment code, ParseNode node) {
-			Type type = node.getType();
-			if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING || type instanceof Array) {
-				code.add(LoadI);
-			}
-			else if(type == PrimitiveType.FLOAT) {
-				code.add(LoadF);
-			}
-			else if(type == PrimitiveType.BOOLEAN || type == PrimitiveType.CHARACTER) {
-				code.add(LoadC);
-			}
-			else if(type == PrimitiveType.RATIONAL) {
-				code.add(Duplicate);
-				code.add(LoadI);
-				code.add(Exchange);	// [... numerator address]
-				code.add(PushI, PrimitiveType.RATIONAL.getSize());
-				code.add(Add);
-				code.add(LoadI);
-			}
-			else {
-				assert false : "node " + node;
-			}
+			RunTime.loadFromAddress(code, node.getType());
 			code.markAsValue();
 		}
 
@@ -297,7 +277,7 @@ public class ASMCodeGenerator {
 				Macros.storeITo(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
 				Macros.storeITo(code, RunTime.RATIONAL_NUMERATOR_TEMPORARY);
 				code.add(Duplicate);
-				code.add(PushI, PrimitiveType.RATIONAL.getSize());
+				code.add(PushI, PrimitiveType.INTEGER.getSize());
 				code.add(Add);	// [... Location Location+1]
 				Macros.loadIFrom(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
 				code.add(StoreI);

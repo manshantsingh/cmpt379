@@ -126,6 +126,9 @@ public class ParseNode {
 			}
 		}	
 	}
+	public void replaceNthChild(int index, ParseNode newChild) {
+		children.set(index, newChild);
+	}
 	public int nChildren() {
 		return children.size();
 	}

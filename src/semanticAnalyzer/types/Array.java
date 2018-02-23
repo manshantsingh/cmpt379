@@ -38,4 +38,11 @@ public class Array implements Type {
 	public String toString() {
 		return infoString();
 	}
+
+	public Type innerMostType() {
+		if(subType instanceof Array) {
+			return ((Array) subType).innerMostType();
+		}
+		return subType;
+	}
 }

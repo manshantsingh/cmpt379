@@ -13,13 +13,15 @@ public class ArrayLengthCodeGenerator implements SimpleCodeGenerator {
 	@Override
 	public ASMCodeFragment generate(ParseNode node) {
 		ASMCodeFragment frag = new ASMCodeFragment(CodeType.GENERATES_VALUE);
+		getLength(frag);
+		return frag;
+	}
+	public static void getLength(ASMCodeFragment frag) {
 		frag.add(Duplicate);
 		frag.add(JumpFalse, RunTime.NULL_ARRAY_RUNTIME_ERROR);
 		frag.add(PushI, ARRAY_LENGTH_OFFSET);
 		frag.add(Add);
 		frag.add(LoadI);
-
-		return frag;
 	}
 
 }
