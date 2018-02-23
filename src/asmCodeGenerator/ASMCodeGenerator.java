@@ -538,9 +538,8 @@ public class ASMCodeGenerator {
 			Labeller labeller = new Labeller("stringConst");
 			String strLabel = labeller.newLabel(node.getValue());
 
-			code.add(DLabel, strLabel);
-			code.add(PushD, strLabel);
-			code.add(DataS, node.getValue());
+			// TODO: change me
+			RecordsCodeGenerator.createStringRecord(code, node.getValue());
 		}
 	}
 }

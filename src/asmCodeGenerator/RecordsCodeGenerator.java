@@ -2,6 +2,8 @@ package asmCodeGenerator;
 
 
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
+import semanticAnalyzer.types.PrimitiveType;
+
 import static asmCodeGenerator.runtime.MemoryManager.*;
 import static asmCodeGenerator.runtime.RunTime.*;
 import static asmCodeGenerator.ASMConstants.*;
@@ -37,6 +39,29 @@ public class RecordsCodeGenerator {
 		Macros.loadIFrom(code, RECORD_CREATION_TEMPORARY);
 	}
 
+	// [...] => [... recordPtr]
+	public static void createStringRecord(ASMCodeFragment code, String str) {
+		int recordSize = STRING_HEADER_OFFSET +
+				PrimitiveType.CHARACTER.getSize() * (str.length() + 1);
+
+		code.add(PushI, recordSize);
+		createRecord(code, STRING_TYPE_ID, STRING_STATUS);
+
+		Macros.loadIFrom(code, RECORD_CREATION_TEMPORARY);
+		code.add(Duplicate);
+		code.add(PushI, STRING_LENGTH_OFFSET);
+		code.add(Add);
+		code.add(PushI, str.length());
+		code.add(StoreI);
+
+		int offset = STRING_HEADER_OFFSET;
+		for(char c: str.toCharArray()) {
+			addChartoString(code, offset, (int)c);
+			offset += PrimitiveType.CHARACTER.getSize();
+		}
+		addChartoString(code, offset, 0);
+	}
+
 	// [... size] => [...]
 	private static void createRecord(ASMCodeFragment code, int typeCode, int statusFlags) {
 		code.add(Call, MEM_MANAGER_ALLOCATE);
@@ -44,6 +69,14 @@ public class RecordsCodeGenerator {
 
 		writeIBaseOffset(code, RECORD_CREATION_TEMPORARY, RECORD_TYPE_ID_OFFSET, typeCode);
 		writeIBaseOffset(code, RECORD_CREATION_TEMPORARY, RECORD_STATUS_OFFSET, statusFlags);
+	}
+
+	private static void addChartoString(ASMCodeFragment code, int offset, int c) {
+		code.add(Duplicate);
+		code.add(PushI, offset);
+		code.add(Add);
+		code.add(PushI, c);
+		code.add(StoreC);
 	}
 
 	private static void writeIBaseOffset(ASMCodeFragment code, String location, int offset, int val) {
