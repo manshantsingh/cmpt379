@@ -552,7 +552,7 @@ public class Parser {
 			if(nowReading.isLextant(Punctuator.PIPE)) {
 				return parseCast(exp, open);
 			}
-			if(nowReading.isLextant(Punctuator.SEPARATOR)) {
+			if(nowReading.isLextant(Punctuator.SEPARATOR, Punctuator.CLOSE_SQUARE)) {
 				return parsePopulatedArray(exp, open);
 			}
 			return syntaxErrorNode("square bracket expression");

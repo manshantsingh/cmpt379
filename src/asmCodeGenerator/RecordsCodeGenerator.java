@@ -42,7 +42,6 @@ public class RecordsCodeGenerator {
 	}
 
 	public static void createPopulatedArrayRecord(ASMCodeFragment code, ASMCodeFragment[] frags, int statusFlags, Type subType) {
-		// TODO
 		int recordSize = ARRAY_HEADER_OFFSET + subType.getSize() * frags.length;
 
 		code.add(PushI, recordSize);
@@ -60,6 +59,8 @@ public class RecordsCodeGenerator {
 
 			offset += subType.getSize();
 		}
+		code.add(Duplicate);
+		Macros.storeITo(code, RECORD_CREATION_TEMPORARY);
 		writeIBaseOffset(code, RECORD_CREATION_TEMPORARY, ARRAY_SUBELEMENT_SIZE_OFFSET, subType.getSize());
 		writeIBaseOffset(code, RECORD_CREATION_TEMPORARY, ARRAY_LENGTH_OFFSET, frags.length);
 	}

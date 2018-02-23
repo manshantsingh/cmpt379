@@ -425,6 +425,8 @@ public class RunTime {
 		String currentPrintProcedure = labeller.newLabel("current-print-procedure");
 		String elementSize = labeller.newLabel("element-size");
 
+		String confirmedNotString = labeller.newLabel("confirmed-not-string");
+
 		String subtypeNotArray = labeller.newLabel("subtype-not-array");
 		String subtypeCheckDone = labeller.newLabel("subtype-check-done");
 
@@ -446,6 +448,18 @@ public class RunTime {
 		frag.add(Duplicate);
 		frag.add(JumpFalse, NULL_ARRAY_RUNTIME_ERROR);
 
+		frag.add(Duplicate);
+		frag.add(PushI, RECORD_TYPE_ID_OFFSET);
+		frag.add(Add);
+		frag.add(LoadI);
+		frag.add(PushI, STRING_TYPE_ID);
+		frag.add(Subtract);
+		frag.add(JumpTrue, confirmedNotString);
+		// [... returnPtr array]
+		frag.add(Call, PRINT_STRING);
+		frag.add(Return);
+
+		frag.add(Label, confirmedNotString);
 		frag.add(Duplicate);
 		frag.add(PushI, RECORD_STATUS_OFFSET);
 		frag.add(Add);

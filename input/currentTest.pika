@@ -42,52 +42,54 @@ exec {
 	print rational, _n_.
 
 	{
+		var hehe := [5].
 		const rational := new [[int]](4).
 		rational[0]:= new [int](1).
 		rational[1]:= new [int](2).
-		rational[2]:= new [int](3).
+		rational[2]:= hehe.
 		rational[3]:= new [int](4).
+		hehe := [6].
 		print "hehe inside 1 : ", rational, _n_.
 	}
 
-	# {
-	# 	const rational := new [string](4).
-	# 	rational[0]:="abc".
-	# 	rational[1]:="abc".
-	# 	rational[2]:="abc".
-	# 	rational[3]:="abc".
-	# 	print "hehe inside 2 : ", rational, _n_.
-	# }
+	{
+		const rational := new [string](4).
+		rational[0]:="abc".
+		rational[1]:="abc".
+		rational[2]:="abc".
+		rational[3]:="abc".
+		print "hehe inside 2 : ", rational, _n_.
+	}
 
 	print "hehe outside: ", rational, _n_.
 
 	{
 		const arr := [1,2,3,4,5,6,7,8,9].
-		print arr, _n_.
+		print length arr, ":"; arr, _n_.
 	}
 
 	{
 		const arr := [^1^,^2^,^3^,^4^,^5^,^6^,^7^,^8^,^9^].
-		print arr, _n_.
+		print length arr, ":"; arr, _n_.
 	}
 
 	{
 		const arr := [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0].
-		print arr, _n_.
+		print length arr, ":"; arr, _n_.
 	}
 
 	{
 		const arr := [_true_, _false_, _false_, _true_].
-		print arr, _n_.
+		print length arr, ":"; arr, _n_.
 	}
 
 	{
 		const arr := [1//2, 2//2, 3//2, 4//2, 5//2, 6//2, 7//2, 8//2, 9//2].
-		print arr, _n_.
+		print length arr, ":"; arr, _n_.
 	}
 
-	# {
-	# 	const arr := ["1","2","3","4","5","6","7","8","9"].
-	# 	print arr, _n_.
-	# }
+	{
+		const arr := ["1-str", "2-str", "3-str", "4-str", "5-str", "6-str", "7-str", "8-str", "9-str"].
+		print length arr, ":"; arr, _n_.
+	}
 }

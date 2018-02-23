@@ -471,7 +471,7 @@ public class ASMCodeGenerator {
 			else {
 				newValueCode(node);
 			}
-			
+
 			ASMCodeFragment[] args = new ASMCodeFragment[node.getChildren().size()];
 			for(int i=0;i<args.length;i++) {
 				args[i] = removeValueCode(node.child(i));
