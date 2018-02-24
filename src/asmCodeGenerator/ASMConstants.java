@@ -24,9 +24,13 @@ public class ASMConstants {
 	public final static int ARRAY_TYPE_ID= 7;
 	public final static int ARRAY_STATUS_WITHOUT_REFERENCE_SUBTYPE = 0;
 	public final static int ARRAY_STATUS_WITH_REFERENCE_SUBTYPE = 0b0010;
-	public final static int ARRAY_MASK_FOR_SUBTYPE = 0b0010;
 	public final static int ARRAY_SUBELEMENT_SIZE_OFFSET = RECORD_HEADER_LENGTH;
 	public final static int ARRAY_LENGTH_OFFSET = ARRAY_SUBELEMENT_SIZE_OFFSET + ARRAY_SUBTYPE_SIZE_BYTE_LENGTH;
 	public final static int ARRAY_HEADER_OFFSET = ARRAY_LENGTH_OFFSET + ARRAY_LENGTH_BYTE_LENGTH;
+
+
+	public final static int MASK_RECORD_CHECK_ALLOWS_DELETION = 0b1100;
+	public final static int MASK_RECORD_SET_IS_DELETED = 0b0100;
+	public final static int MASK_ARRAY_CHECK_REFERENCE_SUBTYPE = 0b0010;
 }
 

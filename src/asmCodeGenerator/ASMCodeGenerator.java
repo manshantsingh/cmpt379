@@ -8,6 +8,7 @@ import java.util.Map;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.operators.ArrayIndexingCodeGenerator;
+import asmCodeGenerator.operators.ArrayReleaseCodeGenerator;
 import asmCodeGenerator.operators.RationalAddSubtractCodeGenerator;
 import asmCodeGenerator.runtime.MemoryManager;
 import asmCodeGenerator.runtime.RunTime;
@@ -465,8 +466,12 @@ public class ASMCodeGenerator {
 
 		}
 		private void visitNormalOperatorNode(OperatorNode node) {
-			if(node.getSignature().getVariant() instanceof ArrayIndexingCodeGenerator) {
+			Object varient = node.getSignature().getVariant();
+			if(varient instanceof ArrayIndexingCodeGenerator) {
 				newAddressCode(node);
+			}
+			else if(varient instanceof ArrayReleaseCodeGenerator) {
+				newVoidCode(node);
 			}
 			else {
 				newValueCode(node);

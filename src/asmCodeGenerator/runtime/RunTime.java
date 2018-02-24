@@ -464,7 +464,7 @@ public class RunTime {
 		frag.add(PushI, RECORD_STATUS_OFFSET);
 		frag.add(Add);
 		frag.add(LoadI);
-		frag.add(PushI, ARRAY_MASK_FOR_SUBTYPE);
+		frag.add(PushI, MASK_ARRAY_CHECK_REFERENCE_SUBTYPE);
 		frag.add(BTAnd);	// [... returnPtr array bitwiseSubtypeAnd]
 		frag.add(JumpFalse, subtypeNotArray);
 		frag.add(PushD, LOAD_PRINT_ARRAY);

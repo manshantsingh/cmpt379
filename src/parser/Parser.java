@@ -134,6 +134,21 @@ public class Parser {
 	private boolean startsWhileStatement(Token token) {
 		return token.isLextant(Keyword.WHILE);
 	}
+
+	private ParseNode parseReleaseStatement() {
+		if(!startsReleaseStatement(nowReading)) {
+			return syntaxErrorNode("release statement");
+		}
+		Token releaseKeyword = nowReading;
+		readToken();
+		ParseNode exp = parseExpression();
+		expect(Punctuator.TERMINATOR);
+		return OperatorNode.withChildren(releaseKeyword, exp);
+	}
+
+	private boolean startsReleaseStatement(Token token) {
+		return token.isLextant(Keyword.RELEASE);
+	}
 	
 	
 	///////////////////////////////////////////////////////////
@@ -162,6 +177,9 @@ public class Parser {
 		if(startsWhileStatement(nowReading)) {
 			return parseWhileStatement();
 		}
+		if(startsReleaseStatement(nowReading)) {
+			return parseReleaseStatement();
+		}
 		return syntaxErrorNode("statement");
 	}
 	private boolean startsStatement(Token token) {
@@ -170,7 +188,8 @@ public class Parser {
 				startsDeclaration(token) ||
 				startsBlockStatements(token) ||
 				startsIfStatement(token) ||
-				startsWhileStatement(token);
+				startsWhileStatement(token) ||
+				startsReleaseStatement(token);
 	}
 	
 	// printStmt -> PRINT printExpressionList .
