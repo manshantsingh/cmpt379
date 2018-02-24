@@ -248,9 +248,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				}
 				int x=0, y=0;
 				for(int i=1;i<precendenceOrder.length; i++) {
-					System.out.println(i+": " +
-							precendenceOrder[i][0] + ", "+
-							precendenceOrder[i][1]);
 					if(precendenceOrder[i][0]<precendenceOrder[x][0]) {
 						x = i;
 					}
