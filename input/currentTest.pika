@@ -43,4 +43,18 @@ exec {
 	print arr2d, _n_.
 	print clone arr, _n_.
 	print clone arr2d, _n_.
+	{
+		var a:= ["hehe", "lol"].
+		var b:= clone a.
+		var c:=a.
+		var d:=b.
+		a:=d.
+		print a;b;c;d,_n_.
+		print a==b || 5//0 == 1//2,_n_.
+		print a==c,_n_.
+		print c==b,_n_.
+		print a!=b && 5//0 == 1//2,_n_.
+		print a!=c,_n_.
+		print c!=b,_n_.
+	}
 }
