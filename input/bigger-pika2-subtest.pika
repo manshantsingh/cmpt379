@@ -61,7 +61,7 @@ exec {
 		rational[3]:=["jkl"].
 		print "hehe inside 2 : ", rational, _n_.
 
-		const a := rational[0].
+		const a := rational[[0|char]].
 		const b := rational[1].
 		const c := rational[2].
 		const d := rational[3].
@@ -146,5 +146,26 @@ exec {
 
 		release arr.
 		print length arr, ":"; arr, _n_.
+	}
+	{
+		print
+			[3|rat];
+			[^c^|rat];
+			[1.5|rat];
+			[3//2|float];
+			[3//2|int];
+			_n_,_n_.
+
+		print 3 * 1.5 - [10|char], _n_.
+		print 3 * 3//2 - [10|char], _n_.
+
+		const arr := [^c^, ^a^, 100, 150, 100//3].
+		print arr, _n_.
+		(arr[0]) := ^e^.
+		print arr, _n_.
+
+		var hehe := ^a^ * ^b^.
+		hehe := 2.
+		print hehe.
 	}
 }
