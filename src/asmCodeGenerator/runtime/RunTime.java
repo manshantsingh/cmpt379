@@ -10,6 +10,7 @@ import static asmCodeGenerator.ASMConstants.*;
 import asmCodeGenerator.Labeller;
 import asmCodeGenerator.Macros;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
+import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 import asmCodeGenerator.operators.ArrayLengthCodeGenerator;
 import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
@@ -56,6 +57,7 @@ public class RunTime {
 	public static final String CLEAR_N_BYTES = "$procedure-clear-n-bytes";
 	public static final String CLONE_N_BYTES = "$procedure-clone-n-bytes";
 	public static final String LOWEST_TERMS = "$procedure-lowest-terms";
+	public static final String RECORD_RELEASE = "$procedure-record-release";
 
 	public static final String PRINT_RATIONAL	= "$procedure-print-rational";
 	public static final String PRINT_ARRAY		= "$procedure-print-array";
@@ -107,6 +109,7 @@ public class RunTime {
 		frag.append(printRational());
 		frag.append(printArray());
 		frag.append(printRemaining());
+		frag.append(recordRelease());
 		frag.append(lowestTerms());
 		frag.append(cloneBytes());
 		frag.append(clearBytes());
@@ -531,6 +534,101 @@ public class RunTime {
 		frag.add(CallV);
 		Macros.storeITo(frag, elmSize);
 		Macros.storeITo(frag, printInner);
+	}
+
+	private ASMCodeFragment recordRelease() {
+		Labeller labeller = new Labeller("release-array");
+
+		String arrayNotNull = labeller.newLabel("array-not-null");
+		String ignoreDelete = labeller.newLabel("ignore-delete");
+		String notTypeArray = labeller.newLabel("not-type-array");
+		String simpleSubElement = labeller.newLabel("simple-sub-element");
+
+		String loopStart = labeller.newLabel("loop-start");
+		String loopEnd = labeller.newLabel("loop-end");
+
+		String end = labeller.newLabel("end");
+
+		ASMCodeFragment frag = new ASMCodeFragment(CodeType.GENERATES_VOID);
+
+		// TODO
+		frag.add(Label, RECORD_RELEASE);
+		frag.add(Exchange); // [... returnPtr arrayAddr]
+
+		frag.add(Duplicate);
+		frag.add(JumpTrue, arrayNotNull);
+		frag.add(Pop);
+		frag.add(Return);
+
+		frag.add(Label, arrayNotNull);
+		frag.add(Duplicate);
+		frag.add(PushI, RECORD_STATUS_OFFSET);
+		frag.add(Add);
+		frag.add(Duplicate);
+		frag.add(LoadI);
+		frag.add(PushI, MASK_RECORD_CHECK_ALLOWS_DELETION);
+		frag.add(BTAnd);		// [... returnPtr arrayAddr statusLocation bitmaskResult]
+		frag.add(JumpTrue, ignoreDelete);
+		frag.add(Duplicate);
+		frag.add(LoadI);
+		frag.add(PushI, MASK_RECORD_SET_IS_DELETED);
+		frag.add(BTOr);		// [... returnPtr arrayAddr statusLocation newStatusValue]
+		frag.add(StoreI);
+
+		// TODO
+		frag.add(Duplicate);	// [... returnPtr arrayAddr arrayAddr]
+		frag.add(PushI, RECORD_TYPE_ID_OFFSET);
+		frag.add(Add);
+		frag.add(LoadI);
+		frag.add(PushI, ARRAY_TYPE_ID);
+		frag.add(Subtract);
+		frag.add(JumpTrue, notTypeArray);
+
+		frag.add(Duplicate);	// [... returnPtr arrayAddr arrayAddr]
+		frag.add(PushI, RECORD_STATUS_OFFSET);
+		frag.add(Add);
+		frag.add(LoadI);
+		frag.add(PushI, MASK_ARRAY_CHECK_REFERENCE_SUBTYPE);
+		frag.add(And);
+		frag.add(JumpTrue, simpleSubElement);
+
+		frag.add(Duplicate);
+		frag.add(Duplicate);	// [... returnPtr arrayAddr arrayAddr arrayAddr]
+		frag.add(PushI, ARRAY_LENGTH_OFFSET);
+		frag.add(Add);
+		frag.add(LoadI);
+		frag.add(Exchange);	// [... returnPtr arrayAddr nElms arrayAddr]
+		frag.add(Duplicate);
+		frag.add(PushI, ARRAY_HEADER_OFFSET);
+		frag.add(Add);		// [... returnPtr arrayAddr nElms firstElmAddr]
+
+		frag.add(Label, loopStart);
+		frag.add(Exchange);		// [... returnPtr arrayAddr firstElmAddr nElms]
+		frag.add(Duplicate);
+		frag.add(JumpFalse, loopEnd);
+		frag.add(PushI, 1);
+		frag.add(Subtract);		// [... returnPtr arrayAddr firstElmAddr nElms]
+		frag.add(Exchange);
+		frag.add(Duplicate);
+		frag.add(Call, RECORD_RELEASE);		// [... returnPtr arrayAddr nElms firstElmAddr]
+		frag.add(Jump, loopStart);
+
+		frag.add(Label, loopEnd);
+		frag.add(Pop);
+		frag.add(Pop);
+
+		frag.add(Label, simpleSubElement);
+		frag.add(Call, MemoryManager.MEM_MANAGER_DEALLOCATE);
+		frag.add(Jump, end);
+
+		frag.add(Label, ignoreDelete);	// [... returnPtr arrayAddr statusLocation]
+		frag.add(Pop);
+		frag.add(Label, notTypeArray);	// [... returnPtr arrayAddr]
+		frag.add(Pop);
+		frag.add(Label, end);
+		frag.add(Return);
+
+		return frag;
 	}
 
 	private ASMCodeFragment lowestTerms() {

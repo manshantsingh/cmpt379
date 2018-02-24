@@ -49,34 +49,41 @@ exec {
 		rational[2]:= hehe.
 		rational[3]:= new [int](4).
 		hehe := [6].
+		release rational[2].
 		print "hehe inside 1 : ", rational, _n_.
 	}
 
 	{
-		const rational := new [string](4).
-		rational[0]:="abc".
-		rational[1]:="abc".
-		rational[2]:="abc".
-		rational[3]:="abc".
+		const rational := new [[string]](4).
+		rational[0]:=["abc"].
+		rational[1]:=["def"].
+		rational[2]:=["ghi"].
+		rational[3]:=["jkl"].
 		print "hehe inside 2 : ", rational, _n_.
+
+		const a := rational[0].
+		const b := rational[1].
+		const c := rational[2].
+		const d := rational[3].
+		print " pre-release: ", a;b;c;d,_n_.
+
+		release a.
+		release b.
+
+		print "about to release", _n_.
+		release rational.
+		print "post-release: ", a;b;c;d,_n_.
+
+		release c.
+		release d.
+		print "post-release: ", a;b;c;d,_n_.
+		print "a: ", rational,_n_.
 	}
 
 	print "hehe outside: ", rational, _n_.
 
 	{
 		const arr := [1,2,3,4,5,6,7,8,9].
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
 		print length arr, ":"; arr, _n_.
 
 		release arr.
@@ -95,34 +102,10 @@ exec {
 
 		release arr.
 		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
 	}
 
 	{
 		const arr := [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0].
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
 		print length arr, ":"; arr, _n_.
 
 		release arr.
@@ -141,18 +124,6 @@ exec {
 
 		release arr.
 		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
 	}
 
 	{
@@ -164,34 +135,10 @@ exec {
 
 		release arr.
 		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
 	}
 
 	{
 		const arr := ["1-str", "2-str", "3-str", "4-str", "5-str", "6-str", "7-str", "8-str", "9-str"].
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
-		print length arr, ":"; arr, _n_.
-
-		release arr.
 		print length arr, ":"; arr, _n_.
 
 		release arr.

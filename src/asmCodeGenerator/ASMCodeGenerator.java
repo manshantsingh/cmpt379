@@ -1,6 +1,5 @@
 package asmCodeGenerator;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,8 +7,8 @@ import java.util.Map;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.operators.ArrayIndexingCodeGenerator;
-import asmCodeGenerator.operators.ArrayReleaseCodeGenerator;
 import asmCodeGenerator.operators.RationalAddSubtractCodeGenerator;
+import asmCodeGenerator.operators.RecordReleaseCodeGenerator;
 import asmCodeGenerator.runtime.MemoryManager;
 import asmCodeGenerator.runtime.RunTime;
 import lexicalAnalyzer.Lextant;
@@ -470,7 +469,7 @@ public class ASMCodeGenerator {
 			if(varient instanceof ArrayIndexingCodeGenerator) {
 				newAddressCode(node);
 			}
-			else if(varient instanceof ArrayReleaseCodeGenerator) {
+			else if(varient instanceof RecordReleaseCodeGenerator) {
 				newVoidCode(node);
 			}
 			else {

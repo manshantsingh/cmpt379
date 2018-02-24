@@ -9,7 +9,7 @@ import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.operators.ArrayCloneCodeGenerator;
 import asmCodeGenerator.operators.ArrayIndexingCodeGenerator;
 import asmCodeGenerator.operators.ArrayLengthCodeGenerator;
-import asmCodeGenerator.operators.ArrayReleaseCodeGenerator;
+import asmCodeGenerator.operators.RecordReleaseCodeGenerator;
 import asmCodeGenerator.operators.BooleanCastCodeGenerator;
 import asmCodeGenerator.operators.ExpressOverFloatCodeGenerator;
 import asmCodeGenerator.operators.ExpressOverRationalCodeGenerator;
@@ -167,7 +167,8 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		);
 
 		new FunctionSignatures(Keyword.RELEASE,
-			new FunctionSignature(new ArrayReleaseCodeGenerator(), new Array(S), PrimitiveType.NO_TYPE)
+			new FunctionSignature(new RecordReleaseCodeGenerator(), new Array(S), PrimitiveType.NO_TYPE),
+			new FunctionSignature(new RecordReleaseCodeGenerator(), PrimitiveType.STRING, PrimitiveType.NO_TYPE)
 		);
 
 		for(Punctuator cmp: Punctuator.COMPARISONS) {
