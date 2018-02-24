@@ -171,6 +171,16 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 		return val;
 	}
+	private int promotionTargetLevel(Type type) {
+		int val = -1;
+		for(int i=0;i<acceptablePromotions.length;i++) {
+			if(type == acceptablePromotions[i][1]) {
+				val = i;
+				break;
+			}
+		}
+		return val;
+	}
 
 	private FunctionSignature binaryPromatableSignature(OperatorNode node, FunctionSignatures group, ArrayList<Type> childTypes) {
 		assert childTypes.size() == 2;
@@ -228,35 +238,38 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				}
 			}
 			if(howManyWork.size()>1) {
-				int[][] params = new int[howManyWork.size()][];
-				for(int i=0;i<params.length;i++) {
+				int[][] precendenceOrder = new int[howManyWork.size()][];
+				for(int i=0;i<precendenceOrder.length;i++) {
 					Type[] t = howManyWork.get(i).getParams();
-					params[i] = new int[] {
-						promotionLevel(t[0]),
-						promotionLevel(t[1])
+					precendenceOrder[i] = new int[] {
+						promotionTargetLevel(t[0]),
+						promotionTargetLevel(t[1])
 					};
 				}
 				int x=0, y=0;
-				for(int i=1;i<params.length; i++) {
-					if(params[i][0]<params[x][0]) {
+				for(int i=1;i<precendenceOrder.length; i++) {
+					System.out.println(i+": " +
+							precendenceOrder[i][0] + ", "+
+							precendenceOrder[i][1]);
+					if(precendenceOrder[i][0]<precendenceOrder[x][0]) {
 						x = i;
 					}
-					if(params[i][1]<params[y][1]) {
+					if(precendenceOrder[i][1]<precendenceOrder[y][1]) {
 						y = i;
 					}
 				}
 				if(x!=y) {
-					if(params[x][1]==params[y][1]) {
+					if(precendenceOrder[x][1]==precendenceOrder[y][1]) {
 						y=x;
 					}
-					else if(params[x][0]==params[y][0]) {
+					else if(precendenceOrder[x][0]==precendenceOrder[y][0]) {
 						x=y;
 					}
 				}
 				if(x==y) {
 					FunctionSignature sig = howManyWork.get(x);
 					Type[] parameters = sig.getParams();
-					for(int i=0; i<params.length; i++) {
+					for(int i=0; i<parameters.length; i++) {
 						implicitCast(node, i, parameters[i], childTypes);
 					}
 					return sig;

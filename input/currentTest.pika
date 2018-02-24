@@ -12,8 +12,12 @@ exec {
 
 	const arr := [^c^, ^a^, 100, 150, 100//3].
 	print arr, _n_.
-	arr[0] := ^e^.
+	(arr[0]) := ^e^.
 	print arr, _n_.
+
+	var hehe := ^a^ * ^b^.
+	hehe := 2//3.
+	print hehe.
 }
 
 # exec {
