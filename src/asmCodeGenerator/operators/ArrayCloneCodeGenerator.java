@@ -39,6 +39,8 @@ public class ArrayCloneCodeGenerator implements SimpleCodeGenerator {
 		frag.add(Add);
 		frag.add(LoadI);	// [... recordAddr nElms subTypeByteSize]
 		frag.add(Multiply);
+		frag.add(PushI, ARRAY_HEADER_OFFSET);
+		frag.add(Add);
 		frag.add(Duplicate);	// [... recordAddr totalByteSize totalByteSize]
 		frag.add(Call, MEM_MANAGER_ALLOCATE);
 		Macros.storeITo(frag, RECORD_CREATION_TEMPORARY);	// [... recordAddr totalByteSize]
