@@ -13,12 +13,15 @@ import asmCodeGenerator.operators.RecordReleaseCodeGenerator;
 import asmCodeGenerator.operators.BooleanCastCodeGenerator;
 import asmCodeGenerator.operators.ExpressOverFloatCodeGenerator;
 import asmCodeGenerator.operators.ExpressOverRationalCodeGenerator;
+import asmCodeGenerator.operators.FloatRationalCastCodeGenerator;
 import asmCodeGenerator.operators.FloatingDivideCodeGenerator;
 import asmCodeGenerator.operators.FormRationalCodeGenerator;
 import asmCodeGenerator.operators.IntegerCharacterCastCodeGenerator;
 import asmCodeGenerator.operators.IntegerDivideCodeGenerator;
+import asmCodeGenerator.operators.IntegerRationalCodeGenerator;
 import asmCodeGenerator.operators.LogicalNotCodeGenerator;
 import asmCodeGenerator.operators.RationalAddSubtractCodeGenerator;
+import asmCodeGenerator.operators.RationalFloatCastCodeGenerator;
 import asmCodeGenerator.operators.RationalMultiplyDivideCodeGenerator;
 import asmCodeGenerator.operators.ShortCircuitCodeGenerator;
 import lexicalAnalyzer.Keyword;
@@ -135,12 +138,19 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		);
 
 		new FunctionSignatures(Punctuator.PIPE,
+			// pika-1 casts
 		    new FunctionSignature(ASMOpcode.ConvertF, PrimitiveType.INTEGER, PrimitiveType.FLOAT),
 		    new FunctionSignature(ASMOpcode.ConvertI, PrimitiveType.FLOAT, PrimitiveType.INTEGER),
 		    new FunctionSignature(new IntegerCharacterCastCodeGenerator(), PrimitiveType.INTEGER, PrimitiveType.CHARACTER),
 		    new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.INTEGER),
 		    new FunctionSignature(new BooleanCastCodeGenerator(PrimitiveType.INTEGER), PrimitiveType.INTEGER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(new BooleanCastCodeGenerator(PrimitiveType.CHARACTER), PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN)
+		    new FunctionSignature(new BooleanCastCodeGenerator(PrimitiveType.CHARACTER), PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN),
+		    // pika-2 casts
+		    new FunctionSignature(ASMOpcode.Divide, PrimitiveType.RATIONAL, PrimitiveType.INTEGER),
+		    new FunctionSignature(new RationalFloatCastCodeGenerator(), PrimitiveType.RATIONAL, PrimitiveType.FLOAT),
+		    new FunctionSignature(new IntegerRationalCodeGenerator(), PrimitiveType.CHARACTER, PrimitiveType.RATIONAL),
+		    new FunctionSignature(new IntegerRationalCodeGenerator(), PrimitiveType.INTEGER, PrimitiveType.RATIONAL),
+		    new FunctionSignature(new FloatRationalCastCodeGenerator(), PrimitiveType.FLOAT, PrimitiveType.RATIONAL)
 		);
 
 		new FunctionSignatures(Punctuator.LOGICAL_AND,
