@@ -1,0 +1,4 @@
+exec {
+	var goat := "abcdefghijklmnopqrstuvwxyz?!@#$%^&*()_+-=[]{}\|.:^<^>,./ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".
+	print goat, _n_.
+}

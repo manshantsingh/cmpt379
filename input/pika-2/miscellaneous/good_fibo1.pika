@@ -1,0 +1,20 @@
+exec {
+	const max := 40.
+	var prevFib := 0.
+	var thisFib := 1.
+	var n := 1.
+	print " ", 0; prevFib, _n_.
+	print " ", 1; thisFib, _n_.
+	while (n < max) {
+		const prevHolder := thisFib.
+		thisFib := thisFib + prevFib.
+		prevFib := prevHolder.
+		n := n + 1.
+		if(n<10) {
+			print ^ ^, n; thisFib, _n_.
+		}
+		else {
+			print n; thisFib, _n_.
+		}
+	}
+}

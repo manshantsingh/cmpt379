@@ -1,0 +1,19 @@
+exec {
+	const aVariable := 12.
+	print aVariable, _n_.					# 12
+	if(_true_) {
+		var aVariable := -11.
+		print aVariable, _n_.				# -11
+		if(_true_) {
+			print aVariable, _n_.			# -11
+		    var aVariable := 10.
+		    print aVariable, _n_.			#  10
+		    aVariable := 9. 
+		    print aVariable, _n_.			# 9
+		}
+		print aVariable, _n_.				# -11
+		aVariable := -8.
+		print aVariable, _n_.				# -8
+	}
+	print aVariable, _n_.				# 12
+}

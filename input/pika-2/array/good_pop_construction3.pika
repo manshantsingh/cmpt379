@@ -1,0 +1,4 @@
+exec {
+	var harp := [_true_, _true_, _false_].
+	print harp, _n_.
+}

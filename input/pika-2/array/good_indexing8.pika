@@ -1,0 +1,11 @@
+exec {
+	const barn := new[float](5).
+	var i := 0.
+	while(i < length barn) {
+		barn[i] := [(3*i*i + i + 1) | float].
+		print barn[i], _n_.
+		i := i + 1.
+	}
+	print _n_.
+	print barn[2*2 - 2], _n_.
+}

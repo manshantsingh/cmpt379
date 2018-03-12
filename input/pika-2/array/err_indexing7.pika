@@ -1,0 +1,11 @@
+exec {
+	const width := 100.
+	const farm := new [int](width).
+	var index := 0.
+	while( index < width ) {
+		farm[index] := index * index + index + 1.
+		index := index + 1.
+	}
+	var barn := 1.77.
+	print barn[^a^], _n_.
+}

@@ -1,0 +1,9 @@
+exec {
+	if( 45 - 27 == 4 * 3 + 2 ) {
+		print "then", _n_.
+	}
+	else {
+		print "else", _n_.
+	}
+	print "after", _n_.
+}

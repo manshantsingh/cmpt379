@@ -127,7 +127,9 @@ public class Parser {
 		}
 		Token whileKeyword = nowReading;
 		readToken();
+		expect(Punctuator.OPEN_ROUND);
 		ParseNode condition = parseExpression();
+		expect(Punctuator.CLOSE_ROUND);
 		ParseNode blockStatement = parseBlockStatements();
 		return WhileStatementNode.make(whileKeyword, condition, blockStatement);
 	}
@@ -439,7 +441,7 @@ public class Parser {
 		while(nowReading.isLextant(Punctuator.OPEN_SQUARE)) {
 			Token token = LextantToken.artificial(nowReading, Punctuator.ARRAY_INDEXING);
 			readToken();
-			ParseNode index = parseAtomicExpression();
+			ParseNode index = parseExpression();
 			expect(Punctuator.CLOSE_SQUARE);
 			left = OperatorNode.withChildren(token, left, index);
 		}

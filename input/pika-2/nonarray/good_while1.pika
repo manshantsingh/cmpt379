@@ -1,0 +1,8 @@
+exec {
+	var counter := 0.
+	while( counter < 5 ) {
+		print "then", _n_.
+		counter := counter + 1.
+	}
+	print "after", _n_.
+}

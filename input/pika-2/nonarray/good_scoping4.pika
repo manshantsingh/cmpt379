@@ -1,0 +1,13 @@
+exec {
+	const aVariable := 19.
+	const bVariable := 2974.12.
+	print aVariable; bVariable, _n_.
+	var x := _true_.
+	while(x) {
+		var aVariable := 2.35001E4.
+		const bVariable := [^a^, ^z^].
+		print aVariable; bVariable, _n_.
+		x := _false_.
+	}
+	print aVariable; bVariable; x, _n_.
+}

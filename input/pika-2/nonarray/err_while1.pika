@@ -1,0 +1,6 @@
+exec {
+	while _true_  {
+		print "then", _n_.
+	}
+	print "after", _n_.
+}

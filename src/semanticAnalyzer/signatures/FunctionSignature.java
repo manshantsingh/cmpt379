@@ -63,7 +63,6 @@ public class FunctionSignature {
 
 	public boolean accepts(List<Type> types) {
 		TypeVariable.resetTypeVariable();
-
 		if(types.size() != paramTypes.length) {
 			return false;
 		}
@@ -83,7 +82,7 @@ public class FunctionSignature {
 	private boolean assignableTo(Type variableType, Type valueType) {
 		if(valueType == PrimitiveType.ERROR && ALL_TYPES_ACCEPT_ERROR_TYPES) {
 			return true;
-		}	
+		}
 		return variableType.equivalent(valueType);
 	}
 	

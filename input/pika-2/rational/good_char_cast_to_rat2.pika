@@ -1,0 +1,3 @@
+exec {
+	print [[0 | char] | rat]; 0,_n_ .
+}

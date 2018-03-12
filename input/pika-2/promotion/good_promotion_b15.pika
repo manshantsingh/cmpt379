@@ -1,0 +1,3 @@
+exec {
+	print ^o^ != 113; _true_, _n_ .
+}

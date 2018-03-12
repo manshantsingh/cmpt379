@@ -1,0 +1,4 @@
+exec {
+	const farm := 71//52.
+	print farm[^a^], _n_.
+}

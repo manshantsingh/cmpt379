@@ -1,0 +1,4 @@
+exec {
+	const grab := [[^a^, ^b^], new[char](0), [^c^, ^d^, ^e^]].
+	print length grab[1], _n_. 			# prints 0
+}

@@ -1,0 +1,9 @@
+exec {
+# variable not usable before definition
+	aVariable := -21.
+	print aVariable.
+	if(_true_) {
+		const aVariable := 19.
+		print aVariable.
+	}
+}

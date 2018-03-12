@@ -1,0 +1,9 @@
+exec {
+	if( _false_ ) {
+		print "then", _n_.
+	}
+	else {
+		print "else", _n_.
+	}
+	print "after", _n_.
+}

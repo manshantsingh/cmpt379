@@ -1,0 +1,30 @@
+exec {
+	const AA := new[int](8).
+	AA[7] := 13.
+	print AA, _n_.
+	
+	const BB := new[float](6).
+	BB[5] := 2.34.
+	print BB, _n_.
+	
+	const CC := new[bool](4).
+	CC[3] := _true_.
+	print CC, _n_.
+
+
+# the following have no fixed interpretation, because the zeroes in the new array
+# don't have a standardized interpretation as char, or as string, or as an array.
+# But it might be interesting to see what your compiler does on them.
+#	
+#	const DD := new[char](2).
+#	DD[1] := ^u^.
+#	print DD, _n_.
+#
+#	const EE := new[string](4).
+#	EE[3] := "howdy!".
+#	print EE, _n_.
+#
+#  const FF := new[[int]](6).
+#  FF[5] := [7, 8, 9].
+#  print FF, _n_.
+}

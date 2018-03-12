@@ -1,0 +1,5 @@
+exec {
+	var farm := new[bool](4).
+	farm := [_true_, _false_].
+	print "ok", _n_.
+}

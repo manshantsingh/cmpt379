@@ -1,0 +1,4 @@
+exec {
+	var barb := [_true_, ^a^].
+	print barb, _n_.
+}

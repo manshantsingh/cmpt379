@@ -1,0 +1,4 @@
+exec {
+	const farm := [_true_, _false_, _true_].
+	print farm[0]; farm[1]; farm[2]; _n_.
+}

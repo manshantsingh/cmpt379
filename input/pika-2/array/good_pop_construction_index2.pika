@@ -1,0 +1,7 @@
+exec {
+	var darb := [^a^, ^d^, ^g^, ^e^].
+	print ^a^ == darb[0], _n_.
+	print ^d^ == darb[1], _n_.
+	print ^g^ == darb[2], _n_.
+	print ^e^ == darb[3], _n_.
+}

@@ -1,0 +1,5 @@
+exec {
+	const a := 355 // 770.
+	const b := 170 // 7.
+	print a; b, _n_.
+}

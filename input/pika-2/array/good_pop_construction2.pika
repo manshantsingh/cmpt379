@@ -1,0 +1,4 @@
+exec {
+	var darb := [^a^, ^d^, ^g^, ^e^].
+	print darb, _n_.
+}

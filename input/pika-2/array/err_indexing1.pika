@@ -1,0 +1,5 @@
+exec {
+	const farm := [18, 71, 52, 42].
+	const barn := ^b^.
+	print barn[0], _n_.
+}

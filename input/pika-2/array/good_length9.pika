@@ -1,0 +1,4 @@
+exec {
+	const gram := new[int](0).
+	print length gram, _n_.				# prints, 0
+}

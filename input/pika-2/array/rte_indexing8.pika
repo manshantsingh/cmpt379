@@ -1,0 +1,4 @@
+exec {
+	const farm := new[char](3).
+	print farm[3], _n_.
+}

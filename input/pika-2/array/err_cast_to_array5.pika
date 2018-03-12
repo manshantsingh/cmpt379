@@ -1,0 +1,5 @@
+exec {
+	const aVariable := ["abcd", "efgh"].
+	const bVariable := [ aVariable | [[int]]].
+	print bVariable, _n_.
+}

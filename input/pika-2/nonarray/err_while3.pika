@@ -1,0 +1,7 @@
+exec {
+	const a := 14.17.
+	while (a) {
+		print "then", _n_.
+	}
+	print "after", _n_.
+}

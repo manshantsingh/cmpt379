@@ -1,0 +1,8 @@
+exec {
+	var i := [1, 2, 3].
+	print i, _n_.
+	const j := i.
+	i := [2, 0, 2].
+	j[1] := 9.
+	print i; j, _n_.
+}

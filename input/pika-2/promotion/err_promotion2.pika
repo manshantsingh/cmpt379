@@ -1,0 +1,3 @@
+exec {
+	print 3.2 + _true_, _n_ .
+}

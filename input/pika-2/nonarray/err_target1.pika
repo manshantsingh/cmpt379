@@ -1,0 +1,6 @@
+exec {
+	const i := 10.1.
+	print i, _n_.
+	(i) := -7.5.
+	print i, _n_.
+}

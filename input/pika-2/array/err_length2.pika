@@ -1,0 +1,4 @@
+exec {
+	const gram := "hello, world!".
+	print length gram, _n_. 			# prints 13
+}

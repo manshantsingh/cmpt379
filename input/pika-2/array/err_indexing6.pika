@@ -1,0 +1,5 @@
+exec {
+	const farm := [18, 71, 52, 42].
+	const tractor := [4, 0, 0, 2].
+	print farm[tractor], _n_.
+}

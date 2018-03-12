@@ -1,0 +1,5 @@
+exec {
+	const aVariable := 19.
+	const bVariable := [aVariable | [int]].
+	print bVariable, _n_.
+}

@@ -1,0 +1,5 @@
+exec {
+	const x := 3 - 88.
+	var barb := new[int](x).
+	print barb, _n_.
+}

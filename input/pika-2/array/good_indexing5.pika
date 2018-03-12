@@ -1,0 +1,4 @@
+exec {
+	const farm := [^a^, ^b^].
+	print farm[0]; farm[1], _n_.
+}

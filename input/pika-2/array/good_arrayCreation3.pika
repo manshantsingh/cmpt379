@@ -1,0 +1,12 @@
+exec {
+	const AA := [[1, 2, 3], [4, 5], [6]].
+	const BB := [[3.4, 10.2], [7.3, 6.66], [6.4]].
+	
+	print AA[0], _n_.
+	print AA[1], _n_. 
+	print AA[2], _n_, _n_.
+	
+	print BB[0], _n_.
+	print BB[1], _n_. 
+	print BB[2], _n_, _n_.
+}

@@ -1,0 +1,7 @@
+exec {
+	const a := ^x^.
+	while (a) {
+		print "then", _n_.
+	}
+	print "after", _n_.
+}

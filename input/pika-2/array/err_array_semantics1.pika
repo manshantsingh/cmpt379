@@ -1,0 +1,8 @@
+exec {
+	const farm := new[int](2).
+	farm[0] := 40.
+	farm[1] := 41.
+	print farm, _n_.
+	farm := [1, 2].
+	print farm, _n_.
+}

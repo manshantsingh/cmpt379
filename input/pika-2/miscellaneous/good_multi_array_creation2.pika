@@ -1,0 +1,35 @@
+exec {
+	const width := 5.
+	const height := 8.
+	
+	# allocate matrix and submatrices
+	const matrix := new[[int]](width).
+	var x := 0.
+	while (x < length matrix) {
+		matrix[x] := new[int](height).
+		x := x + 1.
+	}
+	
+	# assign values to elements
+	x := 0.
+	while (x < length matrix) {
+		var y := 0.
+		while (y < length matrix[x]) {
+			matrix[x][y] := 10*(x + 1) + (y + 1).
+			y := y + 1.
+		}
+		x := x + 1.
+	}
+
+	# print in, y-major, order
+	var y := 0.
+	while (y < length matrix[0]) {
+		var x := 0.
+		while (x < length matrix) {
+			print matrix[x][y];.
+			x := x + 1.
+		}
+		print _n_.
+		y := y + 1.
+	}
+}

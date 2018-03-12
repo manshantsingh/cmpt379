@@ -1,0 +1,9 @@
+exec {
+	const barn := new[float](5).
+	var i := 0.
+	while(i < length barn) {
+		barn[i] := [(i*i) | float].
+		i := i + 1.
+	}
+	print barn[0]; barn[1]; barn[2]; barn[3]; barn[4], _n_.
+}

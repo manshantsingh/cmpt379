@@ -1,0 +1,6 @@
+exec {
+	var farm := [18, 71, 14].
+	print 18 == farm[0], _n_.
+	print 71 == farm[1], _n_.
+	print 14 == farm[2], _n_.
+}

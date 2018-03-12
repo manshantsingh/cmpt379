@@ -1,0 +1,5 @@
+exec {
+	var calf := 42.
+	var foal := clone calf.
+	print calf,  _n_, foal,  _n_.
+}

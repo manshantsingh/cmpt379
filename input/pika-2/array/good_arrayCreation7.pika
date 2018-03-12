@@ -1,0 +1,5 @@
+exec {
+	const AA := new[int](8).
+	AA[2] := 14.
+	print AA, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+	var r := 0 // 44.
+	print [r | int]; 0, _n_ .
+}

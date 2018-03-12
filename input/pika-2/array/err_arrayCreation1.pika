@@ -1,0 +1,5 @@
+exec {
+	const AA := [^a^ ^b^ ^c^].
+	
+	print AA, _n_.
+}

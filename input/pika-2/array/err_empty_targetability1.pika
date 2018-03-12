@@ -1,0 +1,6 @@
+exec {
+	const barb := new[int](4).
+	print ^o^, ^k^, _n_.
+	barb := new[int](8).
+	print barb, _n_.
+}

@@ -1,0 +1,10 @@
+exec {
+  print [[ ^{^, ^u^ ], [ ^J^, ^w^ ]] == [[ ^2^, ^k^ ]], _n_.
+  const x := [[ ^:^, ^<^, ^>^], [ ^Q^, ^0^ ]].
+  var y := x.
+  print x != y, _n_.
+  y := clone x.
+  print x != y, _n_.
+  y := [[^$^] , [^w^, ^o^, ^o^, ^t^]].
+  print x != y, _n_.
+}

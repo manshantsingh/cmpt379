@@ -1,0 +1,8 @@
+exec {
+	const DD := new [int](8).
+	var i := 0.
+	while(i < length DD) {
+		print i; DD[i], _n_.
+		i := i + 1.
+	}
+}

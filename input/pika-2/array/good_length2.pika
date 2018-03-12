@@ -1,0 +1,4 @@
+exec {
+	var farm := [^a^, ^*^, ^l^, ^$^, ^Y^, ^x^].
+	print length farm, _n_.				# prints 6
+}

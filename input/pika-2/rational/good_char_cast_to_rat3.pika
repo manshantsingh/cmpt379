@@ -1,0 +1,5 @@
+exec {
+	const a := ^:^.
+	
+	print [a | rat]; 58,_n_ .
+}

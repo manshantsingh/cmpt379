@@ -1,0 +1,6 @@
+exec {
+	if( 14 < 3 + 4*5 ) {
+		print "then", _n_.
+	}
+	print "after", _n_.
+}

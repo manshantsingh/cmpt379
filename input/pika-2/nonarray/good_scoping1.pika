@@ -1,0 +1,9 @@
+exec {
+	var aVariable := 19.
+	print aVariable;.
+	if(_true_) {
+		aVariable := -21.
+		print aVariable;.
+	}
+	print aVariable, _n_.
+}

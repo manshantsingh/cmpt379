@@ -1,0 +1,4 @@
+exec {
+	const gram := [[_true_, _true_, _false_], [_true_, _false_, _true_], [_true_, _false_, _true_, _false_]].
+	print length gram[2], _n_. 			# prints, 4
+}

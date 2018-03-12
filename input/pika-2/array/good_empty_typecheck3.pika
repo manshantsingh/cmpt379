@@ -1,0 +1,5 @@
+exec {
+	var farm := new[char](4).
+	farm := [^x^, ^Y^].
+	print "ok", _n_.
+}

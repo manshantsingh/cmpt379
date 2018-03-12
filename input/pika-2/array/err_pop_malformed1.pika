@@ -1,0 +1,4 @@
+exec {
+	var barb := [1, 2, 3, 4.
+	print barb, _n_.
+}

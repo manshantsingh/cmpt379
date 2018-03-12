@@ -1,0 +1,8 @@
+exec {
+	if( _false_ || (17 / 0) > 1) {
+		print "good", _n_.
+	}
+	else {
+		print "bad", _n_.
+	}
+}

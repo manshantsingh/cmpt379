@@ -1,0 +1,6 @@
+exec {
+	var lamb := ["Tom", " ", "likes", " ", "cola"].
+	var foal := clone lamb.
+	foal[4] := "coffee".
+	print lamb,  _n_, foal,  _n_.
+}

@@ -589,8 +589,8 @@ public class RunTime {
 		frag.add(Add);
 		frag.add(LoadI);
 		frag.add(PushI, MASK_ARRAY_CHECK_REFERENCE_SUBTYPE);
-		frag.add(And);
-		frag.add(JumpTrue, simpleSubElement);
+		frag.add(BTAnd);
+		frag.add(JumpFalse, simpleSubElement);
 
 		frag.add(Duplicate);
 		frag.add(Duplicate);	// [... returnPtr arrayAddr arrayAddr arrayAddr]
@@ -598,7 +598,7 @@ public class RunTime {
 		frag.add(Add);
 		frag.add(LoadI);
 		frag.add(Exchange);	// [... returnPtr arrayAddr nElms arrayAddr]
-		frag.add(Duplicate);
+//		frag.add(Duplicate);
 		frag.add(PushI, ARRAY_HEADER_OFFSET);
 		frag.add(Add);		// [... returnPtr arrayAddr nElms firstElmAddr]
 

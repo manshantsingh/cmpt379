@@ -1,0 +1,7 @@
+exec {
+	const AA := [^a^, ^b^, ^c^, ^d^, ^e^].
+	const BB := [10.2, 7.3, 6.4].
+	
+	print AA, _n_.
+	print BB, _n_.
+}

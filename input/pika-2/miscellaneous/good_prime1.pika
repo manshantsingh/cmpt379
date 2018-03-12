@@ -1,0 +1,26 @@
+exec {
+	const max := 500.
+	var n := 1.
+	while (n < max) {
+		var divisorFound := _false_.
+		var d := 2.
+		while (d*d <= n) {
+			const approx := (n / d) * d.
+			if(approx == n) {
+				divisorFound := _true_.
+				d := n.
+			}
+			d := d + 1.
+		}
+		if(!divisorFound) {
+			if(n<10) {
+				print ^ ^.
+			}
+			if(n<100) {
+				print ^ ^.
+			}
+			print n, _n_.
+		}
+		n := n + 1.
+	}
+}

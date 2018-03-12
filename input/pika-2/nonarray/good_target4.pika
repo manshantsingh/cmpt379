@@ -1,0 +1,6 @@
+exec {
+	var i := ^a^.
+	print i, _n_.
+	(i) := ^c^.
+	print i, _n_.
+}

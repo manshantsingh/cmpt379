@@ -1,0 +1,4 @@
+exec {
+	const gram := ^a^.
+	print length gram, _n_. 			# typecheck, error
+}

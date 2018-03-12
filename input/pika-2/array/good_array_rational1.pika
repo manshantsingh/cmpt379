@@ -1,0 +1,4 @@
+exec {
+	var arr := [2//3, 3//4].
+	print arr, _n_.
+}

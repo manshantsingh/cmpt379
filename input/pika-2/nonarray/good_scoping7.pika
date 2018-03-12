@@ -1,0 +1,9 @@
+exec {
+	var cc := ^c^.
+	print cc;.
+	if(_true_) {
+		var cc := cc.		# new var on left, old var on right.
+		print cc;.
+	}
+	print cc, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+	var farm := new[int](3.21).
+	print length farm, _n_.
+}

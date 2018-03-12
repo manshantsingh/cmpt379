@@ -1,0 +1,4 @@
+exec {
+	var a := 0.
+	print [a | rat]; 0,_n_ .
+}

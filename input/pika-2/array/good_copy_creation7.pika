@@ -1,0 +1,5 @@
+exec {
+	const llama := [1, 2, 3, 4, 5, 6].
+	var goat := (clone clone clone llama)[3].
+	print goat,  _n_.
+}

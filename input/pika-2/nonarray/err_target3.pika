@@ -1,0 +1,6 @@
+exec {
+	var i := [^A^, ^z^].
+	print i, _n_.
+	[^a^, ^Z^] := [^1^, ^3^].
+	print i, _n_.
+}

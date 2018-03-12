@@ -1,0 +1,4 @@
+exec {
+	var goat := "".
+	print goat,  _n_.
+}

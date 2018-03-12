@@ -1,0 +1,29 @@
+exec {
+	const width := 4.
+	const height := 7.
+	const matrix := new[[int]](width).	
+	var x := 0.
+	while(x < width) {
+		matrix[x] := new[int](height). 
+		x := x + 1.
+	}
+	var y := 0.
+	while(y < height) {
+		x := 0.
+		while(x < width) {
+			matrix[x][y] := 10*(x + 1) + (y + 1).
+			x := x + 1.
+		}
+		y := y + 1.
+	}
+	y := 0.
+	while(y < height) {
+		x := 0.
+		while(x < width) {
+			print matrix[x][y];.
+			x := x + 1.
+		}
+		print _n_.
+		y := y + 1.
+	}
+}

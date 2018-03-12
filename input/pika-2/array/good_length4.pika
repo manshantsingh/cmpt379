@@ -1,0 +1,4 @@
+exec {
+	var farm := new[bool](17).
+	print length farm, _n_.				# prints 17
+}

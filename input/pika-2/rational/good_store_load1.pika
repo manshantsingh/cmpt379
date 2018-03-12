@@ -1,0 +1,5 @@
+exec {
+	const a := 7 // 16.
+	print a; 7//16, _n_.
+}
+

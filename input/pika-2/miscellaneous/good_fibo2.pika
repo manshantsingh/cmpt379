@@ -1,0 +1,24 @@
+exec {
+	const max := 20.
+	const fibs := new[int](max).
+	
+	fibs[0] := 0.
+	fibs[1] := 1.
+	
+	var n := 1.
+	while(n < length fibs) {
+		if(n >= 2) {
+			fibs[n] := fibs[n - 1] + fibs[n - 2].
+		}
+		n := n + 1.
+	}
+	
+	n := 1.
+	while(n < length fibs) {
+		if(n < 10) {
+			print ^ ^.
+		}
+		print n; fibs[n], _n_.
+		n := n + 1.
+	}
+}

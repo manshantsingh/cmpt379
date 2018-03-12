@@ -517,7 +517,7 @@ public class ASMCodeGenerator {
 		public void visitLeave(ArrayNode node) {
 			newValueCode(node);
 
-			Type subType = node.getType().getSubType();
+			Type subType = ((Array)node.getType()).getSubType();
 			int statusFlags;
 			if(subType instanceof Array || subType == PrimitiveType.STRING) {
 				// TODO: fix this for string in procedure call

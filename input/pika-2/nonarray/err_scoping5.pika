@@ -1,0 +1,9 @@
+exec {
+	const aVariable := 19.
+	print aVariable.
+	if(_true_) {
+		print bVariable.
+		var bVariable := -42.
+	}
+	print aVariable, _n_.
+}

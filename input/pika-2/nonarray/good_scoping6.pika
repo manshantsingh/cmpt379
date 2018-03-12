@@ -1,0 +1,14 @@
+exec {
+	var cc := ^c^.
+	print cc;.
+	if(_true_) {
+		var dd := ^d^.
+		print dd;.
+	}
+	if(_true_) {
+		var dd := ^x^.
+		var ee := ^e^.
+		print dd; ee;.
+	}
+	print cc, _n_.
+}

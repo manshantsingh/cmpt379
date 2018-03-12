@@ -1,0 +1,4 @@
+exec {
+	const DD := new [float](12).
+	print DD, _n_.
+}

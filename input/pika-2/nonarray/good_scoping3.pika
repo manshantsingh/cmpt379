@@ -1,0 +1,9 @@
+exec {
+	const aVariable := 19.
+	print aVariable;.
+	if(_true_) {
+		var aVariable := ^c^.
+		print aVariable;.
+	}
+	print aVariable, _n_.
+}

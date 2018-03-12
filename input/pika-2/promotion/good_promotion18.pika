@@ -1,0 +1,5 @@
+exec {
+	var x := ^a^.
+	var y := ^x^.
+	print x // y, _n_ .
+}

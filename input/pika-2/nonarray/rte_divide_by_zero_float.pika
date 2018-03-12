@@ -1,0 +1,5 @@
+exec {
+	const divisor := 1.0 - 1.0.
+	const dividend := 14.4 / divisor.
+	print dividend.
+}

@@ -1,0 +1,5 @@
+exec {
+	const aVariable := [2, 3, 5].
+	const bVariable := [aVariable | [float]].
+	print bVariable, _n_.
+}

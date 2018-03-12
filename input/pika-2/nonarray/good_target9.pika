@@ -1,0 +1,6 @@
+exec {
+	var i := [1, 2, 3].
+	print i, _n_.
+	(i[2]) := 4.
+	print i, _n_.
+}

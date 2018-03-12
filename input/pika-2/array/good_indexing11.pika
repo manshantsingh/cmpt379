@@ -1,0 +1,5 @@
+exec {
+	const farm := [[^a^, ^z^, ^y^], [^b^], [^c^, ^d^, ^e^]].
+	print farm[2], _n_.
+	print farm[0][2], _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+	var barb := new[int].
+	print barb, _n_.
+}

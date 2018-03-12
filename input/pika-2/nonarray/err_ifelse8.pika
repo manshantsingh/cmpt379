@@ -1,0 +1,14 @@
+exec {
+	const a := _false_.
+	const b := _true_.
+	if (a) {
+		print 21, _n_.
+	}
+	else if (b) {
+		print 42, _n_.
+	}
+	else {
+		print 84, _n_.
+	}
+	print "after", _n_.
+}

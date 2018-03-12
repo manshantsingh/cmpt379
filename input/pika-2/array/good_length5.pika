@@ -1,0 +1,3 @@
+exec {
+	print length new[bool](20), _n_.
+}

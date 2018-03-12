@@ -1,0 +1,8 @@
+exec {
+	const a := 355 // 770.
+	var b := 170 // 7.
+	print a; b, _n_.
+	b := 42 // 6.
+	
+	print a; b, _n_.
+}

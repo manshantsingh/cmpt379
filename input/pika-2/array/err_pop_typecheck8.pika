@@ -1,0 +1,4 @@
+exec {
+	var barb := [[[2, 3], [4, 5]], 4].
+	print barb, _n_.
+}

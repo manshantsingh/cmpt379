@@ -1,0 +1,4 @@
+exec {
+	const hogslop := [""].
+	print ^h^, ^i^; hogslop; ^b^, ^u^, ^d^; _n_.
+}

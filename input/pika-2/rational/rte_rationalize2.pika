@@ -1,0 +1,6 @@
+exec {
+	var a := 3.2198.
+	var b := 0.
+	print a //// b; "should've issued run time error by now", _n_.
+}
+

@@ -1,0 +1,6 @@
+exec {
+	const a := _false_.
+	while (a) 
+		print 21, _n_.
+	print "after", _n_.
+}

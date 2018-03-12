@@ -1,0 +1,4 @@
+exec {
+	const farm := [18, 71, 52, 42].
+	print farm[^a^], _n_.
+}

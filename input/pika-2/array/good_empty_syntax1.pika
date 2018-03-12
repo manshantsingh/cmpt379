@@ -1,0 +1,4 @@
+exec {
+	var barb := new[int](5).
+	print "good", _n_.
+}

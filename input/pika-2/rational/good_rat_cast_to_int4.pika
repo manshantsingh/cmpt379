@@ -1,0 +1,5 @@
+exec {
+	var r := 1 // 6.
+	var s := -1 // 3.
+	print [r+s | int]; 0, _n_ .
+}

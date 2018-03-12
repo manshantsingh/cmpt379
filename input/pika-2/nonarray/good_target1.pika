@@ -1,0 +1,6 @@
+exec {
+	var i := 14.
+	print i, _n_.
+	i := 29.
+	print i, _n_.
+}

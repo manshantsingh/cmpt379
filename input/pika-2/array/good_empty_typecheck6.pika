@@ -1,0 +1,5 @@
+exec {
+	var farm := new[string](4).
+	farm[0] := "hello".
+	print "ok", _n_.
+}

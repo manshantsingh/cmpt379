@@ -1,0 +1,8 @@
+exec {
+	var aVariable := 314.
+	print aVariable;.
+	if(_true_) {
+		print aVariable;.
+	}
+	print aVariable, _n_.
+}

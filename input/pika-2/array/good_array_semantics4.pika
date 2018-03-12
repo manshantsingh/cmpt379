@@ -1,0 +1,8 @@
+exec {
+	const farm := [18, 71].
+	const cow := [22, 44].
+	const hay := [farm, cow].
+	print hay, _n_.
+	hay[0][1] := 70.
+	print hay; farm; cow, _n_.
+}

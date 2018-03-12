@@ -1,0 +1,4 @@
+exec {
+	const farm := [18, 71, 52, 42].
+	print farm[1]; farm[2], _n_.
+}

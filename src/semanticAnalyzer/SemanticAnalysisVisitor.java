@@ -184,7 +184,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 	private FunctionSignature binaryPromatableSignature(OperatorNode node, FunctionSignatures group, ArrayList<Type> childTypes) {
 		assert childTypes.size() == 2;
-
 		FunctionSignature originalSignature = group.acceptingSignature(childTypes);
 		if(originalSignature != FunctionSignature.nullInstance()) {
 			return originalSignature;
@@ -237,7 +236,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 					}
 				}
 			}
-			if(howManyWork.size()>1) {
+			if(howManyWork.size()>0) {
 				int[][] precendenceOrder = new int[howManyWork.size()][];
 				for(int i=0;i<precendenceOrder.length;i++) {
 					Type[] t = howManyWork.get(i).getParams();
@@ -354,7 +353,18 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 	public void visitLeave(ArrayNode node) {
 		// TODO promotion stuff and typechecking
-		if(!node.isNewDeclaration()) {
+		if(node.isNewDeclaration()) {
+			ParseNode first = node.child(0);
+			Type type = first.getType();
+			if(type.equivalent(PrimitiveType.CHARACTER)) {
+				implicitCast(node, 0, PrimitiveType.INTEGER, type);
+			}
+			else if(!type.equivalent(PrimitiveType.INTEGER)) {
+				arrayEmptyCreationNonIntegerLength(node, type);
+				node.setType(PrimitiveType.ERROR);
+			}
+		}
+		else {
 			assert node.nChildren() > 0;
 
 			boolean foundRational=false;
@@ -508,6 +518,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 		builder.append(" at " + node.getToken().getLocation());
 		logError(builder.toString());
+	}
+	private void arrayEmptyCreationNonIntegerLength(ParseNode node, Type type) {
+		logError("Array creation with \"new\" keyword cannot have length of type "+type+" at" + node.getToken().getLocation());
 	}
 	private void castTypeCheckError(ParseNode node, Type from, Type to) {
 		logError("Cannot cast from "+from+" to "+to+" at " + node.getToken().getLocation());

@@ -1,0 +1,4 @@
+exec {
+	var farm := [18, 71, 91].
+	print length farm, _n_.		# prints, 3
+}

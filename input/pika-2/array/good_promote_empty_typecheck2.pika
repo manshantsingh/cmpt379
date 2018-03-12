@@ -1,0 +1,4 @@
+exec {
+	var farm := new[int](^a^).
+	print length farm, _n_.
+}

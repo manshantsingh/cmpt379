@@ -1,0 +1,12 @@
+exec {
+	const AA := [[^a^, ^b^, ^c^], [^l^, ^m^, ^n^, ^o^, ^p^], [^z^]].
+	const BB := clone AA.
+	
+	print AA[0], _n_.
+	print AA[1], _n_. 
+	print AA[2], _n_, _n_.
+	
+	print BB[0], _n_.
+	print BB[1], _n_. 
+	print BB[2], _n_, _n_.
+}

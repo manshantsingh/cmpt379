@@ -13,7 +13,7 @@ import tokens.Token;
 
 public class ArrayNode extends ParseNode {
 	private boolean newDeclaration;
-	private Array resultType;
+	private Type resultType;
 
 	public ArrayNode(Token token) {
 		super(token);
@@ -54,13 +54,12 @@ public class ArrayNode extends ParseNode {
 		newDeclaration = isNew;
 	}
 
-	public Array getType() {
+	public Type getType() {
 		return resultType;
 	}
 
 	public void setType(Type type) {
-		assert(type instanceof Array);
-		resultType = (Array) type;
+		resultType = type;
 	}
 
 ///////////////////////////////////////////////////////////

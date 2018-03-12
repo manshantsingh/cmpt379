@@ -1,0 +1,10 @@
+exec {
+	const farm := [18, 71].
+	var cow := farm. 
+	cow[0] := 1.
+	print farm; cow; _n_.
+	const horse := [29, 36].
+	cow := horse.
+	cow[1] := -25.
+	print farm; cow; horse, _n_.
+}

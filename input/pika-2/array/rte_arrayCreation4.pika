@@ -1,0 +1,7 @@
+exec {
+	var x := 14.
+	x := x - 15.
+	const AA := new[int](x).
+	
+	print "hello", _n_.
+}

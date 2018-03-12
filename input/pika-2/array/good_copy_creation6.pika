@@ -1,0 +1,7 @@
+exec {
+	var calf := [_true_, _true_, _false_, _true_].
+	var foal := clone calf.
+	print calf,  _t_, foal,  _n_.
+	foal := [_true_, _false_].
+	print calf,  _t_, foal,  _n_.
+}

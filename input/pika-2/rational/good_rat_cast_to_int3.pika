@@ -1,0 +1,5 @@
+exec {
+	var r := 71 // 44.
+	var s := 59 // 11.
+	print [r+s | int]; 0, _n_ .
+}

@@ -1,0 +1,3 @@
+exec {
+	print [97 | rat]; 97,_n_ .
+}
