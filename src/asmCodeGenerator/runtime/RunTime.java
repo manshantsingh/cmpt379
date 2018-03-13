@@ -598,7 +598,11 @@ public class RunTime {
 		frag.add(Add);
 		frag.add(LoadI);
 		frag.add(Exchange);	// [... returnPtr arrayAddr nElms arrayAddr]
-//		frag.add(Duplicate);
+		frag.add(Duplicate);
+		frag.add(PushI, ARRAY_SUBELEMENT_SIZE_OFFSET);
+		frag.add(Add);
+		frag.add(LoadI);
+		Macros.storeITo(frag, ARRAY_INDEXING_ARRAY);
 		frag.add(PushI, ARRAY_HEADER_OFFSET);
 		frag.add(Add);		// [... returnPtr arrayAddr nElms firstElmAddr]
 
@@ -610,7 +614,13 @@ public class RunTime {
 		frag.add(Subtract);		// [... returnPtr arrayAddr firstElmAddr nElms]
 		frag.add(Exchange);
 		frag.add(Duplicate);
+		Macros.loadIFrom(frag, ARRAY_INDEXING_ARRAY);
+		frag.add(Exchange);
+		frag.add(LoadI);
 		frag.add(Call, RECORD_RELEASE);		// [... returnPtr arrayAddr nElms firstElmAddr]
+		frag.add(Duplicate);
+		Macros.storeITo(frag, ARRAY_INDEXING_ARRAY);
+		frag.add(Add);
 		frag.add(Jump, loopStart);
 
 		frag.add(Label, loopEnd);
