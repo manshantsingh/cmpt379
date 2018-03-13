@@ -13,6 +13,7 @@ import parseTree.nodeTypes.FloatConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
+import parseTree.nodeTypes.LoopJumperNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
@@ -72,6 +73,7 @@ public interface ParseNodeVisitor {
 	void visit(NewlineNode node);
 	void visit(SpaceNode node);
 	void visit(TabSpaceNode node);
+	void visit(LoopJumperNode node);
 
 	
 	public static class Default implements ParseNodeVisitor
@@ -185,6 +187,9 @@ public interface ParseNodeVisitor {
 			defaultVisitForLeaf(node);
 		}
 		public void visit(TabSpaceNode node) {
+			defaultVisitForLeaf(node);
+		}
+		public void visit(LoopJumperNode node) {
 			defaultVisitForLeaf(node);
 		}
 	}

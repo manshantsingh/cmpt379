@@ -21,7 +21,14 @@ public enum Keyword implements Lextant {
 
 	IF("if"),
 	ELSE("else"),
+
 	WHILE("while"),
+	BREAK("break"),
+	CONTINUE("continue"),
+
+	FUNC("func"),
+	CALL("call"),
+	VOID("void"),
 
 	BOOLEAN("bool"),
 	CHARACTER("char"),

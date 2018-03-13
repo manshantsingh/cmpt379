@@ -57,4 +57,22 @@ exec {
 		print a!=c,_n_.
 		print c!=b,_n_.
 	}
+	var j:= 0.
+	while(j<2){
+		j:=j + 1.
+		var i := 0.
+		while(i<5){
+			i := i + 1.
+			if (i < 2){
+				print "special small number:";i,_n_.
+				continue.
+			}
+			if(i>3){
+				print "leaving at i:";i,_n_.
+				break.
+			}
+			print "i:";i,_n_.
+		}
+		print "current j: ",j,_n_.
+	}
 }

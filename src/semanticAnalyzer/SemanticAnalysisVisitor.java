@@ -24,6 +24,7 @@ import parseTree.nodeTypes.FloatConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
+import parseTree.nodeTypes.LoopJumperNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
@@ -467,6 +468,20 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visit(TabSpaceNode node) {
 	}
+	@Override
+	public void visit(LoopJumperNode node) {
+		boolean found=false;
+		for(ParseNode current: node.pathToRoot()) {
+			if(current instanceof WhileStatementNode) {
+				node.setJumpLabelFromParent((WhileStatementNode)current);
+				found=true;
+				break;
+			}
+		}
+		if(!found) {
+			loopParentNotFound(node);
+		}
+	}
 	///////////////////////////////////////////////////////////////////////////
 	// IdentifierNodes, with helper methods
 	@Override
@@ -521,6 +536,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	private void arrayEmptyCreationNonIntegerLength(ParseNode node, Type type) {
 		logError("Array creation with \"new\" keyword cannot have length of type "+type+" at" + node.getToken().getLocation());
+	}
+	private void loopParentNotFound(ParseNode node) {
+		logError("No Loop parent found for "+node.getToken().getLexeme()+" at" + node.getToken().getLocation());
 	}
 	private void castTypeCheckError(ParseNode node, Type from, Type to) {
 		logError("Cannot cast from "+from+" to "+to+" at " + node.getToken().getLocation());

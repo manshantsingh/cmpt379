@@ -26,6 +26,7 @@ import parseTree.nodeTypes.FloatConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
+import parseTree.nodeTypes.LoopJumperNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
@@ -267,17 +268,13 @@ public class ASMCodeGenerator {
 			ASMCodeFragment conditionCode = removeValueCode(node.child(0));
 			ASMCodeFragment blockCode = removeVoidCode(node.child(1));
 
-			Labeller labeller = new Labeller("while");
-			String top = labeller.newLabel("top");
-			String end = labeller.newLabel("end");
-
-			code.add(Label, top);
+			code.add(Label, node.getTopLabel());
 			code.append(conditionCode);
-			code.add(JumpFalse, end);
+			code.add(JumpFalse, node.getEndLabel());
 			code.append(blockCode);
-			code.add(Jump, top);
+			code.add(Jump, node.getTopLabel());
 
-			code.add(Label, end);
+			code.add(Label, node.getEndLabel());
 		}
 		public void visit(NewlineNode node) {
 			newVoidCode(node);
@@ -293,6 +290,10 @@ public class ASMCodeGenerator {
 			newVoidCode(node);
 			code.add(PushD, RunTime.TAB_SPACE_PRINT);
 			code.add(Printf);
+		}
+		public void visit(LoopJumperNode node) {
+			newVoidCode(node);
+			code.add(Jump, node.getJumpLabel());
 		}
 		
 
