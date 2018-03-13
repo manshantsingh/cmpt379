@@ -29,6 +29,7 @@ public enum Keyword implements Lextant {
 	FUNC("func"),
 	CALL("call"),
 	VOID("void"),
+	RETURN("return"),
 
 	BOOLEAN("bool"),
 	CHARACTER("char"),
