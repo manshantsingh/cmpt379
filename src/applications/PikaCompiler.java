@@ -38,7 +38,7 @@ public class PikaCompiler extends PikaApplication {
 //		}
 //		return;
 		ParseNode syntaxTree    = Parser.parse(scanner);
-		System.out.println(" syntaxTree:\n"+syntaxTree);
+//		System.out.println(" syntaxTree:\n"+syntaxTree);
 		ParseNode decoratedTree = SemanticAnalyzer.analyze(syntaxTree);
 //		System.out.println("\n\n decorated:\n"+decoratedTree);
 

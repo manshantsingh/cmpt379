@@ -182,6 +182,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 		return val;
 	}
+	private int hackedPromotionTargetLevel(Type type) {
+		return Math.min(promotionLevel(type),1);
+	}
 
 	private FunctionSignature binaryPromatableSignature(OperatorNode node, FunctionSignatures group, ArrayList<Type> childTypes) {
 		assert childTypes.size() == 2;
@@ -242,28 +245,29 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				for(int i=0;i<precendenceOrder.length;i++) {
 					Type[] t = howManyWork.get(i).getParams();
 					precendenceOrder[i] = new int[] {
-						promotionTargetLevel(t[0]),
-						promotionTargetLevel(t[1])
+						hackedPromotionTargetLevel(t[0]),
+						hackedPromotionTargetLevel(t[1])
 					};
 				}
 				int x=0, y=0;
+				int mx = precendenceOrder[0][0], my = precendenceOrder[0][1];
 				for(int i=1;i<precendenceOrder.length; i++) {
 					if(precendenceOrder[i][0]<precendenceOrder[x][0]) {
 						x = i;
+						mx = precendenceOrder[x][0];
 					}
 					if(precendenceOrder[i][1]<precendenceOrder[y][1]) {
 						y = i;
+						my = precendenceOrder[y][1];
 					}
 				}
-				if(x!=y) {
-					if(precendenceOrder[x][1]==precendenceOrder[y][1]) {
-						y=x;
-					}
-					else if(precendenceOrder[x][0]==precendenceOrder[y][0]) {
-						x=y;
+				int count = 0;
+				for(int[] o: precendenceOrder) {
+					if(o[0]==mx && o[1]==my) {
+						count++;
 					}
 				}
-				if(x==y) {
+				if(count==1) {
 					FunctionSignature sig = howManyWork.get(x);
 					Type[] parameters = sig.getParams();
 					for(int i=0; i<parameters.length; i++) {

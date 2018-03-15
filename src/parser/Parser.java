@@ -18,7 +18,6 @@ import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
 import parseTree.nodeTypes.FunctionDeclarationNode;
 import parseTree.nodeTypes.LambdaNode;
-import parseTree.nodeTypes.GlobalProgramNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
@@ -69,15 +68,14 @@ public class Parser {
 		if(!startsProgram(nowReading)) {
 			return syntaxErrorNode("program");
 		}
-		ParseNode globalProgram = new GlobalProgramNode(nowReading);
+		ParseNode program = new ProgramNode(nowReading);
 		while(nowReading.isLextant(Keyword.FUNC)) {
 			Token funcStart = nowReading;
 			readToken();
 			ParseNode identifier = parseIdentifier();
 			ParseNode lambda = parseLambda();
-			globalProgram.appendChild(FunctionDeclarationNode.make(funcStart, identifier, lambda));
+			program.appendChild(FunctionDeclarationNode.make(funcStart, identifier, lambda));
 		}
-		ParseNode program = new ProgramNode(nowReading);
 		
 		expect(Keyword.EXEC);
 		ParseNode mainBlock = parseBlockStatements();
@@ -86,9 +84,8 @@ public class Parser {
 		if(!(nowReading instanceof NullToken)) {
 			return syntaxErrorNode("end of program");
 		}
-		
-		globalProgram.appendChild(program);
-		return globalProgram;
+
+		return program;
 	}
 	private boolean startsProgram(Token token) {
 		return token.isLextant(Keyword.EXEC) ||
