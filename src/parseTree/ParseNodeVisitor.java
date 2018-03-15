@@ -1,8 +1,11 @@
 package parseTree;
 
+
+import parseTree.nodeTypes.ReturnNode;
 import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.OperatorNode;
+import parseTree.nodeTypes.ParameterNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterConstantNode;
@@ -10,6 +13,8 @@ import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
+import parseTree.nodeTypes.LambdaNode;
+import parseTree.nodeTypes.GlobalProgramNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
@@ -58,6 +63,9 @@ public interface ParseNodeVisitor {
 	void visitEnter(ProgramNode node);
 	void visitLeave(ProgramNode node);
 
+	void visitEnter(GlobalProgramNode node);
+	void visitLeave(GlobalProgramNode node);
+
 	void visitEnter(ArrayNode node);
 	void visitLeave(ArrayNode node);
 
@@ -74,6 +82,8 @@ public interface ParseNodeVisitor {
 	void visit(SpaceNode node);
 	void visit(TabSpaceNode node);
 	void visit(LoopJumperNode node);
+	void visit(ParameterNode node);
+	void visit(ReturnNode node);
 
 	
 	public static class Default implements ParseNodeVisitor
@@ -151,10 +161,22 @@ public interface ParseNodeVisitor {
 		public void visitLeave(ProgramNode node) {
 			defaultVisitLeave(node);
 		}
+		public void visitEnter(GlobalProgramNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(GlobalProgramNode node) {
+			defaultVisitLeave(node);
+		}
 		public void visitEnter(ArrayNode node) {
 			defaultVisitEnter(node);
 		}
 		public void visitLeave(ArrayNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(LambdaNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(LambdaNode node) {
 			defaultVisitLeave(node);
 		}
 		
@@ -190,6 +212,12 @@ public interface ParseNodeVisitor {
 			defaultVisitForLeaf(node);
 		}
 		public void visit(LoopJumperNode node) {
+			defaultVisitForLeaf(node);
+		}
+		public void visit(ParameterNode node) {
+			defaultVisitForLeaf(node);
+		}
+		public void visit(ReturnNode node) {
 			defaultVisitForLeaf(node);
 		}
 	}

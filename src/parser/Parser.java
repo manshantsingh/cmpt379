@@ -8,6 +8,7 @@ import parseTree.*;
 import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.OperatorNode;
+import parseTree.nodeTypes.ParameterNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterConstantNode;
@@ -15,6 +16,9 @@ import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
+import parseTree.nodeTypes.FunctionDeclarationNode;
+import parseTree.nodeTypes.LambdaNode;
+import parseTree.nodeTypes.GlobalProgramNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
@@ -22,12 +26,14 @@ import parseTree.nodeTypes.LoopJumperNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
+import parseTree.nodeTypes.ReturnNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
 import parseTree.nodeTypes.WhileStatementNode;
 import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.PrimitiveType;
+import semanticAnalyzer.types.SpecialType;
 import semanticAnalyzer.types.Type;
 import tokens.*;
 import lexicalAnalyzer.Keyword;
@@ -63,6 +69,14 @@ public class Parser {
 		if(!startsProgram(nowReading)) {
 			return syntaxErrorNode("program");
 		}
+		ParseNode globalProgram = new GlobalProgramNode(nowReading);
+		while(nowReading.isLextant(Keyword.FUNC)) {
+			Token funcStart = nowReading;
+			readToken();
+			ParseNode identifier = parseIdentifier();
+			ParseNode lambda = parseLambda();
+			globalProgram.appendChild(FunctionDeclarationNode.make(funcStart, identifier, lambda));
+		}
 		ParseNode program = new ProgramNode(nowReading);
 		
 		expect(Keyword.EXEC);
@@ -73,10 +87,12 @@ public class Parser {
 			return syntaxErrorNode("end of program");
 		}
 		
-		return program;
+		globalProgram.appendChild(program);
+		return globalProgram;
 	}
 	private boolean startsProgram(Token token) {
-		return token.isLextant(Keyword.EXEC);
+		return token.isLextant(Keyword.EXEC) ||
+				token.isLextant(Keyword.FUNC);
 	}
 	
 	
@@ -165,6 +181,22 @@ public class Parser {
 	private boolean startsLoopJumperStatement(Token token) {
 		return token.isLextant(Keyword.BREAK, Keyword.CONTINUE);
 	}
+
+	private ParseNode parseReturnStatement() {
+		if(!startsReturnStatement(nowReading)) {
+			return syntaxErrorNode("Return statement");
+		}
+		ReturnNode node = new ReturnNode(nowReading);
+		readToken();
+		if(startsExpression(nowReading)) {
+			node.setExpression(parseExpression());
+		}
+		expect(Punctuator.TERMINATOR);
+		return node;
+	}
+	private boolean startsReturnStatement(Token token) {
+		return token.isLextant(Keyword.RETURN);
+	}
 	
 	///////////////////////////////////////////////////////////
 	// statements
@@ -198,6 +230,9 @@ public class Parser {
 		if(startsLoopJumperStatement(nowReading)) {
 			return parseLoopJumperStatement();
 		}
+		if(startsReturnStatement(nowReading)) {
+			return parseReturnStatement();
+		}
 		return syntaxErrorNode("statement");
 	}
 	private boolean startsStatement(Token token) {
@@ -208,7 +243,8 @@ public class Parser {
 				startsIfStatement(token) ||
 				startsWhileStatement(token) ||
 				startsReleaseStatement(token) ||
-				startsLoopJumperStatement(token);
+				startsLoopJumperStatement(token) ||
+				startsReturnStatement(token);
 	}
 	
 	// printStmt -> PRINT printExpressionList .
@@ -290,6 +326,43 @@ public class Parser {
 	}
 	private boolean startsPrintSeparator(Token token) {
 		return token.isLextant(Punctuator.SEPARATOR, Punctuator.SPACE) ;
+	}
+
+
+	private boolean startsLambda(Token token) {
+		return token.isLextant(Punctuator.LESS);
+	}
+	private ParseNode parseLambda() {
+		if(!startsLambda(nowReading)) {
+			return syntaxErrorNode("Lambda");
+		}
+		Token lamdaStart = nowReading;
+		readToken();
+		ArrayList<ParameterNode> params = new ArrayList<ParameterNode>();
+		while((params.isEmpty() && startsType(nowReading) || (!params.isEmpty() && nowReading.isLextant(Punctuator.SEPARATOR)))) {
+			if(!params.isEmpty()) {
+				readToken();
+			}
+			Token paramToken = nowReading;
+			Type t = parseTypeVariable();
+			ParseNode identifer = parseIdentifier();
+			params.add(ParameterNode.make(paramToken, t, identifer));
+		}
+		expect(Punctuator.GREATER);
+		expect(Punctuator.ARROW);
+		Type returnType;
+		if(nowReading.isLextant(Keyword.VOID)) {
+			readToken();
+			returnType = SpecialType.VOID;
+		}
+		else {
+			returnType = parseTypeVariable();
+		}
+		ParseNode block = parseBlockStatements();
+		if(!(block instanceof BlockStatementsNode)) {
+			return syntaxErrorNode("Lambda");
+		}
+		return LambdaNode.make(lamdaStart, params, returnType, (BlockStatementsNode) block);
 	}
 	
 	

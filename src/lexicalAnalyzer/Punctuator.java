@@ -38,6 +38,8 @@ public enum Punctuator implements Lextant {
 	CLOSE_SQUARE("]"),
 	PIPE("|"),
 
+	ARROW("->"),
+
 	ARRAY_INDEXING(""),
 	NULL_PUNCTUATOR("");
 
