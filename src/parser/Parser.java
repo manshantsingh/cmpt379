@@ -230,6 +230,9 @@ public class Parser {
 		if(startsReturnStatement(nowReading)) {
 			return parseReturnStatement();
 		}
+		if(startsCallStatement(nowReading)) {
+			return parseCallStatement();
+		}
 		return syntaxErrorNode("statement");
 	}
 	private boolean startsStatement(Token token) {
@@ -241,7 +244,23 @@ public class Parser {
 				startsWhileStatement(token) ||
 				startsReleaseStatement(token) ||
 				startsLoopJumperStatement(token) ||
-				startsReturnStatement(token);
+				startsReturnStatement(token) ||
+				startsCallStatement(token);
+	}
+
+	private boolean startsCallStatement(Token token) {
+		return token.isLextant(Keyword.CALL);
+	}
+
+	private ParseNode parseCallStatement() {
+		if(!startsCallStatement(nowReading)) {
+			return syntaxErrorNode("call statement");
+		}
+		Token callKeyword = nowReading;
+		readToken();
+		ParseNode exp = parseExpression();
+		expect(Punctuator.TERMINATOR);
+		return OperatorNode.withChildren(callKeyword, exp);
 	}
 	
 	// printStmt -> PRINT printExpressionList .

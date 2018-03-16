@@ -16,6 +16,15 @@ func factorial<int a> -> int{
 	return a*factorial(a - 1).
 }
 
+func dp<int a, [int] arr> -> void{
+	if(arr[a]==-1){
+		call dp(a - 1, arr).
+		call dp(a - 2, arr).
+		arr[a] := arr[a - 1] + arr[a - 2].
+	}
+	return.
+}
+
 func SumOfFirstN<int n> -> int {
 	# if(n<=0){
 	# 	return 0.
@@ -45,11 +54,27 @@ func one<> -> int{
 }
 
 exec {
-	var i := 0.
-	while(i<10){
-		i := i + 1.
-		print i,":"; factorial(i), _n_.
+	# var i := 0.
+	# while(i<10){
+	# 	i := i + 1.
+	# 	print i,":"; factorial(i), _n_.
+	# }
+	const limit := 33.
+	const arr := new [int](limit).
+	var i:=0.
+	while(i<limit){
+		arr[i]:=-1.
+		i:=i+ 1.
 	}
+	arr[0]:=0.
+	arr[1]:=1.
+	call dp(limit - 1, arr).
+	i := 0.
+	while(i<limit){
+		print "answer at ",i,"=",arr[i],_n_.
+		i:= i + 1.
+	}
+	# print "final answer=",arr[limit - 1],_n_.
 	# print one().
 	# print hehe().
 	# print SumOfFirstN(1).

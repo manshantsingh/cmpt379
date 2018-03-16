@@ -11,6 +11,7 @@ import asmCodeGenerator.operators.RationalAddSubtractCodeGenerator;
 import asmCodeGenerator.operators.RecordReleaseCodeGenerator;
 import asmCodeGenerator.runtime.MemoryManager;
 import asmCodeGenerator.runtime.RunTime;
+import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
 import parseTree.*;
@@ -457,7 +458,10 @@ public class ASMCodeGenerator {
 			Lextant operator = node.getOperator();
 
 			if(operator == Punctuator.FUNCTION_INVOCATION) {
-				visitFunctionCall(node);
+				visitFunctionInvocation(node);
+			}
+			else if(operator == Keyword.CALL) {
+				visitCallKeywordHandler(node);
 			}
 			else if(Punctuator.isComparison(operator)) {
 				visitComparisonOperatorNode(node, (Punctuator) operator);
@@ -594,7 +598,22 @@ public class ASMCodeGenerator {
 			code.add(Label, joinLabel);
 
 		}
-		private void visitFunctionCall(OperatorNode node) {
+		private void visitCallKeywordHandler(OperatorNode node) {
+			newVoidCode(node);
+			Type type = node.child(0).getType();
+			
+			if(type == SpecialType.VOID) {
+				code.append(removeVoidCode(node.child(0)));
+			}
+			else {
+				code.append(removeValueCode(node.child(0)));
+				code.add(Pop);
+				if(type == PrimitiveType.RATIONAL) {
+					code.add(Pop);
+				}
+			}
+		}
+		private void visitFunctionInvocation(OperatorNode node) {
 			// TODO: msk
 			Type type = node.getType();
 			if(type == SpecialType.VOID) {

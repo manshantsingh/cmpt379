@@ -40,6 +40,7 @@ import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.types.Array;
 import semanticAnalyzer.types.LambdaType;
 import semanticAnalyzer.types.PrimitiveType;
+import semanticAnalyzer.types.SpecialType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
 import symbolTable.Scope;
@@ -91,8 +92,17 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			if(n instanceof LambdaNode) {
 				LambdaNode lambda = (LambdaNode) n;
 				Type retType = ((LambdaType) lambda.getType()).getReturnType();
-				
-				if(retType.equivalent(node.child(0).getType())) {
+				if(retType == SpecialType.VOID) {
+					if(node.nChildren() == 0) {
+						node.setType(retType);
+						node.setFunctionReturnLabel(lambda.getReturnCodeLabel());
+					}
+					else {
+						voidShouldNotHaveReturnExpression(node);
+						node.setType(PrimitiveType.ERROR);
+					}
+				}
+				else if(retType.equivalent(node.child(0).getType())) {
 					node.setType(retType);
 					node.setFunctionReturnLabel(lambda.getReturnCodeLabel());
 				}
@@ -368,6 +378,16 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		castSemantics(castNode);
 	}
 
+	private void manageCallOperator(OperatorNode node) {
+		// make sure the child is an operator node with function invocation as operator
+		if(node.nChildren()!=1 || !(node.child(0) instanceof OperatorNode) || 
+				((OperatorNode)node.child(0)).getOperator() != Punctuator.FUNCTION_INVOCATION )
+		{
+			callWithoutFunctionCall(node);
+			node.setType(PrimitiveType.ERROR);
+		}
+	}
+
 	private void manageFunctionCall(OperatorNode node, ArrayList<Type> childTypes) {
 		if(childTypes.get(0) instanceof LambdaType) {
 
@@ -384,7 +404,17 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 					}
 				}
 				if(success) {
-					node.setType(lambda.getReturnType());
+					if(lambda.getReturnType() == SpecialType.VOID && 
+							( !(node.getParent() instanceof OperatorNode) ||  
+									((OperatorNode)node.getParent()).getOperator() != Keyword.CALL)
+							) 
+					{
+						voidFunctionWithoutCall(node);
+						node.setType(PrimitiveType.ERROR);
+					}
+					else {
+						node.setType(lambda.getReturnType());
+					}
 					return;
 				}
 			}
@@ -402,6 +432,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 		if(operator == Punctuator.FUNCTION_INVOCATION) {
 			manageFunctionCall(node, childTypes);
+			return;
+		}
+		if(operator == Keyword.CALL) {
+			manageCallOperator(node);
 			return;
 		}
 
@@ -638,8 +672,17 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	private void castTypeCheckError(ParseNode node, Type from, Type to) {
 		logError("Cannot cast from "+from+" to "+to+" at " + node.getToken().getLocation());
 	}
+	private void callWithoutFunctionCall(ParseNode node) {
+		logError("Call keyword must be followed by expression evaluating to a function call at " + node.getToken().getLocation());
+	}
+	private void voidFunctionWithoutCall(ParseNode node) {
+		logError("Void function must have call keyword before invocation " + node.getToken().getLocation());
+	}
 	private void wrongReturnType(ParseNode node, Type expected, Type received) {
 		logError("Expected return type "+expected+" but received "+received+" at " + node.getToken().getLocation());
+	}
+	private void voidShouldNotHaveReturnExpression(ParseNode node) {
+		logError("Void function should not have an expression in return at " + node.getToken().getLocation());
 	}
 	private void returnParentNotFound(ParseNode node) {
 		logError("No return parent found for return statement at" + node.getToken().getLocation());
