@@ -81,6 +81,12 @@ exec {
 	# print SumOfFirstN(1).
 	# print SumOfFirstN(1).
 	# print SumOfFirstN(1).
+	var make_rational := <int a, int b> -> rat{
+		# print "arr Value at 0: ", arr[0], _n_.
+		return a//b.
+	}.
+
+	print make_rational(5,2), _n_.
 }
 
 # exec {

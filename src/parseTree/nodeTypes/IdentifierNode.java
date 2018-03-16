@@ -5,6 +5,7 @@ import parseTree.ParseNodeVisitor;
 import logging.PikaLogger;
 import symbolTable.Binding;
 import symbolTable.Scope;
+import symbolTable.SymbolTable;
 import tokens.IdentifierToken;
 import tokens.Token;
 
@@ -53,6 +54,13 @@ public class IdentifierNode extends ParseNode {
 				declarationScope = current.getScope();
 				return current.bindingOf(identifier);
 			}
+			if(current instanceof LambdaNode) {
+				break;
+			}
+		}
+		SymbolTable globalSymbolTable = Scope.getGlobalScope().getSymbolTable();
+		if(globalSymbolTable.containsKey(identifier)) {
+			return globalSymbolTable.lookup(identifier);
 		}
 		useBeforeDefineError();
 		return Binding.nullInstance();

@@ -12,12 +12,16 @@ public class Scope {
 	private Scope baseScope;
 	private MemoryAllocator allocator;
 	private SymbolTable symbolTable;
+	private static Scope globalScope;
 	
 //////////////////////////////////////////////////////////////////////
 // factories
-
+	public static Scope getGlobalScope() {
+		return globalScope;
+	}
 	public static Scope createProgramScope() {
-		return new Scope(programScopeAllocator(), nullInstance());
+		globalScope = new Scope(programScopeAllocator(), nullInstance());
+		return globalScope;
 	}
 	public Scope createSubscope() {
 		return new Scope(allocator, this);

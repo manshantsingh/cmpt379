@@ -73,7 +73,7 @@ public class Parser {
 			Token funcStart = nowReading;
 			readToken();
 			ParseNode identifier = parseIdentifier();
-			ParseNode lambda = parseLambda();
+			ParseNode lambda = parseLambdaConstant();
 			program.appendChild(DeclarationNode.withChildren(funcStart, identifier, lambda));
 		}
 		
@@ -345,14 +345,14 @@ public class Parser {
 	}
 
 
-	private boolean startsLambda(Token token) {
+	private boolean startsLambdaConstant(Token token) {
 		return token.isLextant(Punctuator.LESS);
 	}
 	private boolean startsLambdaType(Token token) {
 		return token.isLextant(Punctuator.LESS);
 	}
-	private ParseNode parseLambda() {
-		if(!startsLambda(nowReading)) {
+	private ParseNode parseLambdaConstant() {
+		if(!startsLambdaConstant(nowReading)) {
 			return syntaxErrorNode("Lambda");
 			
 		}
@@ -625,6 +625,9 @@ public class Parser {
 		if(startsBooleanConstant(nowReading)) {
 			return parseBooleanConstant();
 		}
+		if(startsLambdaConstant(nowReading)) {
+			return parseLambdaConstant();
+		}
 
 		return syntaxErrorNode("literal");
 	}
@@ -634,7 +637,8 @@ public class Parser {
 				startsCharacterConstant(token) ||
 				startsStringConstant(token) ||
 				startsIdentifier(token) ||
-				startsBooleanConstant(token);
+				startsBooleanConstant(token) ||
+				startsLambdaConstant(token);
 	}
 
 	private boolean startsEmptyArrayCreation(Token token) {
