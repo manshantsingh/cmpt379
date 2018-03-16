@@ -3,23 +3,27 @@ package symbolTable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProcedureMemoryAllocator implements MemoryAllocator {
+import asmCodeGenerator.runtime.RunTime;
+
+public class ParameterMemoryAllocator implements MemoryAllocator {
 	MemoryAccessMethod accessor;
 	final int startingOffset;
 	int currentOffset;
 	int minOffset;
 	String baseAddress;
 	List<Integer> bookmarks;
+	List<MemoryLocation> locationsAllocated;
 	
-	public ProcedureMemoryAllocator(MemoryAccessMethod accessor, String baseAddress, int startingOffset) {
+	private ParameterMemoryAllocator(MemoryAccessMethod accessor, String baseAddress, int startingOffset) {
 		this.accessor = accessor;
 		this.baseAddress = baseAddress;
 		this.startingOffset = startingOffset;
 		this.currentOffset = startingOffset;
 		this.minOffset = startingOffset;
 		this.bookmarks = new ArrayList<Integer>();
+		this.locationsAllocated = new ArrayList<MemoryLocation>();
 	}
-	public ProcedureMemoryAllocator(MemoryAccessMethod accessor,String baseAddress) {
+	public ParameterMemoryAllocator(MemoryAccessMethod accessor,String baseAddress) {
 		this(accessor, baseAddress, 0);
 	}
 
@@ -27,7 +31,9 @@ public class ProcedureMemoryAllocator implements MemoryAllocator {
 	public MemoryLocation allocate(int sizeInBytes) {
 		currentOffset -= sizeInBytes;
 		updateMin();
-		return new MemoryLocation(accessor, baseAddress, currentOffset);
+		MemoryLocation m = new MemoryLocation(accessor, baseAddress, currentOffset);
+		locationsAllocated.add(m);
+		return m;
 	}
 	private void updateMin() {
 		if(minOffset > currentOffset) {
@@ -54,5 +60,10 @@ public class ProcedureMemoryAllocator implements MemoryAllocator {
 		assert bookmarks.size() > 0;
 		int bookmarkIndex = bookmarks.size()-1;
 		currentOffset = (int) bookmarks.remove(bookmarkIndex);
+		if(bookmarks.size()==0) {
+			for(MemoryLocation m: locationsAllocated) {
+				m.setOffset(getMaxAllocatedSize() + m.getOffset());
+			}
+		}
 	}
 }

@@ -1,5 +1,6 @@
 package symbolTable;
 
+import asmCodeGenerator.runtime.RunTime;
 import inputHandler.TextLocation;
 import logging.PikaLogger;
 import parseTree.nodeTypes.IdentifierNode;
@@ -19,6 +20,16 @@ public class Scope {
 	}
 	public Scope createSubscope() {
 		return new Scope(allocator, this);
+	}
+	public Scope createParameterScope() {
+		return new Scope(new ParameterMemoryAllocator(MemoryAccessMethod.INDIRECT_ACCESS_BASE,
+														RunTime.FRAME_POINTER),
+						this);
+	}
+	public Scope createProcedureScope() {
+		return new Scope(new NegativeMemoryAllocator(MemoryAccessMethod.INDIRECT_ACCESS_BASE,
+													RunTime.FRAME_POINTER),
+						this);
 	}
 	
 	private static MemoryAllocator programScopeAllocator() {

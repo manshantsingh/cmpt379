@@ -53,6 +53,8 @@ public class RunTime {
 	public static final String RATIONAL_DENOMINATOR_TEMPORARY = "$$r-denominator-temporary";
 	public static final String RATIONAL_COMMON_DENOMINATOR_TEMPORARY = "$$r-common-denominator-temporary";
 	public static final String INNER_MOST_PRINT_CALL = "$$inner-most-print-call";
+	public static final String FRAME_POINTER = "$$l-frame-pointer";
+	public static final String STACK_POINTER = "$$l-stack-pointer";
 
 	public static final String CLEAR_N_BYTES = "$procedure-clear-n-bytes";
 	public static final String CLONE_N_BYTES = "$procedure-clone-n-bytes";
@@ -82,6 +84,7 @@ public class RunTime {
 		result.append(stringsForPrintf());
 		result.append(runtimeErrors());
 		result.append(temporaryVariables());
+		result.append(functionCallPointers());
 		result.append(additionalSubroutines());
 		result.add(DLabel, USABLE_MEMORY_START);
 		return result;
@@ -100,6 +103,18 @@ public class RunTime {
 		Macros.declareI(frag, RATIONAL_COMMON_DENOMINATOR_TEMPORARY);
 
 		Macros.declareI(frag, INNER_MOST_PRINT_CALL);
+
+		return frag;
+	}
+	private ASMCodeFragment functionCallPointers() {
+		ASMCodeFragment frag  = new ASMCodeFragment(GENERATES_VOID);
+
+		Macros.declareI(frag, FRAME_POINTER);
+		Macros.declareI(frag, STACK_POINTER);
+		frag.add(Memtop);
+		frag.add(Duplicate);
+		Macros.storeITo(frag, FRAME_POINTER);
+		Macros.storeITo(frag, STACK_POINTER);
 
 		return frag;
 	}

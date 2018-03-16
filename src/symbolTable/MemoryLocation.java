@@ -27,6 +27,9 @@ public class MemoryLocation {
 	public int getOffset() {
 		return offset;
 	}
+	public void setOffset(int val) {
+		offset = val;
+	}
 	public String toString() {
 		return "M-" + accessor + "(" + baseAddress + ") +" + offset + "  ";
 	}

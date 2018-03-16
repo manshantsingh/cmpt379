@@ -24,6 +24,8 @@ public class ParameterNode extends ParseNode {
 	// boilerplate for visitors
 			
 	public void accept(ParseNodeVisitor visitor) {
-		visitor.visit(this);
+		visitor.visitEnter(this);
+		visitChildren(visitor);
+		visitor.visitLeave(this);
 	}
 }

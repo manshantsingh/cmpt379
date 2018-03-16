@@ -14,6 +14,7 @@ import parseTree.SomeArbitaryOperatorNode;
 import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.OperatorNode;
+import parseTree.nodeTypes.ParameterNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterConstantNode;
@@ -69,7 +70,12 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		leaveScope(node);
 	}
 	public void visitEnter(BlockStatementsNode node) {
-		enterSubscope(node);
+		if(node.getParent() instanceof LambdaNode) {
+			enterProcedurescope(node);
+		}
+		else {
+			enterSubscope(node);
+		}
 	}
 	public void visitLeave(BlockStatementsNode node) {
 		leaveScope(node);
@@ -79,11 +85,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		// TODO: msk
 	}
 	public void visitEnter(LambdaNode node) {
-		// TODO: msk
+		enterParameterscope(node);
 	}
 	public void visitLeave(LambdaNode node) {
-		// TODO: msk
-//		leaveScope(node);
+		leaveScope(node);
 	}
 	
 	
@@ -97,7 +102,17 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		Scope baseScope = node.getLocalScope();
 		Scope scope = baseScope.createSubscope();
 		node.setScope(scope);
-	}		
+	}
+	private void enterParameterscope(ParseNode node) {
+		Scope baseScope = node.getLocalScope();
+		Scope scope = baseScope.createParameterScope();
+		node.setScope(scope);
+	}
+	private void enterProcedurescope(ParseNode node) {
+		Scope baseScope = node.getLocalScope();
+		Scope scope = baseScope.createProcedureScope();
+		node.setScope(scope);
+	}
 	private void leaveScope(ParseNode node) {
 		node.getScope().leave();
 	}
@@ -125,6 +140,13 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		
 		identifier.setType(declarationType);
 		addBinding(identifier, declarationType, node.getToken().isLextant(Keyword.CONST));
+	}
+	@Override
+	public void visitEnter(ParameterNode node) {
+		IdentifierNode identifier = (IdentifierNode) node.child(0);
+		
+		identifier.setType(node.getType());
+		addBinding(identifier, node.getType(), true);
 	}
 	@Override
 	public void visitLeave(AssignmentNode node) {
@@ -512,17 +534,17 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	// IdentifierNodes, with helper methods
 	@Override
 	public void visit(IdentifierNode node) {
-		if(!isBeingDeclared(node)) {		
+		if(!parentIsHandlingit(node)) {		
 			Binding binding = node.findVariableBinding();
-			
 			node.setType(binding.getType());
 			node.setBinding(binding);
 		}
 		// else parent DeclarationNode does the processing.
 	}
-	private boolean isBeingDeclared(IdentifierNode node) {
+	private boolean parentIsHandlingit(IdentifierNode node) {
 		ParseNode parent = node.getParent();
-		return (parent instanceof DeclarationNode) && (node == parent.child(0));
+		return (parent instanceof DeclarationNode || parent instanceof ParameterNode)
+				&& (node == parent.child(0));
 	}
 	private void addBinding(IdentifierNode identifierNode, Type type, boolean constant) {
 		Scope scope = identifierNode.getLocalScope();

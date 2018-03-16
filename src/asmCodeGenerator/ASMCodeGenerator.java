@@ -17,19 +17,23 @@ import parseTree.*;
 import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.OperatorNode;
+import parseTree.nodeTypes.ParameterNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterConstantNode;
 import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.FloatConstantNode;
+import parseTree.nodeTypes.FunctionDeclarationNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
+import parseTree.nodeTypes.LambdaNode;
 import parseTree.nodeTypes.LoopJumperNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
+import parseTree.nodeTypes.ReturnNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
@@ -80,8 +84,7 @@ public class ASMCodeGenerator {
 	}
 	private ASMCodeFragment programASM() {
 		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
-		
-		code.add(    Label, RunTime.MAIN_PROGRAM_LABEL);
+
 		code.append( programCode());
 		code.add(    Halt );
 		
@@ -219,17 +222,42 @@ public class ASMCodeGenerator {
 		// constructs larger than statements
 		public void visitLeave(ProgramNode node) {
 			newVoidCode(node);
-			for(ParseNode child : node.getChildren()) {
-				ASMCodeFragment childCode = removeVoidCode(child);
+
+			for(int i=0;i<node.nChildren()-1;i++) {
+				ASMCodeFragment childCode = removeVoidCode(node.child(i));
 				code.append(childCode);
 			}
+			code.add(    Label, RunTime.MAIN_PROGRAM_LABEL);
+			ASMCodeFragment childCode = removeVoidCode(node.child(node.nChildren()-1));
+			code.append(childCode);
 		}
 		public void visitLeave(BlockStatementsNode node) {
 			newVoidCode(node);
 			for(ParseNode child : node.getChildren()) {
+				System.out.println(child);
 				ASMCodeFragment childCode = removeVoidCode(child);
 				code.append(childCode);
 			}
+		}
+
+		///////////////////////////////////////////////////////////////////////////
+		// function specials
+
+		public void visitLeave(FunctionDeclarationNode node) {
+			newVoidCode(node);
+			// TODO: msk
+		}
+		public void visitLeave(LambdaNode node) {
+			newVoidCode(node);
+			// TODO: msk
+		}
+		public void visitLeave(ParameterNode node) {
+			newVoidCode(node);
+			// TODO; msk
+		}
+		public void visit(ReturnNode node) {
+			newVoidCode(node);
+			// TODO; msk
 		}
 
 		///////////////////////////////////////////////////////////////////////////
