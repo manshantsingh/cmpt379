@@ -16,9 +16,21 @@ func factorial<int a> -> int{
 	return a*factorial(a - 1).
 }
 
+func fibonanci<int a> -> int{
+	# print "gets here with: ", a, _n_.
+	if(a<=0){
+		return 0.
+	}
+	if(a==1){
+		return 1.
+	}
+	return fibonanci(a - 2)  + fibonanci(a - 1).
+}
+
 func dp<int a, [int] arr> -> void{
 	if(arr[a]==-1){
 		call dp(a - 1, arr).
+		# arr[a - 2] := fibonanci(a - 2).
 		call dp(a - 2, arr).
 		arr[a] := arr[a - 1] + arr[a - 2].
 	}
@@ -53,13 +65,19 @@ func one<> -> int{
 	return 1.
 }
 
+func anotherTest<float a, int b> -> [int] {
+	print "I just got a=",a,", and b=",b,_n_.
+	return [[a|int],b].
+	# return "hello world".
+}
+
 exec {
 	# var i := 0.
 	# while(i<10){
 	# 	i := i + 1.
 	# 	print i,":"; factorial(i), _n_.
 	# }
-	const limit := 33.
+	const limit := 10.
 	const arr := new [int](limit).
 	var i:=0.
 	while(i<limit){
@@ -70,11 +88,11 @@ exec {
 	arr[1]:=1.
 	call dp(limit - 1, arr).
 	i := 0.
-	while(i<limit){
-		print "answer at ",i,"=",arr[i],_n_.
-		i:= i + 1.
-	}
-	# print "final answer=",arr[limit - 1],_n_.
+	# while(i<limit){
+	# 	print "answer at ",i,"=",arr[i],_n_.
+	# 	i:= i + 1.
+	# }
+	print "final answer=",arr[limit - 1],_n_.
 	# print one().
 	# print hehe().
 	# print SumOfFirstN(1).
@@ -86,7 +104,10 @@ exec {
 		return a//b.
 	}.
 
+
+
 	print make_rational(5,2), _n_.
+	call anotherTest(9.0,10).
 }
 
 # exec {
