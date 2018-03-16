@@ -284,19 +284,19 @@ public class ASMCodeGenerator {
 
 			code.add(Label, node.getReturnCodeLabel());		// [...  returnValue]
 			Macros.loadIFrom(code, RunTime.FRAME_POINTER);
-			code.add(PushI, 2*ADDRESS_SIZE);
+			code.add(PushI, FRAME_ADDITIONAL_SIZE);
 			code.add(Subtract);
 			code.add(LoadI);		// [...  returnValue  returnAddr]
 			Macros.loadIFrom(code, RunTime.FRAME_POINTER);
 			Macros.storeITo(code, RunTime.FRAME_POINTER);
-			if(returnType.equivalent(PrimitiveType.RATIONAL)) {
+			if(returnType == PrimitiveType.RATIONAL) {
 				// [...  numer  denom  returnAddr]
 				code.add(Exchange);
 				Macros.storeITo(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);	// [... numer retAddr]
 				code.add(Exchange);
 				Macros.loadIFrom(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);	// [... retAddr numer denom]
 			}
-			else if(returnType.equivalent(SpecialType.VOID)){
+			else if(returnType == SpecialType.VOID){
 				// [...  returnAddr]
 			}
 			else {

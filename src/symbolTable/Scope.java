@@ -1,5 +1,6 @@
 package symbolTable;
 
+import asmCodeGenerator.ASMCodeGenerator;
 import asmCodeGenerator.runtime.RunTime;
 import inputHandler.TextLocation;
 import logging.PikaLogger;
@@ -28,7 +29,7 @@ public class Scope {
 	}
 	public Scope createProcedureScope() {
 		return new Scope(new NegativeMemoryAllocator(MemoryAccessMethod.INDIRECT_ACCESS_BASE,
-													RunTime.FRAME_POINTER),
+													RunTime.FRAME_POINTER, -ASMCodeGenerator.FRAME_ADDITIONAL_SIZE),
 						this);
 	}
 	
