@@ -5,7 +5,7 @@ import parseTree.ParseNodeVisitor;
 import tokens.Token;
 
 public class ReturnNode extends ParseNode {
-	private ParseNode expression = null;
+	private String functionReturnLabel;
 
 	public ReturnNode(ParseNode node) {
 		super(node);
@@ -13,12 +13,12 @@ public class ReturnNode extends ParseNode {
 	public ReturnNode(Token token) {
 		super(token);
 	}
-	
-	public ParseNode getExpression() {
-		return expression;
+
+	public String getFunctionReturnLabel() {
+		return functionReturnLabel;
 	}
-	public void setExpression(ParseNode exp) {
-		expression = exp;
+	public void setFunctionReturnLabel(String val) {
+		functionReturnLabel = val;
 	}
 	///////////////////////////////////////////////////////////
 	// boilerplate for visitors

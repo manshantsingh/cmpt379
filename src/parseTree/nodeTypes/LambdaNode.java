@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import asmCodeGenerator.Labeller;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import semanticAnalyzer.types.Array;
@@ -13,6 +14,8 @@ import tokens.StringConstantToken;
 import tokens.Token;
 
 public class LambdaNode extends ParseNode {
+	
+	private String functionLocationLabel, returnCodeLabel, endLabel;
 
 	public LambdaNode(Token token) {
 		super(token);
@@ -31,7 +34,23 @@ public class LambdaNode extends ParseNode {
 		}
 		node.setType(new LambdaType(paramsType, returnType));
 		node.appendChild(block);
+
+		Labeller labeller = new Labeller("Lambda");
+		node.functionLocationLabel = labeller.newLabel("function-location");
+		node.returnCodeLabel = labeller.newLabel("return-code");
+		node.endLabel = labeller.newLabel("end");
+
 		return node;
+	}
+
+	public String getFunctionLocationLabel() {
+		return functionLocationLabel;
+	}
+	public String getReturnCodeLabel() {
+		return returnCodeLabel;
+	}
+	public String getEndLabel() {
+		return endLabel;
 	}
 
 ////////////////////////////////////////////////////////////

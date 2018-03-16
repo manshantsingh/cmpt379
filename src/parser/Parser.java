@@ -185,7 +185,7 @@ public class Parser {
 		ReturnNode node = new ReturnNode(nowReading);
 		readToken();
 		if(startsExpression(nowReading)) {
-			node.setExpression(parseExpression());
+			node.appendChild(parseExpression());
 		}
 		expect(Punctuator.TERMINATOR);
 		return node;

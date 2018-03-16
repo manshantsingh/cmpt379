@@ -45,7 +45,6 @@ import semanticAnalyzer.types.SpecialType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
 import symbolTable.Scope;
-import tokens.LextantToken;
 
 import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
@@ -234,12 +233,10 @@ public class ASMCodeGenerator {
 		public void visitLeave(ProgramNode node) {
 			newVoidCode(node);
 
-			for(int i=0;i<node.nChildren()-1;i++) {
+			for(int i=0;i<node.nChildren();i++) {
 				ASMCodeFragment childCode = removeVoidCode(node.child(i));
 				code.append(childCode);
 			}
-			ASMCodeFragment childCode = removeVoidCode(node.child(node.nChildren()-1));
-			code.append(childCode);
 		}
 		public void visitLeave(BlockStatementsNode node) {
 			newVoidCode(node);
@@ -253,18 +250,14 @@ public class ASMCodeGenerator {
 		// function specials
 
 		public void visitLeave(LambdaNode node) {
-			Labeller labeller = new Labeller("Lambda");
-			String functionLocation = labeller.newLabel("function-location");
-			String returnCode = labeller.newLabel("return-code");
-			String end = labeller.newLabel("end");
 			
 			Type returnType = ((LambdaType) node.getType()).getReturnType();
 
 			newValueCode(node);
 
-			code.add(Jump, end);
+			code.add(Jump, node.getEndLabel());
 
-			code.add(Label, functionLocation);
+			code.add(Label, node.getFunctionLocationLabel());
 			Macros.loadIFrom(code, RunTime.STACK_POINTER);
 			code.add(PushI, ADDRESS_SIZE);
 			code.add(Subtract);
@@ -289,7 +282,7 @@ public class ASMCodeGenerator {
 			code.add(Jump, RunTime.LAMBDA_REACHED_END_OF_FUNCTION_NO_RETURN);
 
 
-			code.add(Label, returnCode);		// [...  returnValue]
+			code.add(Label, node.getReturnCodeLabel());		// [...  returnValue]
 			Macros.loadIFrom(code, RunTime.FRAME_POINTER);
 			code.add(PushI, 2*ADDRESS_SIZE);
 			code.add(Subtract);
@@ -341,16 +334,29 @@ public class ASMCodeGenerator {
 			}
 			code.add(Return);
 			
-			code.add(Label, end);
-			code.add(PushD, functionLocation);
+			code.add(Label, node.getEndLabel());
+			code.add(PushD, node.getFunctionLocationLabel());
 		}
 		public void visitLeave(ParameterNode node) {
 			newVoidCode(node);
 			// TODO; msk
 		}
-		public void visit(ReturnNode node) {
+		public void visitLeave(ReturnNode node) {
+			Type type = node.getType();
+
 			newVoidCode(node);
-			// TODO; msk
+			if(type == SpecialType.VOID) {
+				newVoidCode(node);
+			}
+			else if(type == PrimitiveType.STRING || type instanceof Array) {
+//				newAddressCode(node);
+				code.append(removeAddressCode(node.child(0)));
+			}
+			else {
+//				newValueCode(node);
+				code.append(removeValueCode(node.child(0)));
+			}
+			code.add(Jump, node.getFunctionReturnLabel());
 		}
 
 		///////////////////////////////////////////////////////////////////////////

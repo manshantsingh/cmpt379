@@ -1,11 +1,16 @@
 func my_function<int a, int b> -> int{
 	var c:= 5.
-	return a+b*c.
+	var e := a+b*c.
+	print _n_,"value is: ", a, _n_.
+	print _n_,"value is: ", b, _n_.
+	print _n_,"value is: ", c, _n_.
+	# print _n_,"value is: ", d, _n_.
+	return c+a*b.
 }
 
 exec {
-# print my_function(7,8).
-	print "my function value: ", my_function(7,8), _n_.
+# print my_function(3, 2).
+	print "wow:", my_function(3,2), _n_.
 }
 
 # exec {

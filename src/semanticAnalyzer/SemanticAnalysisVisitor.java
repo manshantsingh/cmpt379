@@ -87,7 +87,24 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		leaveScope(node);
 	}
 	public void visitLeave(ReturnNode node) {
-		
+		for(ParseNode n: node.pathToRoot()) {
+			if(n instanceof LambdaNode) {
+				LambdaNode lambda = (LambdaNode) n;
+				Type retType = ((LambdaType) lambda.getType()).getReturnType();
+				
+				if(retType.equivalent(node.child(0).getType())) {
+					node.setType(retType);
+					node.setFunctionReturnLabel(lambda.getReturnCodeLabel());
+				}
+				else {
+					wrongReturnType(node, retType, node.child(0).getType());
+					node.setType(PrimitiveType.ERROR);
+				}
+				return;
+			}
+		}
+		returnParentNotFound(node);
+		node.setType(PrimitiveType.ERROR);
 	}
 	
 	
@@ -620,6 +637,12 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	private void castTypeCheckError(ParseNode node, Type from, Type to) {
 		logError("Cannot cast from "+from+" to "+to+" at " + node.getToken().getLocation());
+	}
+	private void wrongReturnType(ParseNode node, Type expected, Type received) {
+		logError("Expected return type "+expected+" but received "+received+" at " + node.getToken().getLocation());
+	}
+	private void returnParentNotFound(ParseNode node) {
+		logError("No return parent found for return statement at" + node.getToken().getLocation());
 	}
 	private void assignmentToConstant(Token token) {
 		logError("Cannot write to const variable \""+
