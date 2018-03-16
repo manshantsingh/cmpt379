@@ -1,12 +1,13 @@
-func my_function<int a, int b> -> int{
+func my_function<int a, int b> -> [rat]{
 	var c:= 5.
 	var d := a+b*c.
 	print _n_,"value is: ", d, _n_.
-	return d.
+	return [2//4].
 }
 
 exec {
 # print my_function(3, 2).
+	# var a := my_function(3,2).
 	print "wow:", my_function(3,2), _n_.
 }
 

@@ -241,6 +241,13 @@ public class ASMCodeGenerator {
 		public void visitLeave(BlockStatementsNode node) {
 			newVoidCode(node);
 			for(ParseNode child : node.getChildren()) {
+//				ASMCodeFragment childCode;
+//				if(child instanceof ReturnNode) {
+//					childCode = removeValueCode(child);
+//				}
+//				else {
+//					childCode = removeVoidCode(child);
+//				}
 				ASMCodeFragment childCode = removeVoidCode(child);
 				code.append(childCode);
 			}
@@ -345,15 +352,7 @@ public class ASMCodeGenerator {
 			Type type = node.getType();
 
 			newVoidCode(node);
-			if(type == SpecialType.VOID) {
-				newVoidCode(node);
-			}
-			else if(type == PrimitiveType.STRING || type instanceof Array) {
-//				newAddressCode(node);
-				code.append(removeAddressCode(node.child(0)));
-			}
-			else {
-//				newValueCode(node);
+			if(type != SpecialType.VOID) {
 				code.append(removeValueCode(node.child(0)));
 			}
 			code.add(Jump, node.getFunctionReturnLabel());
@@ -599,9 +598,6 @@ public class ASMCodeGenerator {
 			Type type = node.getType();
 			if(type == SpecialType.VOID) {
 				newVoidCode(node);
-			}
-			else if(type == PrimitiveType.STRING || type instanceof Array) {
-				newAddressCode(node);
 			}
 			else {
 				newValueCode(node);
