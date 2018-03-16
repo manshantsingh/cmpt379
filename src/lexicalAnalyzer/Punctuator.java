@@ -41,6 +41,7 @@ public enum Punctuator implements Lextant {
 	ARROW("->"),
 
 	ARRAY_INDEXING(""),
+	FUNCTION_INVOCATION(""),
 	NULL_PUNCTUATOR("");
 
 	private String lexeme;

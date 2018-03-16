@@ -13,7 +13,6 @@ import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
-import parseTree.nodeTypes.FunctionDeclarationNode;
 import parseTree.nodeTypes.LambdaNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
@@ -63,14 +62,14 @@ public interface ParseNodeVisitor {
 	void visitEnter(ProgramNode node);
 	void visitLeave(ProgramNode node);
 
-	void visitEnter(FunctionDeclarationNode node);
-	void visitLeave(FunctionDeclarationNode node);
-
 	void visitEnter(LambdaNode node);
 	void visitLeave(LambdaNode node);
 
 	void visitEnter(ParameterNode node);
 	void visitLeave(ParameterNode node);
+
+	void visitEnter(ReturnNode node);
+	void visitLeave(ReturnNode node);
 
 	void visitEnter(ArrayNode node);
 	void visitLeave(ArrayNode node);
@@ -88,7 +87,6 @@ public interface ParseNodeVisitor {
 	void visit(SpaceNode node);
 	void visit(TabSpaceNode node);
 	void visit(LoopJumperNode node);
-	void visit(ReturnNode node);
 
 	
 	public static class Default implements ParseNodeVisitor
@@ -172,12 +170,6 @@ public interface ParseNodeVisitor {
 		public void visitLeave(ArrayNode node) {
 			defaultVisitLeave(node);
 		}
-		public void visitEnter(FunctionDeclarationNode node) {
-			defaultVisitEnter(node);
-		}
-		public void visitLeave(FunctionDeclarationNode node) {
-			defaultVisitLeave(node);
-		}
 		public void visitEnter(LambdaNode node) {
 			defaultVisitEnter(node);
 		}
@@ -188,6 +180,12 @@ public interface ParseNodeVisitor {
 			defaultVisitEnter(node);
 		}
 		public void visitLeave(ParameterNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(ReturnNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(ReturnNode node) {
 			defaultVisitLeave(node);
 		}
 		
@@ -223,9 +221,6 @@ public interface ParseNodeVisitor {
 			defaultVisitForLeaf(node);
 		}
 		public void visit(LoopJumperNode node) {
-			defaultVisitForLeaf(node);
-		}
-		public void visit(ReturnNode node) {
 			defaultVisitForLeaf(node);
 		}
 	}

@@ -22,7 +22,6 @@ import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
-import parseTree.nodeTypes.FunctionDeclarationNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
@@ -31,6 +30,7 @@ import parseTree.nodeTypes.LoopJumperNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
+import parseTree.nodeTypes.ReturnNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
@@ -58,8 +58,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	public void visitEnter(ProgramNode node) {
 		enterProgramScope(node);
 		for(ParseNode child: node.getChildren()) {
-			if(child instanceof FunctionDeclarationNode) {
-				FunctionDeclarationNode func = (FunctionDeclarationNode) child;
+			if(child instanceof DeclarationNode) {
+				DeclarationNode func = (DeclarationNode) child;
 				IdentifierNode identifier = (IdentifierNode) func.child(0);
 				Type funcType = func.child(1).getType();
 				addBinding(identifier, funcType, true);
@@ -80,15 +80,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	public void visitLeave(BlockStatementsNode node) {
 		leaveScope(node);
 	}
-
-	public void visitLeave(FunctionDeclarationNode node) {
-		// TODO: msk
-	}
 	public void visitEnter(LambdaNode node) {
 		enterParameterscope(node);
 	}
 	public void visitLeave(LambdaNode node) {
 		leaveScope(node);
+	}
+	public void visitLeave(ReturnNode node) {
+		
 	}
 	
 	
@@ -134,12 +133,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	public void visitLeave(DeclarationNode node) {
 		IdentifierNode identifier = (IdentifierNode) node.child(0);
 		ParseNode initializer = node.child(1);
-		
 		Type declarationType = initializer.getType();
-		node.setType(declarationType);
-		
+
+		node.setType(declarationType);		
 		identifier.setType(declarationType);
-		addBinding(identifier, declarationType, node.getToken().isLextant(Keyword.CONST));
+
+		if(	!	(node.getParent() instanceof ProgramNode)	) {
+			addBinding(identifier, declarationType, !node.getToken().isLextant(Keyword.VAR));
+		}
 	}
 	@Override
 	public void visitEnter(ParameterNode node) {
@@ -350,14 +351,43 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		castSemantics(castNode);
 	}
 
+	private void manageFunctionCall(OperatorNode node, ArrayList<Type> childTypes) {
+		if(childTypes.get(0) instanceof LambdaType) {
+
+			LambdaType lambda = (LambdaType) childTypes.get(0);
+			ArrayList<Type> params = lambda.getParamTypes();
+
+			if(childTypes.size()-1 == params.size()) {
+
+				boolean success=true;
+				for(int i=0;i<params.size();i++) {
+					if(!childTypes.get(i+1).equivalent(params.get(i))) {
+						success=false;
+						break;
+					}
+				}
+				if(success) {
+					node.setType(lambda.getReturnType());
+					return;
+				}
+			}
+		}
+		typeCheckError(node, childTypes);
+		node.setType(PrimitiveType.ERROR);
+	}
+
 	@Override
 	public void visitLeave(OperatorNode node) {
+		Lextant operator = node.getOperator();
 		ArrayList<Type> childTypes = new ArrayList<Type>();
 		for(ParseNode child: node.getChildren()) {
 			childTypes.add(child.getType());
 		}
+		if(operator == Punctuator.FUNCTION_INVOCATION) {
+			manageFunctionCall(node, childTypes);
+			return;
+		}
 
-		Lextant operator = ((LextantToken) node.getToken()).getLextant();
 		FunctionSignatures signatures = FunctionSignatures.signaturesOf(operator);
 		FunctionSignature signature;
 		if(childTypes.size()==2) {

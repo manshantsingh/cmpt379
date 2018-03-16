@@ -13,13 +13,13 @@ public class LambdaType implements Type {
 
 	@Override
 	public int getSize() {
-		return 0;
+		return PrimitiveType.STRING.getSize();
 	}
 
 	@Override
 	public String infoString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("[");
+		sb.append("{<");
 		if(params.size()>0) {
 			sb.append(params.get(0));
 		}
@@ -27,8 +27,9 @@ public class LambdaType implements Type {
 			sb.append(", ");
 			sb.append(params.get(i));
 		}
-		sb.append("] -> ");
+		sb.append("> -> ");
 		sb.append(returnType.infoString());
+		sb.append("}");
 		return sb.toString();
 	}
 
@@ -64,6 +65,10 @@ public class LambdaType implements Type {
 	
 	public ArrayList<Type> getParamTypes(){
 		return params;
+	}
+	
+	public Type getReturnType(){
+		return returnType;
 	}
 
 }

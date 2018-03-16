@@ -24,7 +24,6 @@ import parseTree.nodeTypes.CharacterConstantNode;
 import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.FloatConstantNode;
-import parseTree.nodeTypes.FunctionDeclarationNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
@@ -40,16 +39,23 @@ import parseTree.nodeTypes.TabSpaceNode;
 import parseTree.nodeTypes.WhileStatementNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.types.Array;
+import semanticAnalyzer.types.LambdaType;
 import semanticAnalyzer.types.PrimitiveType;
+import semanticAnalyzer.types.SpecialType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
 import symbolTable.Scope;
+import tokens.LextantToken;
+
 import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 import static asmCodeGenerator.ASMConstants.*;
 
 // do not call the code generator if any errors have occurred during analysis.
 public class ASMCodeGenerator {
+	public static final int ADDRESS_SIZE = PrimitiveType.STRING.getSize();
+	public static final int FRAME_ADDITIONAL_SIZE = ADDRESS_SIZE * 2;
+
 	ParseNode root;
 
 	public static ASMCodeFragment generate(ParseNode syntaxTree) {
@@ -85,6 +91,7 @@ public class ASMCodeGenerator {
 	private ASMCodeFragment programASM() {
 		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
 
+		code.add(    Label, RunTime.MAIN_PROGRAM_LABEL);
 		code.append( programCode());
 		code.add(    Halt );
 		
@@ -97,7 +104,9 @@ public class ASMCodeGenerator {
 	}
 
 	public static void loadFromAddress(ASMCodeFragment code, Type type) {
-		if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING || type instanceof Array) {
+		if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING ||
+				type instanceof Array || type instanceof LambdaType)
+		{
 			code.add(LoadI);
 		}
 		else if(type == PrimitiveType.FLOAT) {
@@ -120,7 +129,9 @@ public class ASMCodeGenerator {
 	}
 
 	public static void storeToAddress(ASMCodeFragment code, Type type) {
-		if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING || type instanceof Array) {
+		if(type == PrimitiveType.INTEGER || type == PrimitiveType.STRING ||
+				type instanceof Array || type instanceof LambdaType)
+		{
 			code.add(StoreI);
 		}
 		else if(type == PrimitiveType.FLOAT) {
@@ -227,14 +238,12 @@ public class ASMCodeGenerator {
 				ASMCodeFragment childCode = removeVoidCode(node.child(i));
 				code.append(childCode);
 			}
-			code.add(    Label, RunTime.MAIN_PROGRAM_LABEL);
 			ASMCodeFragment childCode = removeVoidCode(node.child(node.nChildren()-1));
 			code.append(childCode);
 		}
 		public void visitLeave(BlockStatementsNode node) {
 			newVoidCode(node);
 			for(ParseNode child : node.getChildren()) {
-				System.out.println(child);
 				ASMCodeFragment childCode = removeVoidCode(child);
 				code.append(childCode);
 			}
@@ -243,13 +252,97 @@ public class ASMCodeGenerator {
 		///////////////////////////////////////////////////////////////////////////
 		// function specials
 
-		public void visitLeave(FunctionDeclarationNode node) {
-			newVoidCode(node);
-			// TODO: msk
-		}
 		public void visitLeave(LambdaNode node) {
-			newVoidCode(node);
-			// TODO: msk
+			Labeller labeller = new Labeller("Lambda");
+			String functionLocation = labeller.newLabel("function-location");
+			String returnCode = labeller.newLabel("return-code");
+			String end = labeller.newLabel("end");
+			
+			Type returnType = ((LambdaType) node.getType()).getReturnType();
+
+			newValueCode(node);
+
+			code.add(Jump, end);
+
+			code.add(Label, functionLocation);
+			Macros.loadIFrom(code, RunTime.STACK_POINTER);
+			code.add(PushI, ADDRESS_SIZE);
+			code.add(Subtract);
+			code.add(Duplicate);	// [...  caller_return_addr  SP_val-4  SP_val-4]
+			Macros.loadIFrom(code, RunTime.FRAME_POINTER);
+			code.add(StoreI);		// [...  caller_return_addr  SP_val-4]
+			code.add(PushI, ADDRESS_SIZE);
+			code.add(Subtract);
+			code.add(Exchange);		// [...  SP_val-8  caller_return_addr]
+			code.add(StoreI);
+			Macros.loadIFrom(code, RunTime.STACK_POINTER);
+			Macros.storeITo(code, RunTime.FRAME_POINTER);		// [...]
+
+			ParseNode bodyCode = node.child(node.nChildren()-1);
+			Macros.loadIFrom(code, RunTime.STACK_POINTER);
+			code.add(PushI, bodyCode.getScope().getAllocatedSize() + FRAME_ADDITIONAL_SIZE);
+			code.add(Subtract);
+			Macros.storeITo(code, RunTime.STACK_POINTER);		// [...]
+			
+			code.append(removeVoidCode(bodyCode));
+
+			code.add(Jump, RunTime.LAMBDA_REACHED_END_OF_FUNCTION_NO_RETURN);
+
+
+			code.add(Label, returnCode);		// [...  returnValue]
+			Macros.loadIFrom(code, RunTime.FRAME_POINTER);
+			code.add(PushI, 2*ADDRESS_SIZE);
+			code.add(Subtract);
+			code.add(LoadI);		// [...  returnValue  returnAddr]
+			Macros.loadIFrom(code, RunTime.FRAME_POINTER);
+			Macros.storeITo(code, RunTime.FRAME_POINTER);
+			if(returnType.equivalent(PrimitiveType.RATIONAL)) {
+				// [...  numer  denom  returnAddr]
+				code.add(Exchange);
+				Macros.storeITo(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);	// [... numer retAddr]
+				code.add(Exchange);
+				Macros.loadIFrom(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);	// [... retAddr numer denom]
+			}
+			else if(returnType.equivalent(SpecialType.VOID)){
+				// [...  returnAddr]
+			}
+			else {
+				code.add(Exchange);		// [...  returnAddr  returnValue]
+			}
+			Macros.loadIFrom(code, RunTime.STACK_POINTER);
+			code.add(PushI, node.getScope().getAllocatedSize() + FRAME_ADDITIONAL_SIZE);
+			code.add(Add);
+			Macros.storeITo(code, RunTime.STACK_POINTER);	// [...  retAddr  retVal]
+			
+			if(returnType.equivalent(SpecialType.VOID)) {
+				// [... retAddr]
+			}
+			else {
+				Macros.loadIFrom(code, RunTime.STACK_POINTER); // [...  retAddr  retVal  SP_val]
+				code.add(PushI, returnType.getSize());
+				code.add(Subtract);
+				code.add(Duplicate);
+				Macros.storeITo(code, RunTime.STACK_POINTER);	// [...  retAddr  retVal  SP_val-type.size]
+				if(returnType.equivalent(PrimitiveType.RATIONAL)) {
+					// [...  retAddr  numer  denom  SP_val-8]
+					code.add(Exchange);
+					Macros.storeITo(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
+					// [...  retAddr  numer SP_val-8]
+					code.add(Exchange);
+					Macros.loadIFrom(code, RunTime.RATIONAL_DENOMINATOR_TEMPORARY);
+					// [... retAddr  SP_val-8  numer  denom]
+				}
+				else {
+					
+					code.add(Exchange); // [...  retAddr  SP_val-type.size  retVal]
+				}
+				storeToAddress(code, returnType);
+				// [... retAddr]
+			}
+			code.add(Return);
+			
+			code.add(Label, end);
+			code.add(PushD, functionLocation);
 		}
 		public void visitLeave(ParameterNode node) {
 			newVoidCode(node);
@@ -357,15 +450,17 @@ public class ASMCodeGenerator {
 		public void visitLeave(OperatorNode node) {
 			Lextant operator = node.getOperator();
 
-			if(Punctuator.isComparison(operator)) {
+			if(operator == Punctuator.FUNCTION_INVOCATION) {
+				visitFunctionCall(node);
+			}
+			else if(Punctuator.isComparison(operator)) {
 				visitComparisonOperatorNode(node, (Punctuator) operator);
 			}
 			else {
 				visitNormalOperatorNode(node);
 			}
 		}
-		private void visitComparisonOperatorNode(OperatorNode node,
-				Punctuator cmp) {
+		private void visitComparisonOperatorNode(OperatorNode node, Punctuator cmp) {
 
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
@@ -492,6 +587,47 @@ public class ASMCodeGenerator {
 			code.add(Jump, joinLabel);
 			code.add(Label, joinLabel);
 
+		}
+		private void visitFunctionCall(OperatorNode node) {
+			// TODO: msk
+			Type type = node.getType();
+			if(type == SpecialType.VOID) {
+				newVoidCode(node);
+			}
+			else if(type == PrimitiveType.STRING || type instanceof Array) {
+				newAddressCode(node);
+			}
+			else {
+				newValueCode(node);
+			}
+
+			ASMCodeFragment[] args = new ASMCodeFragment[node.nChildren()];
+			for(int i=0;i<args.length;i++) {
+				args[i] = removeValueCode(node.child(i));
+			}
+
+			for(int i=1;i<args.length;i++) {
+				Type argType = node.child(i).getType();
+				Macros.loadIFrom(code, RunTime.STACK_POINTER);
+				code.add(PushI, argType.getSize());
+				code.add(Subtract);
+				code.add(Duplicate);
+				Macros.storeITo(code, RunTime.STACK_POINTER);
+				code.append(args[i]);
+				storeToAddress(code, argType);
+			}
+			code.append(args[0]);
+			code.add(CallV);
+
+			// msk TODO hehe
+			if(type != SpecialType.VOID) {
+				Macros.loadIFrom(code, RunTime.STACK_POINTER);
+				loadFromAddress(code, type);
+				Macros.loadIFrom(code, RunTime.STACK_POINTER);
+				code.add(PushI, type.getSize());
+				code.add(Add);
+				Macros.storeITo(code, RunTime.STACK_POINTER);
+			}
 		}
 		private void visitNormalOperatorNode(OperatorNode node) {
 			Object varient = node.getSignature().getVariant();

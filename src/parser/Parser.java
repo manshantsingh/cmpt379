@@ -16,7 +16,6 @@ import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
-import parseTree.nodeTypes.FunctionDeclarationNode;
 import parseTree.nodeTypes.LambdaNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
@@ -74,7 +73,7 @@ public class Parser {
 			readToken();
 			ParseNode identifier = parseIdentifier();
 			ParseNode lambda = parseLambda();
-			program.appendChild(FunctionDeclarationNode.make(funcStart, identifier, lambda));
+			program.appendChild(DeclarationNode.withChildren(funcStart, identifier, lambda));
 		}
 		
 		expect(Keyword.EXEC);
@@ -525,12 +524,30 @@ public class Parser {
 		}
 
 		ParseNode left = parseAtomicExpression();
-		while(nowReading.isLextant(Punctuator.OPEN_SQUARE)) {
-			Token token = LextantToken.artificial(nowReading, Punctuator.ARRAY_INDEXING);
-			readToken();
-			ParseNode index = parseExpression();
-			expect(Punctuator.CLOSE_SQUARE);
-			left = OperatorNode.withChildren(token, left, index);
+		while(nowReading.isLextant(Punctuator.OPEN_SQUARE, Punctuator.OPEN_ROUND)) {
+			if(nowReading.isLextant(Punctuator.OPEN_SQUARE)) {
+				Token token = LextantToken.artificial(nowReading, Punctuator.ARRAY_INDEXING);
+				readToken();
+				ParseNode index = parseExpression();
+				expect(Punctuator.CLOSE_SQUARE);
+				left = OperatorNode.withChildren(token, left, index);
+			}
+			else if(nowReading.isLextant(Punctuator.OPEN_ROUND)) {
+				Token token = LextantToken.artificial(nowReading, Punctuator.FUNCTION_INVOCATION);
+				readToken();
+				ArrayList<ParseNode> arr = new ArrayList<ParseNode>();
+				arr.add(left);
+				while((arr.size()==1 && startsExpression(nowReading))
+						|| (arr.size()>1 && nowReading.isLextant(Punctuator.SEPARATOR)))
+				{
+					if(arr.size()>1) {
+						readToken();
+					}
+					arr.add(parseExpression());
+				}
+				expect(Punctuator.CLOSE_ROUND);
+				left = OperatorNode.withChildren(token, arr.toArray(new ParseNode[arr.size()]));
+			}
 		}
 		return left;
 	}

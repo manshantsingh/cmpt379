@@ -1,83 +1,88 @@
-func add<int a, int b> -> int{
+func my_function<int a, int b> -> int{
 	var c:= 5.
-	return a+b.
+	return a+b*c.
 }
 
 exec {
-	const half := 1//2.
-	const third := 1//3.
-	const quater := 1//4.
-
-	const a := 12//13.
-	const b := 3//2.
-
-	print half; third; quater; a; b, _n_, _n_.
-
-	const arr := [^a^, ^b^, ^c^, 1, 2, 3, 4, 5 , 6,7,8,9,1,2,3,4,5,6,7,8,9, 1.0].
-	print "arr: ", arr, _n_, _n_.
-	print length arr, _n_.
-	print arr, _n_.
-	print clone arr, _n_.
-
-
-	print half + quater; 3//4, _n_.
-	print half - quater; quater, _n_.
-	print half * quater; 1//8, _n_.
-	print half / quater; 2, _n_.
-
-	print a * b; 18//13, _n_, _n_.
-
-
-
-	print half == quater, _n_.
-	print half != quater, _n_.
-	print half >= quater, _n_.
-	print half <= quater, _n_.
-	print half >  quater, _n_.
-	print half <  quater, _n_, _n_, _n_.
-
-	print "arr: ", arr, _n_, _n_.
-
-
-	print half + 2 * quater == [1|char], _n_.
-	print 5 * length arr + 8, _n_.
-	print "arr: ", arr, _n_, _n_.
-
-	const arr2d := [clone arr, clone arr, new [float](2)].
-	print "arr: ", arr, _n_, _n_.
-	print arr2d, _n_.
-	print clone arr, _n_.
-	print clone arr2d, _n_.
-	{
-		var a:= ["hehe", "lol"].
-		var b:= clone a.
-		var c:=a.
-		var d:=b.
-		a:=d.
-		print a;b;c;d,_n_.
-		print a==b || 5//0 == 1//2,_n_.
-		print a==c,_n_.
-		print c==b,_n_.
-		print a!=b && 5//0 == 1//2,_n_.
-		print a!=c,_n_.
-		print c!=b,_n_.
-	}
-	var j:= 0.
-	while(j<2){
-		j:=j + 1.
-		var i := 0.
-		while(i<5){
-			i := i + 1.
-			if (i < 2){
-				print "special small number:";i,_n_.
-				continue.
-			}
-			if(i>3){
-				print "leaving at i:";i,_n_.
-				break.
-			}
-			print "i:";i,_n_.
-		}
-		print "current j: ",j,_n_.
-	}
+# print my_function(7,8).
+	print "my function value: ", my_function(7,8), _n_.
 }
+
+# exec {
+# 	const half := 1//2.
+# 	const third := 1//3.
+# 	const quater := 1//4.
+
+# 	const a := 12//13.
+# 	const b := 3//2.
+
+# 	print half; third; quater; a; b, _n_, _n_.
+
+# 	const arr := [^a^, ^b^, ^c^, 1, 2, 3, 4, 5 , 6,7,8,9,1,2,3,4,5,6,7,8,9, 1.0].
+# 	print "arr: ", arr, _n_, _n_.
+# 	print length arr, _n_.
+# 	print arr, _n_.
+# 	print clone arr, _n_.
+
+
+# 	print half + quater; 3//4, _n_.
+# 	print half - quater; quater, _n_.
+# 	print half * quater; 1//8, _n_.
+# 	print half / quater; 2, _n_.
+
+# 	print a * b; 18//13, _n_, _n_.
+
+
+
+# 	print half == quater, _n_.
+# 	print half != quater, _n_.
+# 	print half >= quater, _n_.
+# 	print half <= quater, _n_.
+# 	print half >  quater, _n_.
+# 	print half <  quater, _n_, _n_, _n_.
+
+# 	print "arr: ", arr, _n_, _n_.
+
+
+# 	print half + 2 * quater == [1|char], _n_.
+# 	print 5 * length arr + 8, _n_.
+# 	print "arr: ", arr, _n_, _n_.
+
+# 	const arr2d := [clone arr, clone arr, new [float](2)].
+# 	print "arr: ", arr, _n_, _n_.
+# 	print arr2d, _n_.
+# 	print clone arr, _n_.
+# 	print clone arr2d, _n_.
+# 	{
+# 		var a:= ["hehe", "lol"].
+# 		var b:= clone a.
+# 		var c:=a.
+# 		var d:=b.
+# 		a:=d.
+# 		print a;b;c;d,_n_.
+# 		print a==b || 5//0 == 1//2,_n_.
+# 		print a==c,_n_.
+# 		print c==b,_n_.
+# 		print a!=b && 5//0 == 1//2,_n_.
+# 		print a!=c,_n_.
+# 		print c!=b,_n_.
+# 	}
+# 	var j:= 0.
+# 	while(j<2){
+# 		j:=j + 1.
+# 		var i := 0.
+# 		while(i<5){
+# 			i := i + 1.
+# 			if (i < 2){
+# 				print "special small number:";i,_n_.
+# 				continue.
+# 			}
+# 			if(i>3){
+# 				print "leaving at i:";i,_n_.
+# 				break.
+# 			}
+# 			print "i:";i,_n_.
+# 		}
+# 		print "current j: ",j,_n_.
+# 	}
+# }

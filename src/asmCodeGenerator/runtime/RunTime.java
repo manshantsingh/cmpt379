@@ -46,6 +46,8 @@ public class RunTime {
 	public static final String INDEX_OUT_OF_BOUND_ARRAY_RUNTIME_ERROR = "$$a-index-out-of-bound-runtime_error";
 	public static final String NEGATIVE_LENGTH_ARRAY_RUNTIME_ERROR = "$$a-negative-length-runtime_error";
 
+	public static final String LAMBDA_REACHED_END_OF_FUNCTION_NO_RETURN = "$$l-reached-end-of-function-no-return";
+
 	public static final String RECORD_CREATION_TEMPORARY = "$$record-create-temporary";
 	public static final String ARRAY_INDEXING_ARRAY = "$$a-indexing-array";
 	public static final String ARRAY_INDEXING_INDEX = "$$a-indexing-index";
@@ -80,11 +82,11 @@ public class RunTime {
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
+		result.append(functionCallPointers());
 		result.append(jumpToMain());
 		result.append(stringsForPrintf());
 		result.append(runtimeErrors());
 		result.append(temporaryVariables());
-		result.append(functionCallPointers());
 		result.append(additionalSubroutines());
 		result.add(DLabel, USABLE_MEMORY_START);
 		return result;
@@ -188,6 +190,7 @@ public class RunTime {
 		nullArrayError(frag);
 		indexOutOfBoundArrayError(frag);
 		negativeLengthArrayError(frag);
+		endOfFunctionNoReturnStatement(frag);
 		
 		return frag;
 	}
@@ -266,6 +269,17 @@ public class RunTime {
 
 		frag.add(Label, NEGATIVE_LENGTH_ARRAY_RUNTIME_ERROR);
 		frag.add(PushD, negativeLengthArrayErrorMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
+	private void endOfFunctionNoReturnStatement(ASMCodeFragment frag) {
+		String endOfFunctionNoReturnStatementErrorMessage = "$errors-end-of-function-no-return";
+
+		frag.add(DLabel, endOfFunctionNoReturnStatementErrorMessage);
+		frag.add(DataS, "reached end of function but no return was issued");
+
+		frag.add(Label, LAMBDA_REACHED_END_OF_FUNCTION_NO_RETURN);
+		frag.add(PushD, endOfFunctionNoReturnStatementErrorMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 
