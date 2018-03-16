@@ -1,6 +1,6 @@
-# func add<int a, int b> -> int{
-# 	return a+b.
-# }
+func add<int a, int b> -> int{
+	return a+b.
+}
 
 exec {
 	const half := 1//2.

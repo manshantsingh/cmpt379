@@ -21,9 +21,11 @@ import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
+import parseTree.nodeTypes.FunctionDeclarationNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
+import parseTree.nodeTypes.LambdaNode;
 import parseTree.nodeTypes.LoopJumperNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
@@ -35,6 +37,7 @@ import parseTree.nodeTypes.WhileStatementNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.types.Array;
+import semanticAnalyzer.types.LambdaType;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
@@ -53,6 +56,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visitEnter(ProgramNode node) {
 		enterProgramScope(node);
+		for(ParseNode child: node.getChildren()) {
+			if(child instanceof FunctionDeclarationNode) {
+				FunctionDeclarationNode func = (FunctionDeclarationNode) child;
+				IdentifierNode identifier = (IdentifierNode) func.child(0);
+				Type funcType = func.child(1).getType();
+				addBinding(identifier, funcType, true);
+			}
+		}
 	}
 	public void visitLeave(ProgramNode node) {
 		leaveScope(node);
@@ -62,6 +73,17 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	public void visitLeave(BlockStatementsNode node) {
 		leaveScope(node);
+	}
+
+	public void visitLeave(FunctionDeclarationNode node) {
+		// TODO: msk
+	}
+	public void visitEnter(LambdaNode node) {
+		// TODO: msk
+	}
+	public void visitLeave(LambdaNode node) {
+		// TODO: msk
+//		leaveScope(node);
 	}
 	
 	

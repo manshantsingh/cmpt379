@@ -13,8 +13,6 @@ import tokens.StringConstantToken;
 import tokens.Token;
 
 public class LambdaNode extends ParseNode {
-	
-	private LambdaType lamdaType;
 
 	public LambdaNode(Token token) {
 		super(token);
@@ -31,7 +29,7 @@ public class LambdaNode extends ParseNode {
 			node.appendChild(n);
 			paramsType.add(n.getType());
 		}
-		node.lamdaType = new LambdaType(paramsType, returnType);
+		node.setType(new LambdaType(paramsType, returnType));
 		node.appendChild(block);
 		return node;
 	}
@@ -47,9 +45,5 @@ public class LambdaNode extends ParseNode {
 		visitor.visitEnter(this);
 		visitChildren(visitor);
 		visitor.visitLeave(this);
-	}
-
-	public LambdaType getLamdaType() {
-		return lamdaType;
 	}
 }
