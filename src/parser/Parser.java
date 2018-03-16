@@ -30,6 +30,7 @@ import parseTree.nodeTypes.StringConstantNode;
 import parseTree.nodeTypes.TabSpaceNode;
 import parseTree.nodeTypes.WhileStatementNode;
 import semanticAnalyzer.types.Array;
+import semanticAnalyzer.types.LambdaType;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.SpecialType;
 import semanticAnalyzer.types.Type;
@@ -328,9 +329,13 @@ public class Parser {
 	private boolean startsLambda(Token token) {
 		return token.isLextant(Punctuator.LESS);
 	}
+	private boolean startsLambdaType(Token token) {
+		return token.isLextant(Punctuator.LESS);
+	}
 	private ParseNode parseLambda() {
 		if(!startsLambda(nowReading)) {
 			return syntaxErrorNode("Lambda");
+			
 		}
 		Token lamdaStart = nowReading;
 		readToken();
@@ -633,6 +638,35 @@ public class Parser {
 		return syntaxErrorNode("empty array creation expression");
 	}
 
+	private Type parseLambdaType() {
+		if(!startsLambdaType(nowReading)) {
+			syntaxError(nowReading, "expecting a lambda type");
+			readToken();
+			return null;
+		}
+		readToken();
+		ArrayList<Type> params = new ArrayList<Type>();
+		while((params.isEmpty() && startsType(nowReading)) ||
+				(!params.isEmpty() && nowReading.isLextant(Punctuator.SEPARATOR)))
+		{
+			if(!params.isEmpty()) {
+				readToken();
+			}
+			params.add(parseTypeVariable());
+		}
+		expect(Punctuator.GREATER);
+		expect(Punctuator.ARROW);
+		Type returnType;
+		if(nowReading.isLextant(Keyword.VOID)) {
+			readToken();
+			returnType = SpecialType.VOID;
+		}
+		else {
+			returnType = parseTypeVariable();
+		}
+		return new LambdaType(params, returnType);
+	}
+
 	private Type parseTypeVariable() {
 		if(!startsType(nowReading)) {
 			syntaxError(nowReading, "expecting a type");
@@ -651,6 +685,9 @@ public class Parser {
 		if(startsPrimativeType(nowReading)) {
 			readToken();
 			return PrimitiveType.fromTypeVariable((LextantToken) previouslyRead);
+		}
+		if(startsLambdaType(nowReading)) {
+			return parseLambdaType();
 		}
 		// Theoretically should not reach here
 		syntaxError(nowReading, "expecting a type");
@@ -731,7 +768,7 @@ public class Parser {
 	}
 
 	private boolean startsType(Token token) {
-		return startsPrimativeType(token) || startsArrayType(token);
+		return startsPrimativeType(token) || startsArrayType(token) || startsLambdaType(token);
 	}
 
 	private boolean startsArrayType(Token token) {

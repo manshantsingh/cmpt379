@@ -1,14 +1,61 @@
-func my_function<int a, int b> -> [rat]{
-	var c:= 5.
-	var d := a+b*c.
-	print _n_,"value is: ", d, _n_.
-	return [2//4].
+# func my_function<int a, int b> -> string{
+# 	var c:= 5.
+# 	var d := a+b*c.
+# 	print _n_,"value is: ", d, _n_.
+# 	return "hello world".
+# }
+
+func factorial<int a> -> int{
+	# print "gets here with: ", a, _n_.
+	if(a<=0){
+		return 0.
+	}
+	if(a==1){
+		return 1.
+	}
+	return a*factorial(a - 1).
+}
+
+func SumOfFirstN<int n> -> int {
+	# if(n<=0){
+	# 	return 0.
+	# }
+	# var a:= 8.
+	var a:= one().
+	print a,_n_.
+	return a.
+}
+
+func hehe<> -> int{
+	var a:= anotherOne().
+	return a.
+	# return one().
+}
+
+
+func anotherOne<> -> int{
+	var a:= one().
+	return a.
+	# return one().
+}
+
+func one<> -> int{
+	var b := 2.
+	return 1.
 }
 
 exec {
-# print my_function(3, 2).
-	# var a := my_function(3,2).
-	print "wow:", my_function(3,2), _n_.
+	var i := 0.
+	while(i<10){
+		i := i + 1.
+		print i,":"; factorial(i), _n_.
+	}
+	# print one().
+	# print hehe().
+	# print SumOfFirstN(1).
+	# print SumOfFirstN(1).
+	# print SumOfFirstN(1).
+	# print SumOfFirstN(1).
 }
 
 # exec {

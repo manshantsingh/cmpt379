@@ -241,13 +241,6 @@ public class ASMCodeGenerator {
 		public void visitLeave(BlockStatementsNode node) {
 			newVoidCode(node);
 			for(ParseNode child : node.getChildren()) {
-//				ASMCodeFragment childCode;
-//				if(child instanceof ReturnNode) {
-//					childCode = removeValueCode(child);
-//				}
-//				else {
-//					childCode = removeVoidCode(child);
-//				}
 				ASMCodeFragment childCode = removeVoidCode(child);
 				code.append(childCode);
 			}
@@ -265,6 +258,7 @@ public class ASMCodeGenerator {
 			code.add(Jump, node.getEndLabel());
 
 			code.add(Label, node.getFunctionLocationLabel());
+//			code.add(PStack);
 			Macros.loadIFrom(code, RunTime.STACK_POINTER);
 			code.add(PushI, ADDRESS_SIZE);
 			code.add(Subtract);
@@ -274,9 +268,11 @@ public class ASMCodeGenerator {
 			code.add(PushI, ADDRESS_SIZE);
 			code.add(Subtract);
 			code.add(Exchange);		// [...  SP_val-8  caller_return_addr]
+			testPointer(code, 1);
 			code.add(StoreI);
 			Macros.loadIFrom(code, RunTime.STACK_POINTER);
 			Macros.storeITo(code, RunTime.FRAME_POINTER);		// [...]
+			testPointer(code, 5);
 
 			ParseNode bodyCode = node.child(node.nChildren()-1);
 			Macros.loadIFrom(code, RunTime.STACK_POINTER);
@@ -290,11 +286,16 @@ public class ASMCodeGenerator {
 
 
 			code.add(Label, node.getReturnCodeLabel());		// [...  returnValue]
+//			code.add(PStack);
 			Macros.loadIFrom(code, RunTime.FRAME_POINTER);
 			code.add(PushI, FRAME_ADDITIONAL_SIZE);
 			code.add(Subtract);
 			code.add(LoadI);		// [...  returnValue  returnAddr]
+			testPointer(code, -99);
 			Macros.loadIFrom(code, RunTime.FRAME_POINTER);
+			code.add(PushI, ADDRESS_SIZE);
+			code.add(Subtract);
+			code.add(LoadI);
 			Macros.storeITo(code, RunTime.FRAME_POINTER);
 			if(returnType == PrimitiveType.RATIONAL) {
 				// [...  numer  denom  returnAddr]
@@ -310,7 +311,7 @@ public class ASMCodeGenerator {
 				code.add(Exchange);		// [...  returnAddr  returnValue]
 			}
 			Macros.loadIFrom(code, RunTime.STACK_POINTER);
-			code.add(PushI, node.getScope().getAllocatedSize() + FRAME_ADDITIONAL_SIZE);
+			code.add(PushI, bodyCode.getScope().getAllocatedSize() + node.getScope().getAllocatedSize() + FRAME_ADDITIONAL_SIZE);
 			code.add(Add);
 			Macros.storeITo(code, RunTime.STACK_POINTER);	// [...  retAddr  retVal]
 			
@@ -607,7 +608,6 @@ public class ASMCodeGenerator {
 			for(int i=0;i<args.length;i++) {
 				args[i] = removeValueCode(node.child(i));
 			}
-
 			for(int i=1;i<args.length;i++) {
 				Type argType = node.child(i).getType();
 				Macros.loadIFrom(code, RunTime.STACK_POINTER);
@@ -616,9 +616,11 @@ public class ASMCodeGenerator {
 				code.add(Duplicate);
 				Macros.storeITo(code, RunTime.STACK_POINTER);
 				code.append(args[i]);
+//				code.add(PStack);
 				storeToAddress(code, argType);
 			}
 			code.append(args[0]);
+//			code.add(PStack);
 			code.add(CallV);
 
 			// msk TODO hehe
@@ -745,5 +747,16 @@ public class ASMCodeGenerator {
 			// TODO: change me
 			RecordsCodeGenerator.createStringRecord(code, node.getValue());
 		}
+	}
+	
+	private void testPointer(ASMCodeFragment code, int a) {
+		//msk test
+//		Macros.loadIFrom(code, RunTime.FRAME_POINTER);
+//		Macros.loadIFrom(code, RunTime.STACK_POINTER);
+//		code.add(PushI, a);
+//		code.add(PStack);
+//		code.add(Pop);
+//		code.add(Pop);
+//		code.add(Pop);
 	}
 }
