@@ -1,0 +1,190 @@
+# func my_function<int a, int b> -> string{
+# 	var c:= 5.
+# 	var d := a+b*c.
+# 	print _n_,"value is: ", d, _n_.
+# 	return "hello world".
+# }
+
+func factorial<int a> -> int{
+	# print "gets here with: ", a, _n_.
+	if(a<=0){
+		return 0.
+	}
+	if(a==1){
+		return 1.
+	}
+	return a*factorial(a - 1).
+}
+
+func fibonanci<int a> -> int{
+	# print "gets here with: ", a, _n_.
+	if(a<=0){
+		return 0.
+	}
+	if(a==1){
+		return 1.
+	}
+	return fibonanci(a - 2)  + fibonanci(a - 1).
+}
+
+func dp<int a, [int] arr> -> void{
+	if(arr[a]==-1){
+		call dp(a - 1, arr).
+		# arr[a - 2] := fibonanci(a - 2).
+		call dp(a - 2, arr).
+		arr[a] := arr[a - 1] + arr[a - 2].
+	}
+	return.
+}
+
+func SumOfFirstN<int n> -> int {
+	# if(n<=0){
+	# 	return 0.
+	# }
+	# var a:= 8.
+	var a:= one().
+	print a,_n_.
+	return a.
+}
+
+func hehe<> -> int{
+	var a:= anotherOne().
+	return a.
+	# return one().
+}
+
+
+func anotherOne<> -> int{
+	var a:= one().
+	return a.
+	# return one().
+}
+
+func one<> -> int{
+	var b := 2.
+	return 1.
+}
+
+func anotherTest<float a, int b> -> [int] {
+	print "I just got a=",a,", and b=",b,_n_.
+	return [[a|int],b].
+	# return "hello world".
+}
+
+exec {
+	# var i := 0.
+	# while(i<10){
+	# 	i := i + 1.
+	# 	print i,":"; factorial(i), _n_.
+	# }
+	const limit := 10.
+	const arr := new [int](limit).
+	var i:=0.
+	while(i<limit){
+		arr[i]:=-1.
+		i:=i+ 1.
+	}
+	arr[0]:=0.
+	arr[1]:=1.
+	call dp(limit - 1, arr).
+	i := 0.
+	# while(i<limit){
+	# 	print "answer at ",i,"=",arr[i],_n_.
+	# 	i:= i + 1.
+	# }
+	print "final answer=",arr[limit - 1],_n_.
+	# print one().
+	# print hehe().
+	# print SumOfFirstN(1).
+	# print SumOfFirstN(1).
+	# print SumOfFirstN(1).
+	# print SumOfFirstN(1).
+	var make_rational := <int a, int b> -> rat{
+		# print "arr Value at 0: ", arr[0], _n_.
+		return a//b.
+	}.
+
+
+
+	print make_rational(5,2), _n_.
+	call anotherTest(9.0,10).
+}
+
+# exec {
+# 	const half := 1//2.
+# 	const third := 1//3.
+# 	const quater := 1//4.
+
+# 	const a := 12//13.
+# 	const b := 3//2.
+
+# 	print half; third; quater; a; b, _n_, _n_.
+
+# 	const arr := [^a^, ^b^, ^c^, 1, 2, 3, 4, 5 , 6,7,8,9,1,2,3,4,5,6,7,8,9, 1.0].
+# 	print "arr: ", arr, _n_, _n_.
+# 	print length arr, _n_.
+# 	print arr, _n_.
+# 	print clone arr, _n_.
+
+
+# 	print half + quater; 3//4, _n_.
+# 	print half - quater; quater, _n_.
+# 	print half * quater; 1//8, _n_.
+# 	print half / quater; 2, _n_.
+
+# 	print a * b; 18//13, _n_, _n_.
+
+
+
+# 	print half == quater, _n_.
+# 	print half != quater, _n_.
+# 	print half >= quater, _n_.
+# 	print half <= quater, _n_.
+# 	print half >  quater, _n_.
+# 	print half <  quater, _n_, _n_, _n_.
+
+# 	print "arr: ", arr, _n_, _n_.
+
+
+# 	print half + 2 * quater == [1|char], _n_.
+# 	print 5 * length arr + 8, _n_.
+# 	print "arr: ", arr, _n_, _n_.
+
+# 	const arr2d := [clone arr, clone arr, new [float](2)].
+# 	print "arr: ", arr, _n_, _n_.
+# 	print arr2d, _n_.
+# 	print clone arr, _n_.
+# 	print clone arr2d, _n_.
+# 	{
+# 		var a:= ["hehe", "lol"].
+# 		var b:= clone a.
+# 		var c:=a.
+# 		var d:=b.
+# 		a:=d.
+# 		print a;b;c;d,_n_.
+# 		print a==b || 5//0 == 1//2,_n_.
+# 		print a==c,_n_.
+# 		print c==b,_n_.
+# 		print a!=b && 5//0 == 1//2,_n_.
+# 		print a!=c,_n_.
+# 		print c!=b,_n_.
+# 	}
+# 	var j:= 0.
+# 	while(j<2){
+# 		j:=j + 1.
+# 		var i := 0.
+# 		while(i<5){
+# 			i := i + 1.
+# 			if (i < 2){
+# 				print "special small number:";i,_n_.
+# 				continue.
+# 			}
+# 			if(i>3){
+# 				print "leaving at i:";i,_n_.
+# 				break.
+# 			}
+# 			print "i:";i,_n_.
+# 		}
+# 		print "current j: ",j,_n_.
+# 	}
+# }
