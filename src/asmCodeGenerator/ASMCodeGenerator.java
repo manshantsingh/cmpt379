@@ -269,11 +269,9 @@ public class ASMCodeGenerator {
 			code.add(PushI, ADDRESS_SIZE);
 			code.add(Subtract);
 			code.add(Exchange);		// [...  SP_val-8  caller_return_addr]
-			testPointer(code, 1);
 			code.add(StoreI);
 			Macros.loadIFrom(code, RunTime.STACK_POINTER);
 			Macros.storeITo(code, RunTime.FRAME_POINTER);		// [...]
-			testPointer(code, 5);
 
 			ParseNode bodyCode = node.child(node.nChildren()-1);
 			Macros.loadIFrom(code, RunTime.STACK_POINTER);
@@ -292,7 +290,6 @@ public class ASMCodeGenerator {
 			code.add(PushI, FRAME_ADDITIONAL_SIZE);
 			code.add(Subtract);
 			code.add(LoadI);		// [...  returnValue  returnAddr]
-			testPointer(code, -99);
 			Macros.loadIFrom(code, RunTime.FRAME_POINTER);
 			code.add(PushI, ADDRESS_SIZE);
 			code.add(Subtract);
@@ -766,16 +763,5 @@ public class ASMCodeGenerator {
 			// TODO: change me
 			RecordsCodeGenerator.createStringRecord(code, node.getValue());
 		}
-	}
-	
-	private void testPointer(ASMCodeFragment code, int a) {
-		//msk test
-//		Macros.loadIFrom(code, RunTime.FRAME_POINTER);
-//		Macros.loadIFrom(code, RunTime.STACK_POINTER);
-//		code.add(PushI, a);
-//		code.add(PStack);
-//		code.add(Pop);
-//		code.add(Pop);
-//		code.add(Pop);
 	}
 }
