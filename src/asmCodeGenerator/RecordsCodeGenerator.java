@@ -88,6 +88,24 @@ public class RecordsCodeGenerator {
 		addChartoString(code, offset, 0);
 	}
 
+	// [... length] => [... recordPosition]
+	public static void createUnfilledStringRecord(ASMCodeFragment code) {
+		code.add(Duplicate);
+		Macros.storeITo(code, RATIONAL_DENOMINATOR_TEMPORARY);
+		code.add(PushI, PrimitiveType.CHARACTER.getSize());
+		code.add(Multiply);
+		code.add(PushI, STRING_HEADER_OFFSET);
+		code.add(Add);
+		createRecord(code, STRING_TYPE_ID, STRING_STATUS);
+		
+		Macros.loadIFrom(code, RECORD_CREATION_TEMPORARY);
+		code.add(Duplicate);
+		code.add(PushI, STRING_LENGTH_OFFSET);
+		code.add(Add);
+		Macros.loadIFrom(code, RATIONAL_DENOMINATOR_TEMPORARY);		// [...  recordPos  recordPos+lenOffset  strLen]
+		code.add(StoreI);
+	}
+
 	// [... size] => [...]
 	private static void createRecord(ASMCodeFragment code, int typeCode, int statusFlags) {
 		code.add(Call, MEM_MANAGER_ALLOCATE);

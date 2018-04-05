@@ -553,8 +553,16 @@ public class Parser {
 				Token token = LextantToken.artificial(nowReading, Punctuator.ARRAY_INDEXING);
 				readToken();
 				ParseNode index = parseExpression();
-				expect(Punctuator.CLOSE_SQUARE);
-				left = OperatorNode.withChildren(token, left, index);
+				if(nowReading.isLextant(Punctuator.SEPARATOR)) {
+					readToken();
+					ParseNode index2 = parseExpression();
+					expect(Punctuator.CLOSE_SQUARE);
+					left = OperatorNode.withChildren(token, left, index, index2);
+				}
+				else {
+					expect(Punctuator.CLOSE_SQUARE);
+					left = OperatorNode.withChildren(token, left, index);
+				}
 			}
 			else if(nowReading.isLextant(Punctuator.OPEN_ROUND)) {
 				Token token = LextantToken.artificial(nowReading, Punctuator.FUNCTION_INVOCATION);

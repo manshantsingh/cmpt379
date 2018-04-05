@@ -7,6 +7,8 @@ import tokens.Token;
 public enum Keyword implements Lextant {
 	CONST("const"),
 	VAR("var"),
+	STATIC("static"),
+
 	PRINT("print"),
 	NEWLINE("_n_"),
 	TAB_SPACE("_t_"),
@@ -30,6 +32,15 @@ public enum Keyword implements Lextant {
 	CALL("call"),
 	VOID("void"),
 	RETURN("return"),
+
+	FOR("for"),
+	INDEX("index"),
+	ELEM("elem"),
+	MAP("map"),
+	REDUCE("reduce"),
+	FOLD("fold"),
+	ZIP("zip"),
+	REVERSE("reverse"),
 
 	BOOLEAN("bool"),
 	CHARACTER("char"),

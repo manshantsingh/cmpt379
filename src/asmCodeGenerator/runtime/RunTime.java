@@ -1,7 +1,6 @@
 package asmCodeGenerator.runtime;
 import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
-import static asmCodeGenerator.runtime.RunTime.NULL_ARRAY_RUNTIME_ERROR;
 
 import asmCodeGenerator.ASMCodeGenerator;
 import asmCodeGenerator.ASMConstants;
@@ -45,6 +44,11 @@ public class RunTime {
 	public static final String NULL_ARRAY_RUNTIME_ERROR = "$$a-null-array-runtime_error";
 	public static final String INDEX_OUT_OF_BOUND_ARRAY_RUNTIME_ERROR = "$$a-index-out-of-bound-runtime_error";
 	public static final String NEGATIVE_LENGTH_ARRAY_RUNTIME_ERROR = "$$a-negative-length-runtime_error";
+
+	public static final String NULL_STRING_RUNTIME_ERROR = "$$s-null-string-runtime_error";
+	public static final String INDEX_OUT_OF_BOUND_STRING_RUNTIME_ERROR = "$$s-index-out-of-bound-runtime_error";
+	public static final String NEGATIVE_LENGTH_STRING_RUNTIME_ERROR = "$$s-negative-length-runtime_error";
+	public static final String SECOND_INDEX_SMALLER_STRING_RUNTIME_ERROR = "$$s-second-index-smaller-runtime_error";
 
 	public static final String LAMBDA_REACHED_END_OF_FUNCTION_NO_RETURN = "$$l-reached-end-of-function-no-return";
 
@@ -190,6 +194,12 @@ public class RunTime {
 		nullArrayError(frag);
 		indexOutOfBoundArrayError(frag);
 		negativeLengthArrayError(frag);
+
+		nullStringError(frag);
+		indexOutOfBoundStringError(frag);
+		negativeLengthStringError(frag);
+		secondIndexSmallerStringError(frag);
+
 		endOfFunctionNoReturnStatement(frag);
 		
 		return frag;
@@ -269,6 +279,50 @@ public class RunTime {
 
 		frag.add(Label, NEGATIVE_LENGTH_ARRAY_RUNTIME_ERROR);
 		frag.add(PushD, negativeLengthArrayErrorMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
+	private void nullStringError(ASMCodeFragment frag) {
+		String nullStringErrorMessage = "$errors-null-string";
+
+		frag.add(DLabel, nullStringErrorMessage);
+		frag.add(DataS, "null string");
+
+		frag.add(Label, NULL_STRING_RUNTIME_ERROR);
+		frag.add(PushD, nullStringErrorMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
+	private void indexOutOfBoundStringError(ASMCodeFragment frag) {
+		String indexOutOfBoundStringErrorMessage = "$errors-index-out-of-bound-string";
+
+		frag.add(DLabel, indexOutOfBoundStringErrorMessage);
+		frag.add(DataS, "string index out of bound");
+
+		frag.add(Label, INDEX_OUT_OF_BOUND_STRING_RUNTIME_ERROR);
+		frag.add(PushD, indexOutOfBoundStringErrorMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
+	private void negativeLengthStringError(ASMCodeFragment frag) {
+		String negativeLengthStringErrorMessage = "$errors-negative-length-string";
+
+		frag.add(DLabel, negativeLengthStringErrorMessage);
+		frag.add(DataS, "string negative length");
+
+		frag.add(Label, NEGATIVE_LENGTH_STRING_RUNTIME_ERROR);
+		frag.add(PushD, negativeLengthStringErrorMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
+	private void secondIndexSmallerStringError(ASMCodeFragment frag) {
+		String secondIndexSmallerStringErrorMessage = "$errors-second-index-smaller-string";
+
+		frag.add(DLabel, secondIndexSmallerStringErrorMessage);
+		frag.add(DataS, "substring second index smaller");
+
+		frag.add(Label, SECOND_INDEX_SMALLER_STRING_RUNTIME_ERROR);
+		frag.add(PushD, secondIndexSmallerStringErrorMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 

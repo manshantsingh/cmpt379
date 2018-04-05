@@ -24,6 +24,9 @@ import asmCodeGenerator.operators.RationalAddSubtractCodeGenerator;
 import asmCodeGenerator.operators.RationalFloatCastCodeGenerator;
 import asmCodeGenerator.operators.RationalMultiplyDivideCodeGenerator;
 import asmCodeGenerator.operators.ShortCircuitCodeGenerator;
+import asmCodeGenerator.operators.StringIndexingCodeGenerator;
+import asmCodeGenerator.operators.StringLengthCodeGenerator;
+import asmCodeGenerator.operators.StringSubstringCodeGenerator;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Punctuator;
 import semanticAnalyzer.types.Type;
@@ -165,11 +168,14 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 
 		TypeVariable S = TypeVariable.getInstance();
 		new FunctionSignatures(Punctuator.ARRAY_INDEXING,
-			new FunctionSignature(new ArrayIndexingCodeGenerator(), new Array(S), PrimitiveType.INTEGER, S).setAsTargetable()
+			new FunctionSignature(new ArrayIndexingCodeGenerator(), new Array(S), PrimitiveType.INTEGER, S).setAsTargetable(),
+			new FunctionSignature(new StringIndexingCodeGenerator(), PrimitiveType.STRING, PrimitiveType.INTEGER, PrimitiveType.CHARACTER),
+			new FunctionSignature(new StringSubstringCodeGenerator(), PrimitiveType.STRING, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.STRING)
 		);
 
 		new FunctionSignatures(Keyword.LENGTH,
-			new FunctionSignature(new ArrayLengthCodeGenerator(), new Array(S), PrimitiveType.INTEGER)
+			new FunctionSignature(new ArrayLengthCodeGenerator(), new Array(S), PrimitiveType.INTEGER),
+			new FunctionSignature(new StringLengthCodeGenerator(), PrimitiveType.STRING, PrimitiveType.INTEGER)
 		);
 
 		new FunctionSignatures(Keyword.CLONE,
