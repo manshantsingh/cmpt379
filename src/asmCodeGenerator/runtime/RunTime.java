@@ -53,8 +53,11 @@ public class RunTime {
 	public static final String LAMBDA_REACHED_END_OF_FUNCTION_NO_RETURN = "$$l-reached-end-of-function-no-return";
 
 	public static final String RECORD_CREATION_TEMPORARY = "$$record-create-temporary";
+	public static final String RECORD_REVERSE_TOP = "$$record-reverse-top";
+	public static final String RECORD_REVERSE_BOTTOM = "$$record-reverse-bottom";
 	public static final String ARRAY_INDEXING_ARRAY = "$$a-indexing-array";
 	public static final String ARRAY_INDEXING_INDEX = "$$a-indexing-index";
+	public static final String ARRAY_INDEXING_INDEX_SECOND = "$$a-indexing-index-second";
 	public static final String RATIONAL_NUMERATOR_TEMPORARY = "$$r-numerator-temporary";
 	public static final String RATIONAL_DENOMINATOR_TEMPORARY = "$$r-denominator-temporary";
 	public static final String RATIONAL_COMMON_DENOMINATOR_TEMPORARY = "$$r-common-denominator-temporary";
@@ -100,9 +103,12 @@ public class RunTime {
 		ASMCodeFragment frag  = new ASMCodeFragment(GENERATES_VOID);
 
 		Macros.declareI(frag, RECORD_CREATION_TEMPORARY);
+		Macros.declareI(frag, RECORD_REVERSE_TOP);
+		Macros.declareI(frag, RECORD_REVERSE_BOTTOM);
 
 		Macros.declareI(frag, ARRAY_INDEXING_ARRAY);
 		Macros.declareI(frag, ARRAY_INDEXING_INDEX);
+		Macros.declareI(frag, ARRAY_INDEXING_INDEX_SECOND);
 
 		Macros.declareI(frag, RATIONAL_NUMERATOR_TEMPORARY);
 		Macros.declareI(frag, RATIONAL_DENOMINATOR_TEMPORARY);

@@ -27,7 +27,7 @@ public class StringSubstringCodeGenerator implements SimpleCodeGenerator {
 		String inBound1 = labeller.newLabel("in-bounds1");
 //		String length
 
-		Macros.storeITo(frag, RATIONAL_COMMON_DENOMINATOR_TEMPORARY);
+		Macros.storeITo(frag, ARRAY_INDEXING_INDEX_SECOND);
 		Macros.storeITo(frag, ARRAY_INDEXING_INDEX);
 		Macros.storeITo(frag, ARRAY_INDEXING_ARRAY);
 
@@ -37,7 +37,7 @@ public class StringSubstringCodeGenerator implements SimpleCodeGenerator {
 		Macros.loadIFrom(frag, ARRAY_INDEXING_INDEX);
 		frag.add(JumpNeg, INDEX_OUT_OF_BOUND_STRING_RUNTIME_ERROR);
 
-		Macros.loadIFrom(frag, RATIONAL_COMMON_DENOMINATOR_TEMPORARY);
+		Macros.loadIFrom(frag, ARRAY_INDEXING_INDEX_SECOND);
 		frag.add(JumpNeg, INDEX_OUT_OF_BOUND_STRING_RUNTIME_ERROR);
 
 		Macros.loadIFrom(frag, ARRAY_INDEXING_ARRAY);
@@ -50,12 +50,12 @@ public class StringSubstringCodeGenerator implements SimpleCodeGenerator {
 		frag.add(JumpPos, inBound1);
 		frag.add(Jump, INDEX_OUT_OF_BOUND_STRING_RUNTIME_ERROR);
 		frag.add(Label, inBound1);		//[...  length]
-		Macros.loadIFrom(frag, RATIONAL_COMMON_DENOMINATOR_TEMPORARY);
+		Macros.loadIFrom(frag, ARRAY_INDEXING_INDEX_SECOND);
 		frag.add(Subtract);		// [... length-index2]
 		frag.add(JumpNeg, INDEX_OUT_OF_BOUND_STRING_RUNTIME_ERROR);
 
 		// [...]
-		Macros.loadIFrom(frag, RATIONAL_COMMON_DENOMINATOR_TEMPORARY);
+		Macros.loadIFrom(frag, ARRAY_INDEXING_INDEX_SECOND);
 		Macros.loadIFrom(frag, ARRAY_INDEXING_INDEX);
 		frag.add(Subtract);
 		frag.add(Duplicate);

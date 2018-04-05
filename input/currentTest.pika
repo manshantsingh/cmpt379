@@ -19,4 +19,12 @@ exec{
 
 	print a+" vs "+b + ^!^, _n_.
 	print ^!^ + "another!", _n_.
+	print "reverse a: '", reverse a, "'", _n_.
+
+	var arr := reverse [1//2, 2//3, 3//4].
+	i:=0.
+	while(i<length arr){
+		print i,": ", arr[i], _n_.
+		i:= i + 1.
+	}
 }

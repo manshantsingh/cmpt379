@@ -10,6 +10,7 @@ import asmCodeGenerator.operators.ArrayCloneCodeGenerator;
 import asmCodeGenerator.operators.ArrayIndexingCodeGenerator;
 import asmCodeGenerator.operators.ArrayLengthCodeGenerator;
 import asmCodeGenerator.operators.RecordReleaseCodeGenerator;
+import asmCodeGenerator.operators.RecordReverseCodeGenerator;
 import asmCodeGenerator.operators.BooleanCastCodeGenerator;
 import asmCodeGenerator.operators.CharConcatenateStringCodeGenerator;
 import asmCodeGenerator.operators.ExpressOverFloatCodeGenerator;
@@ -186,6 +187,11 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 
 		new FunctionSignatures(Keyword.CLONE,
 			new FunctionSignature(new ArrayCloneCodeGenerator(), new Array(S), new Array(S))
+		);
+
+		new FunctionSignatures(Keyword.REVERSE,
+			new FunctionSignature(new RecordReverseCodeGenerator(), new Array(S), new Array(S)),
+			new FunctionSignature(new RecordReverseCodeGenerator(), PrimitiveType.STRING, PrimitiveType.STRING)
 		);
 
 		new FunctionSignatures(Keyword.RELEASE,

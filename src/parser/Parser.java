@@ -780,7 +780,7 @@ public class Parser {
 	}
 
 	private boolean startsExplicitUnaryOperatorExpression(Token token) {
-		return token.isLextant(Punctuator.LOGICAL_NOT, Keyword.CLONE, Keyword.LENGTH);
+		return token.isLextant(Punctuator.LOGICAL_NOT, Keyword.CLONE, Keyword.LENGTH, Keyword.REVERSE, Keyword.ZIP);
 	}
 
 	private ParseNode parseUnaryOperatorExpression() {
