@@ -16,4 +16,7 @@ exec{
 		print i,": ", b[i], _n_.
 		i:= i + 1.
 	}
+
+	print a+" vs "+b + ^!^, _n_.
+	print ^!^ + "another!", _n_.
 }

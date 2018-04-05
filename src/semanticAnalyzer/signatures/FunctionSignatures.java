@@ -11,6 +11,7 @@ import asmCodeGenerator.operators.ArrayIndexingCodeGenerator;
 import asmCodeGenerator.operators.ArrayLengthCodeGenerator;
 import asmCodeGenerator.operators.RecordReleaseCodeGenerator;
 import asmCodeGenerator.operators.BooleanCastCodeGenerator;
+import asmCodeGenerator.operators.CharConcatenateStringCodeGenerator;
 import asmCodeGenerator.operators.ExpressOverFloatCodeGenerator;
 import asmCodeGenerator.operators.ExpressOverRationalCodeGenerator;
 import asmCodeGenerator.operators.FloatRationalCastCodeGenerator;
@@ -24,6 +25,8 @@ import asmCodeGenerator.operators.RationalAddSubtractCodeGenerator;
 import asmCodeGenerator.operators.RationalFloatCastCodeGenerator;
 import asmCodeGenerator.operators.RationalMultiplyDivideCodeGenerator;
 import asmCodeGenerator.operators.ShortCircuitCodeGenerator;
+import asmCodeGenerator.operators.StringConcatenateCharCodeGenerator;
+import asmCodeGenerator.operators.StringConcatenateStringCodeGenerator;
 import asmCodeGenerator.operators.StringIndexingCodeGenerator;
 import asmCodeGenerator.operators.StringLengthCodeGenerator;
 import asmCodeGenerator.operators.StringSubstringCodeGenerator;
@@ -105,7 +108,10 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		new FunctionSignatures(Punctuator.ADD,
 		    new FunctionSignature(ASMOpcode.Add, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
 		    new FunctionSignature(ASMOpcode.FAdd, PrimitiveType.FLOAT, PrimitiveType.FLOAT, PrimitiveType.FLOAT),
-		    new FunctionSignature(new RationalAddSubtractCodeGenerator(true), PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
+		    new FunctionSignature(new RationalAddSubtractCodeGenerator(true), PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL),
+		    new FunctionSignature(new StringConcatenateStringCodeGenerator(), PrimitiveType.STRING, PrimitiveType.STRING, PrimitiveType.STRING),
+		    new FunctionSignature(new StringConcatenateCharCodeGenerator(), PrimitiveType.STRING, PrimitiveType.CHARACTER, PrimitiveType.STRING),
+		    new FunctionSignature(new CharConcatenateStringCodeGenerator(), PrimitiveType.CHARACTER, PrimitiveType.STRING, PrimitiveType.STRING)
 		);
 		
 		new FunctionSignatures(Punctuator.SUBTRACT,
