@@ -2,9 +2,9 @@ package asmCodeGenerator.codeStorage;
 
 
 public class ASMInstruction {
-	private ASMOpcode opcode;
-	private Object argument;
-	private String comment;
+	public ASMOpcode opcode;
+	public Object argument;
+	public String comment;
 	
 	
 /////////////////////////////////////////////////////////////////////

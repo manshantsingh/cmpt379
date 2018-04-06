@@ -54,6 +54,17 @@ public class ASMCodeFragment {
 		chunks.addAll(fragment.chunks);
 	}
 	
+	public void appendN(ASMCodeFragment fragment, int n) {
+		for(int i=0;i<n;i++) {
+			lastChunk().add(fragment.chunks.get(0).instructions.get(i));
+//			System.out.println(fragment.chunks.get(0).instructions.get(i));
+		}
+	}
+	
+	public int getChunkSize() {
+		return chunks.get(0).instructions.size();
+	}
+	
 	public void add(ASMOpcode opcode, int operand, String comment) {
 		lastChunk().add(opcode, operand, comment);
 	}

@@ -45,7 +45,7 @@ public class SymbolTable {
 	//error reporting
 
 	public void errorIfAlreadyDefined(Token token) {
-		if(containsKey(token.getLexeme())) {		
+		if(containsKey(token.getLexeme())) {
 			multipleDefinitionError(token);
 		}
 	}

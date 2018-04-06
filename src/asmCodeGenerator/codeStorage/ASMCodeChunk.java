@@ -5,7 +5,7 @@ import java.util.List;
 
 // a glorified list of instructions.
 public class ASMCodeChunk {
-	List<ASMInstruction> instructions;
+	public List<ASMInstruction> instructions;
 	
 	public ASMCodeChunk() {
 		instructions = new LinkedList<ASMInstruction>();
@@ -37,6 +37,10 @@ public class ASMCodeChunk {
 	public void add(ASMOpcode opcode) {
 		ASMInstruction instruction = new ASMInstruction(opcode);
 		instructions.add(instruction);
+	}
+	
+	public void add(ASMInstruction in) {
+		instructions.add(in);
 	}
 	
 	static private String terminator = System.getProperty("line.separator");

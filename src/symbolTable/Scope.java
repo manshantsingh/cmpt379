@@ -85,7 +85,6 @@ public class Scope {
 		String lexeme = token.getLexeme();
 		Binding binding = allocateNewBinding(type, token.getLocation(), lexeme, constant);
 		symbolTable.install(lexeme, binding);
-
 		return binding;
 	}
 	private Binding allocateNewBinding(Type type, TextLocation textLocation, String lexeme, boolean constant) {

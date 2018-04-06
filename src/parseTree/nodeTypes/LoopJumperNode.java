@@ -31,6 +31,17 @@ public class LoopJumperNode extends ParseNode {
 			System.out.println("Found unknown Loop Jumper token: "+token);
 		}
 	}
+	public void setJumpLabelFromParent(ForStatementNode node) {
+		if(token.isLextant(Keyword.CONTINUE)) {
+			jumpLabel = node.getTopLabel();
+		}
+		else if(token.isLextant(Keyword.BREAK)) {
+			jumpLabel = node.getEndLabel();
+		}
+		else {
+			System.out.println("Found unknown Loop Jumper token: "+token);
+		}
+	}
 	///////////////////////////////////////////////////////////
 	// boilerplate for visitors
 

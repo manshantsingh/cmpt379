@@ -2,12 +2,16 @@ package parseTree.nodeTypes;
 
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
+import symbolTable.Scope;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import tokens.LextantToken;
 import tokens.Token;
 
 public class DeclarationNode extends ParseNode {
+
+	private Scope declarationScope;
+	private boolean isStatic, isConstant;
 
 	public DeclarationNode(Token token) {
 		super(token);
@@ -27,16 +31,26 @@ public class DeclarationNode extends ParseNode {
 	}
 	public LextantToken lextantToken() {
 		return (LextantToken)token;
-	}	
+	}
+	
+
+	public boolean getIsStatic() {
+		return isStatic;
+	}
+	public boolean getIsConstant() {
+		return isConstant;
+	}
 	
 	
 	////////////////////////////////////////////////////////////
 	// convenience factory
 	
-	public static DeclarationNode withChildren(Token token, ParseNode declaredName, ParseNode initializer) {
+	public static DeclarationNode withChildren(Token token, ParseNode declaredName, ParseNode initializer, boolean isStatic, boolean isConstant) {
 		DeclarationNode node = new DeclarationNode(token);
 		node.appendChild(declaredName);
 		node.appendChild(initializer);
+		node.isStatic=isStatic;
+		node.isConstant=isConstant;
 		return node;
 	}
 	

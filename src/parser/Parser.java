@@ -16,6 +16,7 @@ import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
+import parseTree.nodeTypes.ForStatementNode;
 import parseTree.nodeTypes.LambdaNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
@@ -74,7 +75,7 @@ public class Parser {
 			readToken();
 			ParseNode identifier = parseIdentifier();
 			ParseNode lambda = parseLambdaConstant();
-			program.appendChild(DeclarationNode.withChildren(funcStart, identifier, lambda));
+			program.appendChild(DeclarationNode.withChildren(funcStart, identifier, lambda, false, true));
 		}
 		
 		expect(Keyword.EXEC);
@@ -149,6 +150,25 @@ public class Parser {
 	}
 	private boolean startsWhileStatement(Token token) {
 		return token.isLextant(Keyword.WHILE);
+	}
+
+	private ParseNode parseForStatement() {
+		if(!startsForStatement(nowReading)) {
+			return syntaxErrorNode("for statement");
+		}
+		// change me
+		Token forToken = nowReading;
+		readToken();
+		boolean byIndex = nowReading.isLextant(Keyword.INDEX);
+		expect(Keyword.INDEX, Keyword.ELEM);
+		ParseNode identifier = parseIdentifier();
+		expect(Keyword.OF);
+		ParseNode expression = parseExpression();
+		ParseNode blockStatement = parseBlockStatements();
+		return ForStatementNode.make(forToken, byIndex, identifier, expression, blockStatement);
+	}
+	private boolean startsForStatement(Token token) {
+		return token.isLextant(Keyword.FOR);
 	}
 
 	private ParseNode parseReleaseStatement() {
@@ -233,6 +253,9 @@ public class Parser {
 		if(startsCallStatement(nowReading)) {
 			return parseCallStatement();
 		}
+		if(startsForStatement(nowReading)) {
+			return parseForStatement();
+		}
 		return syntaxErrorNode("statement");
 	}
 	private boolean startsStatement(Token token) {
@@ -245,7 +268,8 @@ public class Parser {
 				startsReleaseStatement(token) ||
 				startsLoopJumperStatement(token) ||
 				startsReturnStatement(token) ||
-				startsCallStatement(token);
+				startsCallStatement(token) ||
+				startsForStatement(token);
 	}
 
 	private boolean startsCallStatement(Token token) {
@@ -391,6 +415,14 @@ public class Parser {
 		if(!startsDeclaration(nowReading)) {
 			return syntaxErrorNode("declaration");
 		}
+		boolean isStatic = false;
+		if(nowReading.isLextant(Keyword.STATIC)) {
+			isStatic=true;
+			readToken();
+		}
+		if(!startsDeclaration(nowReading)) {
+			return syntaxErrorNode("declaration");
+		}
 		Token declarationToken = nowReading;
 		readToken();
 		
@@ -399,10 +431,10 @@ public class Parser {
 		ParseNode initializer = parseExpression();
 		expect(Punctuator.TERMINATOR);
 		
-		return DeclarationNode.withChildren(declarationToken, identifier, initializer);
+		return DeclarationNode.withChildren(declarationToken, identifier, initializer, isStatic, declarationToken.isLextant(Keyword.CONST));
 	}
 	private boolean startsDeclaration(Token token) {
-		return token.isLextant(Keyword.CONST, Keyword.VAR);
+		return token.isLextant(Keyword.CONST, Keyword.VAR, Keyword.STATIC);
 	}
 
 	private ParseNode parseAssignment() {

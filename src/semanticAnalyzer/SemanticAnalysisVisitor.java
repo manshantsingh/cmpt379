@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import asmCodeGenerator.Labeller;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
@@ -22,6 +23,7 @@ import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatConstantNode;
+import parseTree.nodeTypes.ForStatementNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
@@ -44,6 +46,7 @@ import semanticAnalyzer.types.SpecialType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
 import symbolTable.Scope;
+import tokens.IdentifierToken;
 import tokens.LextantToken;
 import tokens.Token;
 
@@ -76,6 +79,44 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 		else {
 			enterSubscope(node);
+			if(node.getParent() instanceof ForStatementNode) {
+				//identifer binding
+				ForStatementNode parent = (ForStatementNode) node.getParent();
+				IdentifierNode identifierNode = (IdentifierNode) parent.child(0);
+				Type type;
+				if(parent.isByIndex()) {
+					type = PrimitiveType.INTEGER;
+				}
+				else {
+					ParseNode exp = parent.child(1);
+					if(exp.getType() == PrimitiveType.STRING) {
+						type = PrimitiveType.CHARACTER;
+					}
+					else if(exp.getType() instanceof Array) {
+						type = ((Array)exp.getType()).getSubType();
+					}
+					else {
+						ForExpressionMustBeRecordType(node, exp.getType());
+						type = PrimitiveType.ERROR;
+					}
+				}
+				Binding binding = node.getScope().createBinding(identifierNode, type, true);
+				identifierNode.setBinding(binding);
+				
+				Labeller labeller = new Labeller("loop-variables");
+				
+				IdentifierNode terminator = new IdentifierNode(IdentifierToken.make(node.getToken().getLocation(), labeller.newLabel("hidden_loop_terminator")));
+				Binding yetbinding = node.getLocalScope().createBinding(terminator, PrimitiveType.INTEGER, true);
+				terminator.setBinding(yetbinding);
+				parent.appendChild(terminator);
+				
+				if(!parent.isByIndex()) {
+					IdentifierNode index = new IdentifierNode(IdentifierToken.make(parent.getToken().getLocation(), labeller.newLabel("hidden_index")));
+					Binding anotherbinding = node.getLocalScope().createBinding(index, PrimitiveType.INTEGER, true);
+					index.setBinding(anotherbinding);
+					parent.appendChild(index);
+				}
+			}
 		}
 	}
 	public void visitLeave(BlockStatementsNode node) {
@@ -157,6 +198,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		assertCorrectType(node, PrimitiveType.BOOLEAN, node.child(0).getType());
 	}
 	@Override
+	public void visitLeave(ForStatementNode node) {
+		ParseNode exp = node.child(1);
+		if(exp.getType() != PrimitiveType.STRING && !(exp.getType() instanceof Array)) {
+			ForExpressionMustBeRecordType(node, exp.getType());
+			node.setType(PrimitiveType.ERROR);
+		}
+	}
+	@Override
 	public void visitLeave(DeclarationNode node) {
 		IdentifierNode identifier = (IdentifierNode) node.child(0);
 		ParseNode initializer = node.child(1);
@@ -166,7 +215,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		identifier.setType(declarationType);
 
 		if(	!	(node.getParent() instanceof ProgramNode)	) {
-			addBinding(identifier, declarationType, !node.getToken().isLextant(Keyword.VAR));
+			addBinding(identifier, declarationType, node.getIsConstant());
 		}
 	}
 	@Override
@@ -606,6 +655,11 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				found=true;
 				break;
 			}
+			if(current instanceof ForStatementNode) {
+				node.setJumpLabelFromParent((ForStatementNode)current);
+				found=true;
+				break;
+			}
 		}
 		if(!found) {
 			loopParentNotFound(node);
@@ -624,7 +678,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	private boolean parentIsHandlingit(IdentifierNode node) {
 		ParseNode parent = node.getParent();
-		return (parent instanceof DeclarationNode || parent instanceof ParameterNode)
+		return (parent instanceof DeclarationNode || parent instanceof ParameterNode || parent instanceof ForStatementNode)
 				&& (node == parent.child(0));
 	}
 	private void addBinding(IdentifierNode identifierNode, Type type, boolean constant) {
@@ -686,6 +740,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	private void returnParentNotFound(ParseNode node) {
 		logError("No return parent found for return statement at" + node.getToken().getLocation());
+	}
+	private void ForExpressionMustBeRecordType(ParseNode node, Type type) {
+		logError("Expected a record type but received "+type+" at " + node.getToken().getLocation());
 	}
 	private void assignmentToConstant(Token token) {
 		logError("Cannot write to const variable \""+

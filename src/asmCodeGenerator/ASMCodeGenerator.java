@@ -11,6 +11,7 @@ import asmCodeGenerator.operators.RationalAddSubtractCodeGenerator;
 import asmCodeGenerator.operators.RecordReleaseCodeGenerator;
 import asmCodeGenerator.runtime.MemoryManager;
 import asmCodeGenerator.runtime.RunTime;
+import static asmCodeGenerator.runtime.RunTime.*;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
@@ -25,6 +26,7 @@ import parseTree.nodeTypes.CharacterConstantNode;
 import parseTree.nodeTypes.BlockStatementsNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.FloatConstantNode;
+import parseTree.nodeTypes.ForStatementNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IfStatementNode;
 import parseTree.nodeTypes.IntegerConstantNode;
@@ -396,6 +398,161 @@ public class ASMCodeGenerator {
 			code.add(Label, node.getTopLabel());
 			code.append(conditionCode);
 			code.add(JumpFalse, node.getEndLabel());
+			code.append(blockCode);
+			code.add(Jump, node.getTopLabel());
+
+			code.add(Label, node.getEndLabel());
+		}
+		public void visitLeave(ForStatementNode node) {
+			newVoidCode(node);
+			//TODO: msk
+			ASMCodeFragment expression = removeValueCode(node.child(1));
+			ASMCodeFragment blockCode = removeVoidCode(node.child(2));
+			ASMCodeFragment terminator = removeAddressCode(node.child(3));
+			
+			ASMCodeFragment index, elem = null;
+			int elemChunkSize = 0;
+			if(node.isByIndex()) {
+				index = removeAddressCode(node.child(0));
+			}
+			else {
+				index = removeAddressCode(node.child(4));
+				elem = removeAddressCode(node.child(0));
+				elemChunkSize = elem.getChunkSize();
+			}
+
+//			System.out.println(index);
+//			System.out.println(terminator);
+			
+			int indexChunkSize = index.getChunkSize();
+			int terminatorChunkSize = terminator.getChunkSize();
+			
+			Labeller labeller = new Labeller("for-loop");
+			String simpleContinue = labeller.newLabel("simple-continue");
+			String mid = labeller.newLabel("mid");
+			
+			Type expType = node.child(1).getType();
+			boolean isArray = expType instanceof Array;
+			Type subtype;
+			if(isArray) {
+				subtype = ((Array)expType).getSubType();
+			}
+			else {
+				subtype = PrimitiveType.CHARACTER;
+			}
+			
+			
+			// actual code
+			code.append(expression);
+			code.add(Duplicate);
+			if(isArray) {
+				code.add(JumpFalse, NULL_ARRAY_RUNTIME_ERROR);
+			}
+			else {
+				code.add(JumpFalse, NULL_STRING_RUNTIME_ERROR);
+			}
+
+			if(node.isByIndex()) {
+				if(isArray) {
+					code.add(PushI, ARRAY_LENGTH_OFFSET);
+				}
+				else {
+					code.add(PushI, STRING_LENGTH_OFFSET);
+				}
+				code.add(Add);
+				code.add(LoadI);
+				code.add(Duplicate);
+				code.add(JumpPos, simpleContinue);
+				code.add(Pop);
+				code.add(Jump, node.getEndLabel());
+
+				code.add(Label, simpleContinue);
+				code.appendN(terminator, terminatorChunkSize);
+				code.add(Exchange);
+				code.add(StoreI);		// [...]
+				
+				code.appendN(index, indexChunkSize);
+				code.add(PushI, 0);
+				code.add(StoreI);		// [...]
+			}
+			else {
+				code.add(Duplicate);		//[... record record]
+				if(isArray) {
+					code.add(PushI, ARRAY_HEADER_OFFSET);
+				}
+				else {
+					code.add(PushI, STRING_HEADER_OFFSET);
+				}
+				code.add(Add);
+				code.add(Duplicate);	// [...  record  firstElmPtr  firstElmPtr]
+				code.appendN(index, indexChunkSize);
+				code.add(Exchange);
+				code.add(StoreI);		// [...  record  firstElmPtr]
+				code.add(Duplicate);
+				code.appendN(elem, elemChunkSize);
+				code.add(Exchange);
+				loadFromAddress(code, subtype);
+				storeToAddress(code, subtype);
+				
+				code.add(Exchange);		// [...  firstElmPtr  record]
+				if(isArray) {
+					code.add(PushI, ARRAY_LENGTH_OFFSET);
+				}
+				else {
+					code.add(PushI, STRING_LENGTH_OFFSET);
+				}
+				code.add(Add);
+				code.add(LoadI);
+				code.add(Duplicate);
+				code.add(JumpPos, simpleContinue);
+				code.add(Pop);
+				code.add(Pop);
+				code.add(Jump, node.getEndLabel());
+
+				code.add(Label, simpleContinue);
+				code.add(PushI, subtype.getSize());
+				code.add(Multiply);
+				code.add(Add);
+				code.appendN(terminator, terminatorChunkSize);
+				code.add(Exchange);
+				code.add(StoreI);
+			}
+			code.add(Jump, mid);
+
+			code.add(Label, node.getTopLabel());
+			code.appendN(terminator, terminatorChunkSize);
+			code.add(LoadI);
+			code.appendN(index, indexChunkSize);	// [... terminatorVal identifierAddr]
+			if(node.isByIndex()) {
+				code.add(Duplicate);
+				code.add(Duplicate);
+				code.add(LoadI);
+				code.add(PushI, 1);
+				code.add(Add);
+				code.add(StoreI);		// [...  terminatorVal  identifierAddr]
+				code.add(LoadI);
+				code.add(Subtract);
+				code.add(JumpFalse, node.getEndLabel());
+			}
+			else {
+				code.add(Duplicate);
+				code.add(Duplicate);
+				code.add(LoadI);
+				code.add(PushI, subtype.getSize());
+				code.add(Add);
+				code.add(StoreI);		// [...  terminatorVal  identifierAddr]
+				code.add(LoadI);
+				code.add(Subtract);
+				code.add(JumpFalse, node.getEndLabel());
+
+				code.appendN(elem, elemChunkSize);
+				code.appendN(index, indexChunkSize);
+				code.add(LoadI);
+				loadFromAddress(code, subtype);
+				storeToAddress(code, subtype);
+			}
+			
+			code.add(Label, mid);
 			code.append(blockCode);
 			code.add(Jump, node.getTopLabel());
 

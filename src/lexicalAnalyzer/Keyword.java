@@ -36,6 +36,7 @@ public enum Keyword implements Lextant {
 	FOR("for"),
 	INDEX("index"),
 	ELEM("elem"),
+	OF("of"),
 	MAP("map"),
 	REDUCE("reduce"),
 	FOLD("fold"),

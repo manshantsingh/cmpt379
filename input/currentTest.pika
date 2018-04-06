@@ -22,9 +22,14 @@ exec{
 	print "reverse a: '", reverse a, "'", _n_.
 
 	var arr := reverse [1//2, 2//3, 3//4].
-	i:=0.
-	while(i<length arr){
-		print i,": ", arr[i], _n_.
-		i:= i + 1.
+	for index i of arr {
+		print "i: ",i,"  and arr[i]: ", arr[i], _n_.
 	}
+
+	print _n_, "by val now: ",_n_.
+	for elem x of arr{
+		print "x: ", x, _n_.
+	}
+
+	print _n_, "this is the end.", _n_.
 }
