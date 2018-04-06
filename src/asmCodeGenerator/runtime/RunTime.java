@@ -64,6 +64,8 @@ public class RunTime {
 	public static final String INNER_MOST_PRINT_CALL = "$$inner-most-print-call";
 	public static final String FRAME_POINTER = "$$l-frame-pointer";
 	public static final String STACK_POINTER = "$$l-stack-pointer";
+	public static final String MAP_REDUCE_ARRAY = "$$a-map-reduce-array";
+	public static final String MAP_REDUCE_LAMBDA = "$$a-map-reduce-lambda";
 
 	public static final String CLEAR_N_BYTES = "$procedure-clear-n-bytes";
 	public static final String CLONE_N_BYTES = "$procedure-clone-n-bytes";
@@ -113,6 +115,9 @@ public class RunTime {
 		Macros.declareI(frag, RATIONAL_NUMERATOR_TEMPORARY);
 		Macros.declareI(frag, RATIONAL_DENOMINATOR_TEMPORARY);
 		Macros.declareI(frag, RATIONAL_COMMON_DENOMINATOR_TEMPORARY);
+
+		Macros.declareI(frag, MAP_REDUCE_ARRAY);
+		Macros.declareI(frag, MAP_REDUCE_LAMBDA);
 
 		Macros.declareI(frag, INNER_MOST_PRINT_CALL);
 

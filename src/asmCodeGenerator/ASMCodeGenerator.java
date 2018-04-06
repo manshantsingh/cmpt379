@@ -1,5 +1,6 @@
 package asmCodeGenerator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -789,11 +790,9 @@ public class ASMCodeGenerator {
 				code.add(Duplicate);
 				Macros.storeITo(code, RunTime.STACK_POINTER);
 				code.append(args[i]);
-//				code.add(PStack);
 				storeToAddress(code, argType);
 			}
 			code.append(args[0]);
-//			code.add(PStack);
 			code.add(CallV);
 
 			// msk TODO hehe
