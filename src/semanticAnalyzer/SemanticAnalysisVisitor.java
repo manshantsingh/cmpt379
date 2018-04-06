@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import asmCodeGenerator.Labeller;
+import asmCodeGenerator.operators.FoldCodeGenerator;
 import asmCodeGenerator.operators.MapReduceGenerator;
 import asmCodeGenerator.operators.ZipCodeGenerator;
 import lexicalAnalyzer.Keyword;
@@ -553,6 +554,95 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		node.setType(new Array(left));
 	}
 	
+	private void manageFoldOperator(OperatorNode node) {
+		boolean hasStart=false;
+		if(node.nChildren()==3) {
+			hasStart=true;
+		}
+		else if(node.nChildren()!=2) {
+			wrongNumberOfOperators(node.getToken(), 2, node.nChildren());
+			wrongNumberOfOperators(node.getToken(), 3, node.nChildren());
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		
+		if(!(node.child(0).getType() instanceof Array)) {
+			typeMismatchError(node.getToken(), new Array(new TypeVariable("Any_Array")), node.child(0).getType());
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		Array arr = (Array) node.child(0).getType();
+		
+		
+		
+		
+		if(hasStart) {
+			Type baseType = node.child(1).getType();
+			if(!(node.child(2).getType() instanceof LambdaType)) {
+				typeMismatchError(node.getToken(), 
+						new LambdaType(new ArrayList<>(Arrays.asList(baseType, arr.getSubType())), baseType),
+						node.child(2).getType());
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+			LambdaType lambda = (LambdaType)node.child(2).getType();
+			if(lambda.getParamTypes().size()!=2) {
+				wrongNumberOfOperators(node.getToken(), 2, lambda.getParamTypes().size());
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+			if(!lambda.getParamTypes().get(0).equivalent(baseType)) {
+				typeMismatchError(node.getToken(),lambda.getParamTypes().get(0), baseType);
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+			if(!lambda.getParamTypes().get(1).equivalent(arr.getSubType())) {
+				typeMismatchError(node.getToken(),lambda.getParamTypes().get(1), arr.getSubType());
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+			if(lambda.getReturnType()!=baseType) {
+				typeMismatchError(node.getToken(),lambda.getReturnType(), baseType);
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+			node.setSignature(new FunctionSignature(new FoldCodeGenerator(true), baseType));
+			node.setType(baseType);
+		}
+		else {
+			if(!(node.child(1).getType() instanceof LambdaType)) {
+				typeMismatchError(node.getToken(), 
+						new LambdaType(new ArrayList<>(Arrays.asList(arr.getSubType(),arr.getSubType())), arr.getSubType()),
+						node.child(1).getType());
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+			LambdaType lambda = (LambdaType)node.child(1).getType();
+			if(lambda.getParamTypes().size()!=2) {
+				wrongNumberOfOperators(node.getToken(), 2, lambda.getParamTypes().size());
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+			if(!lambda.getParamTypes().get(0).equivalent(arr.getSubType())) {
+				typeMismatchError(node.getToken(),lambda.getParamTypes().get(0), arr.getSubType());
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+			if(!lambda.getParamTypes().get(1).equivalent(arr.getSubType())) {
+				typeMismatchError(node.getToken(),lambda.getParamTypes().get(1), arr.getSubType());
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+			if(lambda.getReturnType()!=arr.getSubType()) {
+				typeMismatchError(node.getToken(),lambda.getReturnType(), arr.getSubType());
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+			node.setSignature(new FunctionSignature(new FoldCodeGenerator(false), arr.getSubType()));
+			node.setType(arr.getSubType());
+		}
+	}
+	
 	private void manageZipOperator(OperatorNode node) {
 		if(node.nChildren()!=3) {
 			wrongNumberOfOperators(node.getToken(), 3, node.nChildren());
@@ -626,7 +716,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			manageReduceOperator(node);
 			return;
 		}
-		
+		if(operator == Keyword.FOLD) {
+			manageFoldOperator(node);
+			return;
+		}
 		if(operator == Keyword.ZIP) {
 			manageZipOperator(node);
 			return;

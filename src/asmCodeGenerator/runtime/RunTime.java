@@ -52,6 +52,7 @@ public class RunTime {
 
 	public static final String LAMBDA_REACHED_END_OF_FUNCTION_NO_RETURN = "$$l-reached-end-of-function-no-return";
 	public static final String ZIP_ARRAY_LENGTHS_NOT_SAME = "$$z-array-lengths-not-same";
+	public static final String FOLD_ARRAY_LENGTH_ZERO = "$$f-array-length-zero";
 
 	public static final String RECORD_CREATION_TEMPORARY = "$$record-create-temporary";
 	public static final String RECORD_REVERSE_TOP = "$$record-reverse-top";
@@ -216,6 +217,7 @@ public class RunTime {
 
 		endOfFunctionNoReturnStatement(frag);
 		zipArrayLengthsNotSame(frag);
+		foldArrayLengthZero(frag);
 		
 		return frag;
 	}
@@ -360,6 +362,17 @@ public class RunTime {
 
 		frag.add(Label, ZIP_ARRAY_LENGTHS_NOT_SAME);
 		frag.add(PushD, zipArrayLengthsNotSameErrorMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
+	private void foldArrayLengthZero(ASMCodeFragment frag) {
+		String foldArrayLengthZeroErrorMessage = "$errors-array-length-zero-fold";
+
+		frag.add(DLabel, foldArrayLengthZeroErrorMessage);
+		frag.add(DataS, "Fold operator with array length ZERO with no base value");
+
+		frag.add(Label, FOLD_ARRAY_LENGTH_ZERO);
+		frag.add(PushD, foldArrayLengthZeroErrorMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 
