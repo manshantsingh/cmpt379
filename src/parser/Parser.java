@@ -871,7 +871,17 @@ public class Parser {
 		if(startsExplicitUnaryOperatorExpression(nowReading)) {
 			Token operator = nowReading;
 			readToken();
-			return OperatorNode.withChildren(operator, parseUnaryOperatorExpression());
+			if(operator.isLextant(Keyword.ZIP)) {
+				ParseNode exp1 = parseExpression();
+				expect(Punctuator.SEPARATOR);
+				ParseNode exp2 = parseExpression();
+				expect(Punctuator.SEPARATOR);
+				ParseNode exp3 = parseUnaryOperatorExpression();
+				return OperatorNode.withChildren(operator, exp1, exp2, exp3);
+			}
+			else {
+				return OperatorNode.withChildren(operator, parseUnaryOperatorExpression());
+			}
 		}
 		if(startsArrayIndexExpression(nowReading)) {
 			return parseArrayIndexExpression();

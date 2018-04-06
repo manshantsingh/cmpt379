@@ -51,6 +51,7 @@ public class RunTime {
 	public static final String SECOND_INDEX_SMALLER_STRING_RUNTIME_ERROR = "$$s-second-index-smaller-runtime_error";
 
 	public static final String LAMBDA_REACHED_END_OF_FUNCTION_NO_RETURN = "$$l-reached-end-of-function-no-return";
+	public static final String ZIP_ARRAY_LENGTHS_NOT_SAME = "$$z-array-lengths-not-same";
 
 	public static final String RECORD_CREATION_TEMPORARY = "$$record-create-temporary";
 	public static final String RECORD_REVERSE_TOP = "$$record-reverse-top";
@@ -66,6 +67,7 @@ public class RunTime {
 	public static final String STACK_POINTER = "$$l-stack-pointer";
 	public static final String MAP_REDUCE_ARRAY = "$$a-map-reduce-array";
 	public static final String MAP_REDUCE_LAMBDA = "$$a-map-reduce-lambda";
+	public static final String ZIP_ADDITIONAL_ARRAY = "$$a-zip-additional-array";
 
 	public static final String CLEAR_N_BYTES = "$procedure-clear-n-bytes";
 	public static final String CLONE_N_BYTES = "$procedure-clone-n-bytes";
@@ -118,6 +120,7 @@ public class RunTime {
 
 		Macros.declareI(frag, MAP_REDUCE_ARRAY);
 		Macros.declareI(frag, MAP_REDUCE_LAMBDA);
+		Macros.declareI(frag, ZIP_ADDITIONAL_ARRAY);
 
 		Macros.declareI(frag, INNER_MOST_PRINT_CALL);
 
@@ -212,6 +215,7 @@ public class RunTime {
 		secondIndexSmallerStringError(frag);
 
 		endOfFunctionNoReturnStatement(frag);
+		zipArrayLengthsNotSame(frag);
 		
 		return frag;
 	}
@@ -345,6 +349,17 @@ public class RunTime {
 
 		frag.add(Label, LAMBDA_REACHED_END_OF_FUNCTION_NO_RETURN);
 		frag.add(PushD, endOfFunctionNoReturnStatementErrorMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+
+	private void zipArrayLengthsNotSame(ASMCodeFragment frag) {
+		String zipArrayLengthsNotSameErrorMessage = "$errors-array-lengths-not-same-for-zip";
+
+		frag.add(DLabel, zipArrayLengthsNotSameErrorMessage);
+		frag.add(DataS, "Zip requires arrays of same length");
+
+		frag.add(Label, ZIP_ARRAY_LENGTHS_NOT_SAME);
+		frag.add(PushD, zipArrayLengthsNotSameErrorMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 

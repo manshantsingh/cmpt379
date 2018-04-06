@@ -93,7 +93,7 @@ public class MapReduceGenerator implements SimpleCodeGenerator {
 		code.add(Duplicate);
 		Macros.storeITo(code, RunTime.STACK_POINTER);
 		Macros.loadIFrom(code, MAP_REDUCE_ARRAY);
-		code.add(LoadI);
+		ASMCodeGenerator.loadFromAddress(code, originalSubType);
 		ASMCodeGenerator.storeToAddress(code, originalSubType);
 		
 		Macros.loadIFrom(code, MAP_REDUCE_ARRAY);

@@ -1,16 +1,29 @@
-func double<int a> -> int {
-	return a*2.
+func double<float a> -> int {
+	return [a*2|int].
 }
 
 func isEven<int a> -> bool{
-	print "value: ", a, _n_.
 	return (a/2)*2 == a.
 }
 
+func isOdd<int a> -> bool{
+	return (a/2)*2 != a.
+}
+
+func willRoundUp<float a> -> bool{
+	return a - [a|int] >= 0.5.
+}
+
+func sumFloat<float a, float b> -> [float]{
+	return [a,b].
+}
+
 exec{
-	var arr := [1,2,3,4,5,6,7,8,9,10].
+	var arr := [1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8,9.9,11].
 	print arr map double, _n_. 
-	print arr reduce isEven, _n_. 
+	print arr reduce willRoundUp, _n_.
+	print zip arr, reverse arr, sumFloat, _n_.
+
 }
 
 # exec{

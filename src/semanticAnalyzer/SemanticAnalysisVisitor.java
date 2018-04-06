@@ -6,6 +6,7 @@ import java.util.List;
 
 import asmCodeGenerator.Labeller;
 import asmCodeGenerator.operators.MapReduceGenerator;
+import asmCodeGenerator.operators.ZipCodeGenerator;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
@@ -505,7 +506,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			return;
 		}
 		if(right.getReturnType()==SpecialType.VOID) {
-			mapToVoid(node.getToken());
+			cannotHaveVoidReturn(node.getToken());
 			node.setType(PrimitiveType.ERROR);
 			return;
 		}
@@ -551,6 +552,56 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		node.setSignature(new FunctionSignature(new MapReduceGenerator(true), left));
 		node.setType(new Array(left));
 	}
+	
+	private void manageZipOperator(OperatorNode node) {
+		if(node.nChildren()!=3) {
+			wrongNumberOfOperators(node.getToken(), 3, node.nChildren());
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		if(!(node.child(0).getType() instanceof Array)) {
+			typeMismatchError(node.getToken(), new Array(new TypeVariable("Any_Array")), node.child(0).getType());
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		if(!(node.child(1).getType() instanceof Array)) {
+			typeMismatchError(node.getToken(), new Array(new TypeVariable("Any_Array")), node.child(1).getType());
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		Array arr1 = (Array) node.child(0).getType();
+		Array arr2 = (Array) node.child(1).getType();
+		if(!(node.child(2).getType() instanceof LambdaType)) {
+			typeMismatchError(node.getToken(), 
+					new LambdaType(new ArrayList<>(Arrays.asList(arr1.getSubType(), arr2.getSubType())), new TypeVariable("Any_type")),
+					node.child(2).getType());
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		LambdaType lambda = (LambdaType)node.child(2).getType();
+		if(lambda.getParamTypes().size()!=2) {
+			wrongNumberOfOperators(node.getToken(), 2, lambda.getParamTypes().size());
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		if(!lambda.getParamTypes().get(0).equivalent(arr1.getSubType())) {
+			typeMismatchError(node.getToken(),lambda.getParamTypes().get(0), arr1.getSubType());
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		if(!lambda.getParamTypes().get(1).equivalent(arr2.getSubType())) {
+			typeMismatchError(node.getToken(),lambda.getParamTypes().get(1), arr2.getSubType());
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		if(lambda.getReturnType()==SpecialType.VOID) {
+			cannotHaveVoidReturn(node.getToken());
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		node.setSignature(new FunctionSignature(new ZipCodeGenerator(), lambda.getReturnType()));
+		node.setType(new Array(lambda.getReturnType()));
+	}
 
 	@Override
 	public void visitLeave(OperatorNode node) {
@@ -573,6 +624,11 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 		if(operator == Keyword.REDUCE) {
 			manageReduceOperator(node);
+			return;
+		}
+		
+		if(operator == Keyword.ZIP) {
+			manageZipOperator(node);
 			return;
 		}
 
@@ -844,8 +900,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		logError("Expected type "+expected+" for "+token.getLexeme()+
 				", but received "+received+" at "+token.getLocation());
 	}
-	private void mapToVoid(Token token) {
-		logError("Cannot map with lambda with return VOID at "+token.getLocation());
+	private void cannotHaveVoidReturn(Token token) {
+		logError("Cannot have lambda with return VOID at "+token.getLocation());
 	}
 	private void wrongNumberOfOperators(Token token, int expected, int received) {
 		logError("Expected "+expected+" operators for "+token.getLexeme()+
