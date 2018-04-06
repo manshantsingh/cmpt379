@@ -557,21 +557,70 @@ public class Parser {
 			return syntaxErrorNode("multiplicativeExpression");
 		}
 		
-		ParseNode left = parseUnaryOperatorExpression();
+		ParseNode left = parseFoldExpression();
 		while(nowReading.isLextant(Punctuator.MULTIPLY, Punctuator.DIVIDE,
 				Punctuator.OVER, Punctuator.EXPRESS_OVER, Punctuator.RATIONALIZE))
 		{
 			Token multiplicativeToken = nowReading;
 			readToken();
-			ParseNode right = parseUnaryOperatorExpression();
+			ParseNode right = parseFoldExpression();
 			
 			left = OperatorNode.withChildren(multiplicativeToken, left, right);
 		}
 		return left;
 	}
 	private boolean startsMultiplicativeExpression(Token token) {
+		return startsFoldExpression(token);
+	}
+
+	private ParseNode parseFoldExpression() {
+		if(!startsFoldExpression(nowReading)) {
+			return syntaxErrorNode("foldExpression");
+		}
+		
+		ParseNode left = parseMapReduceExpression();
+		while(nowReading.isLextant(Keyword.FOLD)) {
+			Token foldToken = nowReading;
+			readToken();
+			ParseNode middle = null;
+			if(nowReading.isLextant(Punctuator.OPEN_SQUARE)) {
+				readToken();
+				middle = parseExpression();
+				expect(Punctuator.CLOSE_SQUARE);
+			}
+			ParseNode right = parseMapReduceExpression();
+			if(middle!=null) {
+				left = OperatorNode.withChildren(foldToken, left, middle, right);
+			}
+			else{
+				left = OperatorNode.withChildren(foldToken, left, right);
+			}
+		}
+		return left;
+	}
+	private boolean startsFoldExpression(Token token) {
+		return startsMapReduceExpression(token);
+	}
+	
+	private ParseNode parseMapReduceExpression() {
+		if(!startsMapReduceExpression(nowReading)) {
+			return syntaxErrorNode("map or reduce Expression");
+		}
+		
+		ParseNode left = parseUnaryOperatorExpression();
+		while(nowReading.isLextant(Keyword.MAP, Keyword.REDUCE)) {
+			Token mapReduceToken = nowReading;
+			readToken();
+			ParseNode right = parseUnaryOperatorExpression();
+			
+			left = OperatorNode.withChildren(mapReduceToken, left, right);
+		}
+		return left;
+	}
+	private boolean startsMapReduceExpression(Token token) {
 		return startsUnaryPrecedenceExpression(token);
 	}
+	
 
 	// multiplicativeExpression -> atomicExpression [MULT atomicExpression]*  (left-assoc)
 	private ParseNode parseArrayIndexExpression() {
