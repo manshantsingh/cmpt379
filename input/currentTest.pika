@@ -1,143 +1,27 @@
-# func double<rat a> -> rat {
-# 	return a*2.
-# }
-
-# func isEven<int a> -> bool{
-# 	return (a/2)*2 == a.
-# }
-
-# func recursiveValueN<int n> -> int{
-# 	static const adderVal := getZero() + 1.
-# 	if(n == adderVal){
-# 		return adderVal.
-# 	}
-# 	return recursiveValueN(n- 1) + adderVal.
-# }
-
-# func isOdd<int a> -> bool{
-# 	static const modder:= getZero() + 2.
-# 	return (a/modder)*modder != a.
-# }
-
-# func willRoundUp<rat a> -> bool{
-# 	return a > [0.5|rat].
-# }
-
-# func makeTuple<rat a, rat b> -> [rat]{
-# 	return [a,b].
-# }
-
-# func maxRational<rat a, rat b> -> rat{
-# print "a: ",a,"  and b: ",b,_n_.
-# 	if(a>b){return a.}
-# 	return b.
-# }
-
-# func maxRationalAsInt<int a, rat b> -> int{
-# print "a: ",a,"  and b: ",b,_n_.
-# 	if(a>b){return a.}
-# 	return [b|int].
-# }
-
-# func maxInt<int a, int b> -> int{
-# print "a: ",a,"  and b: ",b,_n_.
-# 	if(a>b){return a.}
-# 	return b.
-# }
-
-# func maxIntasRational<rat a, int b> -> rat{
-# print world, _t_, _t_, "a: ",a,"  and b: ",b,_n_.
-# 	if(a>b){return a.}
-# 	return b//13.
-# }
-
-# func getZero<> -> int{
-# 	print _n_, _n_, "this will return ZERO", _n_, _n_.
-# 	return 0.
-# }
-
-const world := "hello world!!!".
 exec{
-	print world, _n_. 
-	static var arr := [1//2, 2//3, 100//7, 3//4, 4//5, 5//6].
-	# var arr2 := [1,5,3,7,100,6,7,3,0,1,56,65].
-	# print arr map double, _n_. 
-	# print arr reduce willRoundUp, _n_.
-	# print zip arr, reverse arr, makeTuple, _n_.
-
-	# print _n_, "full: ", arr2, _n_.
-	# print "odds: ", arr2 reduce isOdd, _n_.
-
-	# var hehe:= <int a, int b> -> int {
-	# 	return [	arr[a]+arr[b]	| int].
-	# }.
-
-	# print "hehe val: ", hehe(1,2),_n_.
-
-	# print _n_, "full: ", arr, _n_.
-	# print "max: ",_n_, arr fold[20//3] maxRational, _n_.
-	# print "max: ",_n_, arr fold[8] maxRationalAsInt, _n_.
-
-	# for index i of arr{
-	# 	print "i: ",i,_t_,_t_,"elem: ",arr[i],_n_.
-	# }
-	for elem x of arr{
-		print "elem: ",x,_n_.
-	}
-
-	# const N := 100.
-
-	# print "I am about to print N=",N, " with recursiveValueN: ", recursiveValueN(N), _n_.
-
-
-	static const a:= 0.
+	var hehe:= 75.
 	{
-		static const a:=1.
-		print "value of a should be 1: ", a,_n_.
-		{
-			print "inner value of a should be 1: ", a,_n_.
+		var arr := [1//2, 2//3, 100//7, 3//4, 4//5, 5//6].
+		for elem x of arr{
+			var a:= 5.
+			print "elem: ",x,_n_.
 		}
+		var i:= 0.
+		while(i < length arr){
+			var y := 0.
+			print "elem: ",y,arr[i],_n_.
+			i:= i+ 1.
+		}
+		static const bigger:= 0.
+		{
+			static const bigger:=1.
+			print "value of a should be 1: ", bigger,_n_.
+			{
+				print "inner value of a should be 1: ", bigger,_n_.
+			}
+		}
+		print "outer of a should be 1: ", bigger,_n_.
 	}
-	print "outer of a should be 1: ", a,_n_.
-
-	# print _n_, "full: ", arr2, _n_.
-	# print "max: ",_n_, arr2 fold maxInt, _n_.
-	# print "max: ", _n_, arr2 fold[100//3] maxIntasRational, _n_.
+	static var x:= 5.
+	print "x: ", x.
 }
-
-# exec{
-# 	var a:= "hello world".
-# 	var x:= 3.
-# 	var y:= 5.
-# 	var i:= 0.
-# 	print "a: '", a, "' with length: ", length a, _n_, _n_.
-# 	while(i < length a){
-# 		print i,": ", a, _n_.
-# 		i:= i + 1.
-# 	}
-# 	var b:= a[x,y].
-# 	print _n_,_n_,"substring: '", b, "' with length:"; length b, _n_, _n_.
-# 	i :=0.
-# 	while(i < length b){
-# 		print i,": ", b[i], _n_.
-# 		i:= i + 1.
-# 	}
-
-# 	print a+" vs "+b + ^!^, _n_.
-# 	print ^!^ + "another!", _n_.
-# 	print "reverse a: '", reverse a, "'", _n_.
-
-# 	var arr := reverse [1//2, 2//3, 3//4].
-# 	for index i of arr {
-# 		print "i: ",i,"  and arr[i]: ", arr[i], _n_.
-# 	}
-
-# 	print _n_, "by val now: ",_n_.
-# 	for elem x of arr{
-# 		print "x: ", x, _n_.
-# 	}
-
-# 	print _n_, "this is the end.", _n_.
-
-
-# }

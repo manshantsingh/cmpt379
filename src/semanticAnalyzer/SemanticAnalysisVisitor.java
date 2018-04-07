@@ -112,13 +112,13 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				Labeller labeller = new Labeller("loop-variables");
 				
 				IdentifierNode terminator = new IdentifierNode(IdentifierToken.make(node.getToken().getLocation(), labeller.newLabel("hidden_loop_terminator")));
-				Binding yetbinding = node.getLocalScope().createBinding(terminator, PrimitiveType.INTEGER, false, true);
+				Binding yetbinding = node.getScope().createBinding(terminator, PrimitiveType.INTEGER, false, true);
 				terminator.setBinding(yetbinding);
 				parent.appendChild(terminator);
 				
 				if(!parent.isByIndex()) {
 					IdentifierNode index = new IdentifierNode(IdentifierToken.make(parent.getToken().getLocation(), labeller.newLabel("hidden_index")));
-					Binding anotherbinding = node.getLocalScope().createBinding(index, PrimitiveType.INTEGER, false, true);
+					Binding anotherbinding = node.getScope().createBinding(index, PrimitiveType.INTEGER, false, true);
 					index.setBinding(anotherbinding);
 					parent.appendChild(index);
 				}
@@ -126,6 +126,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 	}
 	public void visitLeave(BlockStatementsNode node) {
+		
 		leaveScope(node);
 	}
 	public void visitEnter(LambdaNode node) {
