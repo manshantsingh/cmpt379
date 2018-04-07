@@ -71,7 +71,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				DeclarationNode func = (DeclarationNode) child;
 				IdentifierNode identifier = (IdentifierNode) func.child(0);
 				Type funcType = func.child(1).getType();
-				addBinding(identifier, funcType, true);
+				addBinding(identifier, funcType, false, true);
 //				System.out.println(child+"\ntype: "+funcType);
 			}
 		}
@@ -106,19 +106,19 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 						type = PrimitiveType.ERROR;
 					}
 				}
-				Binding binding = node.getScope().createBinding(identifierNode, type, true);
+				Binding binding = node.getScope().createBinding(identifierNode, type, false, true);
 				identifierNode.setBinding(binding);
 				
 				Labeller labeller = new Labeller("loop-variables");
 				
 				IdentifierNode terminator = new IdentifierNode(IdentifierToken.make(node.getToken().getLocation(), labeller.newLabel("hidden_loop_terminator")));
-				Binding yetbinding = node.getLocalScope().createBinding(terminator, PrimitiveType.INTEGER, true);
+				Binding yetbinding = node.getLocalScope().createBinding(terminator, PrimitiveType.INTEGER, false, true);
 				terminator.setBinding(yetbinding);
 				parent.appendChild(terminator);
 				
 				if(!parent.isByIndex()) {
 					IdentifierNode index = new IdentifierNode(IdentifierToken.make(parent.getToken().getLocation(), labeller.newLabel("hidden_index")));
-					Binding anotherbinding = node.getLocalScope().createBinding(index, PrimitiveType.INTEGER, true);
+					Binding anotherbinding = node.getLocalScope().createBinding(index, PrimitiveType.INTEGER, false, true);
 					index.setBinding(anotherbinding);
 					parent.appendChild(index);
 				}
@@ -221,7 +221,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		identifier.setType(declarationType);
 
 		if(	! node.getToken().isLextant(Keyword.FUNC)	) {
-			addBinding(identifier, declarationType, node.getIsConstant());
+			addBinding(identifier, declarationType, node.getIsStatic(), node.getIsConstant());
+			
 		}
 	}
 	@Override
@@ -229,7 +230,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		IdentifierNode identifier = (IdentifierNode) node.child(0);
 		
 		identifier.setType(node.getType());
-		addBinding(identifier, node.getType(), true);
+		addBinding(identifier, node.getType(), false, true);
 	}
 	@Override
 	public void visitLeave(AssignmentNode node) {
@@ -920,9 +921,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		return (parent instanceof DeclarationNode || parent instanceof ParameterNode || parent instanceof ForStatementNode)
 				&& (node == parent.child(0));
 	}
-	private void addBinding(IdentifierNode identifierNode, Type type, boolean constant) {
+	private void addBinding(IdentifierNode identifierNode, Type type, boolean isStatic, boolean constant) {
 		Scope scope = identifierNode.getLocalScope();
-		Binding binding = scope.createBinding(identifierNode, type, constant);
+		Binding binding = scope.createBinding(identifierNode, type, isStatic, constant);
 		identifierNode.setBinding(binding);
 	}
 	

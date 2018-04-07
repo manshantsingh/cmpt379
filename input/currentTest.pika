@@ -6,8 +6,17 @@ func isEven<int a> -> bool{
 	return (a/2)*2 == a.
 }
 
+func recursiveValueN<int n> -> int{
+	static const adderVal := getZero() + 1.
+	if(n == adderVal){
+		return adderVal.
+	}
+	return recursiveValueN(n- 1) + adderVal.
+}
+
 func isOdd<int a> -> bool{
-	return (a/2)*2 != a.
+	static const modder:= getZero() + 2.
+	return (a/modder)*modder != a.
 }
 
 func willRoundUp<rat a> -> bool{
@@ -42,25 +51,57 @@ print world, _t_, _t_, "a: ",a,"  and b: ",b,_n_.
 	return b//13.
 }
 
+func getZero<> -> int{
+	print _n_, _n_, "this will return ZERO", _n_, _n_.
+	return 0.
+}
+
 const world := "hello world!!!".
 exec{
 	print world, _n_. 
 	static var arr := [1//2, 2//3, 100//7, 3//4, 4//5, 5//6].
 	var arr2 := [1,5,3,7,100,6,7,3,0,1,56,65].
-	# print arr map double, _n_. 
-	# print arr reduce willRoundUp, _n_.
-	# print zip arr, reverse arr, makeTuple, _n_.
-
-	# print _n_, "full: ", arr2, _n_.
-	# print "odds: ", arr2 reduce isOdd, _n_.
-
-	# print _n_, "full: ", arr, _n_.
-	# # print "max: ",_n_, arr fold[20//3] maxRational, _n_.
-	# print "max: ",_n_, arr fold[8] maxRationalAsInt, _n_.
+	print arr map double, _n_. 
+	print arr reduce willRoundUp, _n_.
+	print zip arr, reverse arr, makeTuple, _n_.
 
 	print _n_, "full: ", arr2, _n_.
+	print "odds: ", arr2 reduce isOdd, _n_.
+
+	var hehe:= <int a, int b> -> int {
+		return [	arr[a]+arr[b]	| int].
+	}.
+
+	print "hehe val: ", hehe(1,2),_n_.
+
+	print _n_, "full: ", arr, _n_.
+	print "max: ",_n_, arr fold[20//3] maxRational, _n_.
+	print "max: ",_n_, arr fold[8] maxRationalAsInt, _n_.
+
+	for index i of arr{
+		print "i: ",i,_t_,_t_,"elem: ",arr[i],_n_.
+	}
+	for elem x of arr{
+		print "elem: ",x,_n_.
+	}
+
+	const N := 100.
+
+	# print "I am about to print N=",N, " with recursiveValueN: ", recursiveValueN(N), _n_.
+
+
+	const a:= 0.
+	{
+		static const a:=1.
+		print "value of a should be 1: ", a,_n_.
+		{
+			print "inner value of a should be 1: ", a,_n_.
+		}
+	}
+
+	# print _n_, "full: ", arr2, _n_.
 	# print "max: ",_n_, arr2 fold maxInt, _n_.
-	print "max: ", _n_, arr2 fold[100//3] maxIntasRational, _n_.
+	# print "max: ", _n_, arr2 fold[100//3] maxIntasRational, _n_.
 }
 
 # exec{

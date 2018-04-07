@@ -3,6 +3,7 @@ package parseTree.nodeTypes;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import symbolTable.Scope;
+import asmCodeGenerator.Labeller;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import tokens.LextantToken;
@@ -12,6 +13,7 @@ public class DeclarationNode extends ParseNode {
 
 	private Scope declarationScope;
 	private boolean isStatic, isConstant;
+	private String staticJumpLabel;
 
 	public DeclarationNode(Token token) {
 		super(token);
@@ -40,6 +42,9 @@ public class DeclarationNode extends ParseNode {
 	public boolean getIsConstant() {
 		return isConstant;
 	}
+	public String getStaticJumpLabel() {
+		return staticJumpLabel;
+	}
 	
 	
 	////////////////////////////////////////////////////////////
@@ -51,6 +56,9 @@ public class DeclarationNode extends ParseNode {
 		node.appendChild(initializer);
 		node.isStatic=isStatic;
 		node.isConstant=isConstant;
+		if(isStatic) {
+			node.staticJumpLabel = new Labeller("Declaration-node-"+declaredName.getToken().getLexeme()).newLabel("Static-already-initialized");
+		}
 		return node;
 	}
 	

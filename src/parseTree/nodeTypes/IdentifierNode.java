@@ -49,13 +49,18 @@ public class IdentifierNode extends ParseNode {
 	public Binding findVariableBinding() {
 		String identifier = token.getLexeme();
 
+		boolean staticOnly = false;
 		for(ParseNode current : pathToRoot()) {
 			if(current.containsBindingOf(identifier)) {
+				Binding b = current.bindingOf(identifier);
+				if(staticOnly && !b.isStatic()) {
+					continue;
+				}
 				declarationScope = current.getScope();
-				return current.bindingOf(identifier);
+				return b;
 			}
 			if(current instanceof LambdaNode) {
-				break;
+				staticOnly=true;
 			}
 		}
 		SymbolTable globalSymbolTable = Scope.getGlobalScope().getSymbolTable();

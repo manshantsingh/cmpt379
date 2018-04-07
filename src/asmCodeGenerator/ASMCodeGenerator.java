@@ -581,15 +581,33 @@ public class ASMCodeGenerator {
 		
 
 		public void visitLeave(DeclarationNode node) {
+			newVoidCode(node);
+
+			if(node.getIsStatic()) {
+				//prechecks
+				((IdentifierNode)node.child(0)).getBinding().generateStaticCheckAddress(code);
+				code.add(LoadC);
+//				code.add(PStack);
+				code.add(JumpTrue, node.getStaticJumpLabel());
+			}
 			storeToLocation(node);
+			if(node.getIsStatic()) {
+				((IdentifierNode)node.child(0)).getBinding().generateStaticCheckAddress(code);
+				code.add(PushI, 1);
+//				code.add(PStack);
+				code.add(StoreC);
+				code.add(Label, node.getStaticJumpLabel());
+//				code.add(PStack);
+			}
 		}
 
 		public void visitLeave(AssignmentNode node) {
+			newVoidCode(node);
+
 			storeToLocation(node);
 		}
 
 		private void storeToLocation(ParseNode node) {
-			newVoidCode(node);
 			ASMCodeFragment lvalue = removeAddressCode(node.child(0));
 			ASMCodeFragment rvalue = removeValueCode(node.child(1));
 

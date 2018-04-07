@@ -78,18 +78,24 @@ public class Scope {
 
 ///////////////////////////////////////////////////////////////////////
 //bindings
-	public Binding createBinding(IdentifierNode identifierNode, Type type, boolean constant) {
+	public Binding createBinding(IdentifierNode identifierNode, Type type, boolean isStatic, boolean constant) {
 		Token token = identifierNode.getToken();
 		symbolTable.errorIfAlreadyDefined(token);
 
 		String lexeme = token.getLexeme();
-		Binding binding = allocateNewBinding(type, token.getLocation(), lexeme, constant);
+		Binding binding = allocateNewBinding(type, token.getLocation(), lexeme, isStatic, constant);
 		symbolTable.install(lexeme, binding);
 		return binding;
 	}
-	private Binding allocateNewBinding(Type type, TextLocation textLocation, String lexeme, boolean constant) {
-		MemoryLocation memoryLocation = allocator.allocate(type.getSize());
-		return new Binding(type, textLocation, memoryLocation, lexeme, constant);
+	private Binding allocateNewBinding(Type type, TextLocation textLocation, String lexeme, boolean isStatic, boolean constant) {
+		MemoryLocation memoryLocation;
+		if(isStatic) {
+			memoryLocation = globalScope.allocator.allocate(type.getSize()+1);
+		}
+		else{
+			memoryLocation = allocator.allocate(type.getSize());
+		}
+		return new Binding(type, textLocation, memoryLocation, lexeme, isStatic, constant);
 	}
 	
 ///////////////////////////////////////////////////////////////////////
@@ -117,9 +123,9 @@ public class Scope {
 			return "scope: the-null-scope";
 		}
 		@Override
-		public Binding createBinding(IdentifierNode identifierNode, Type type, boolean constant) {
+		public Binding createBinding(IdentifierNode identifierNode, Type type, boolean isStatic, boolean constant) {
 			unscopedIdentifierError(identifierNode.getToken());
-			return super.createBinding(identifierNode, type, constant);
+			return super.createBinding(identifierNode, type, isStatic, constant);
 		}
 		// subscopes of null scope need their own strategy.  Assumes global block is static.
 		public Scope createSubscope() {

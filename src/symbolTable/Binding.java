@@ -10,14 +10,15 @@ public class Binding {
 	private TextLocation textLocation;
 	private MemoryLocation memoryLocation;
 	private String lexeme;
-	private boolean constant;
+	private boolean is_static, constant;
 	
-	public Binding(Type type, TextLocation location, MemoryLocation memoryLocation, String lexeme, boolean constant) {
+	public Binding(Type type, TextLocation location, MemoryLocation memoryLocation, String lexeme, boolean is_static, boolean constant) {
 		super();
 		this.type = type;
 		this.textLocation = location;
 		this.memoryLocation = memoryLocation;
 		this.lexeme = lexeme;
+		this.is_static = is_static;
 		this.constant = constant;
 	}
 	
@@ -43,8 +44,14 @@ public class Binding {
 	public void generateAddress(ASMCodeFragment code) {
 		memoryLocation.generateAddress(code, "%% " + lexeme);
 	}
+	public void generateStaticCheckAddress(ASMCodeFragment code) {
+		memoryLocation.generateStaticCheckAddress(code, "%% " + lexeme, type.getSize());
+	}
 	public boolean isConstant() {
 		return constant;
+	}
+	public boolean isStatic() {
+		return is_static;
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +67,7 @@ public class Binding {
 			super(PrimitiveType.ERROR,
 					TextLocation.nullInstance(),
 					MemoryLocation.nullInstance(),
-					"the-null-binding", false);
+					"the-null-binding", false, false);
 		}
 		public static NullBinding getInstance() {
 			if(instance==null)

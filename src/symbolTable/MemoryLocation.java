@@ -37,6 +37,9 @@ public class MemoryLocation {
 	public void generateAddress(ASMCodeFragment code, String comment) {
 		accessor.generateAddress(code, baseAddress, offset, comment);
 	}
+	public void generateStaticCheckAddress(ASMCodeFragment code, String comment, int typeSize) {
+		accessor.generateAddress(code, baseAddress, offset+typeSize, comment+"-static-checker-location");
+	}
 	
 	
 ////////////////////////////////////////////////////////////////////////////////////
