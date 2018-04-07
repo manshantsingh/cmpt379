@@ -37,13 +37,12 @@ print "a: ",a,"  and b: ",b,_n_.
 }
 
 func maxIntasRational<rat a, int b> -> rat{
-print "a: ",a,"  and b: ",b,_n_.
+print world, _t_, _t_, "a: ",a,"  and b: ",b,_n_.
 	if(a>b){return a.}
 	return b//13.
 }
 
 const world := "hello world!!!".
-
 exec{
 	print world, _n_. 
 	static var arr := [1//2, 2//3, 100//7, 3//4, 4//5, 5//6].
