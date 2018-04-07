@@ -36,13 +36,12 @@ public class FoldCodeGenerator implements SimpleCodeGenerator {
 	public ASMCodeFragment generate(ParseNode node) {
 		ASMCodeFragment code = new ASMCodeFragment(CodeType.GENERATES_ADDRESS);
 		
-		Type baseType, subType;
+		Type baseType;
+		Type subType = ((Array)node.child(0).getType()).getSubType();
 		if(hasStrartingValue) {
 			baseType = node.child(1).getType();
-			subType = node.child(0).getType();
 		}
 		else {
-			subType = node.child(0).getType();
 			baseType = subType;
 		}
 		
@@ -58,6 +57,7 @@ public class FoldCodeGenerator implements SimpleCodeGenerator {
 				Macros.storeITo(code, RATIONAL_DENOMINATOR_TEMPORARY);
 				code.add(Exchange);
 				Macros.loadIFrom(code, RATIONAL_DENOMINATOR_TEMPORARY);
+				code.add(Exchange);
 			}
 			else {
 				code.add(Exchange);
@@ -93,38 +93,97 @@ public class FoldCodeGenerator implements SimpleCodeGenerator {
 			code.add(Add);
 			Macros.storeITo(code, MAP_REDUCE_ARRAY);
 			ASMCodeGenerator.loadFromAddress(code, subType);
+
 			if(subType == PrimitiveType.RATIONAL) {
 				Macros.storeITo(code, RATIONAL_DENOMINATOR_TEMPORARY);
 				code.add(Exchange);
 				Macros.loadIFrom(code, RATIONAL_DENOMINATOR_TEMPORARY);
+				code.add(Exchange);
 			}
 			else {
 				code.add(Exchange);
 			}
 		}
+
+		
+		code.add(Label, top);		// [...  base_value(s)  numElms]
+		code.add(PushI, 1);
+		code.add(Subtract);
+		code.add(Duplicate);
+		code.add(JumpNeg, end);
 		
 		// [...  base_value(s)  numElms]
+		if(baseType == PrimitiveType.RATIONAL) {
+			code.add(Exchange);
+			Macros.storeITo(code, RATIONAL_DENOMINATOR_TEMPORARY);
+			code.add(Exchange);
+			Macros.loadIFrom(code, RATIONAL_DENOMINATOR_TEMPORARY);
+		}
+		else {
+			code.add(Exchange);
+		}
+		// [... numElms base_values(s)
 		
-		code.add(Label, top);
+		if(baseType == PrimitiveType.RATIONAL) {
+			Macros.storeITo(code, RATIONAL_DENOMINATOR_TEMPORARY);
+		}
+		Macros.storeITo(code, RATIONAL_NUMERATOR_TEMPORARY);	// [... numElms]
+
+		Macros.loadIFrom(code, RunTime.STACK_POINTER);
+		code.add(PushI, baseType.getSize());
+		code.add(Subtract);
+		code.add(Duplicate);
+		Macros.storeITo(code, RunTime.STACK_POINTER);
+		Macros.loadIFrom(code, RATIONAL_NUMERATOR_TEMPORARY);
+		if(baseType == PrimitiveType.RATIONAL) {
+			Macros.loadIFrom(code, RATIONAL_DENOMINATOR_TEMPORARY);
+		}
+		ASMCodeGenerator.storeToAddress(code, baseType);
+
+		Macros.loadIFrom(code, RunTime.STACK_POINTER);
+		code.add(PushI, subType.getSize());
+		code.add(Subtract);
+		code.add(Duplicate);
+		Macros.storeITo(code, RunTime.STACK_POINTER);
+		Macros.loadIFrom(code, MAP_REDUCE_ARRAY);
+		ASMCodeGenerator.loadFromAddress(code, subType);
+		ASMCodeGenerator.storeToAddress(code, subType);
 		
+		// [... numElms]
+		Macros.loadIFrom(code, MAP_REDUCE_ARRAY);
+		code.add(PushI, subType.getSize());
+		code.add(Add);
 		
+		Macros.loadIFrom(code, MAP_REDUCE_LAMBDA);
+		code.add(Duplicate);
 		
-		// TODO
+		// [... numElms arrayElemPtr lambda lambda]
+		code.add(CallV);
+
+		Macros.storeITo(code, MAP_REDUCE_LAMBDA);
+		Macros.storeITo(code, MAP_REDUCE_ARRAY);	// [... numElms]
 		
+		Macros.loadIFrom(code, RunTime.STACK_POINTER);
+		ASMCodeGenerator.loadFromAddress(code, baseType);
+		Macros.loadIFrom(code, RunTime.STACK_POINTER);
+		code.add(PushI, baseType.getSize());
+		code.add(Add);
+		Macros.storeITo(code, RunTime.STACK_POINTER);	// [... numElms base_value(s)]
 		
+		if(baseType == PrimitiveType.RATIONAL) {
+			Macros.storeITo(code, RATIONAL_DENOMINATOR_TEMPORARY);
+			code.add(Exchange);
+			Macros.loadIFrom(code, RATIONAL_DENOMINATOR_TEMPORARY);
+			code.add(Exchange);
+		}
+		else {
+			code.add(Exchange);
+		}
+		// [... base_value(s) numElms]
+		code.add(Jump, top);
 		
-		
-		
-		code.add(Jump, end);
-		
-		code.add(Label, end);
-		
-		
-		
-		
-		
-		
-		
+		code.add(Label, end);	// [...  base_value(s)  numElms]
+		code.add(Pop);
 		return code;
 		
 //		Macros.storeITo(code, ZIP_ADDITIONAL_ARRAY);

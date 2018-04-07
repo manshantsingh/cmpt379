@@ -18,16 +18,47 @@ func makeTuple<rat a, rat b> -> [rat]{
 	return [a,b].
 }
 
+func maxRational<rat a, rat b> -> rat{
+print "a: ",a,"  and b: ",b,_n_.
+	if(a>b){return a.}
+	return b.
+}
+
+func maxRationalAsInt<int a, rat b> -> int{
+print "a: ",a,"  and b: ",b,_n_.
+	if(a>b){return a.}
+	return [b|int].
+}
+
+func maxInt<int a, int b> -> int{
+print "a: ",a,"  and b: ",b,_n_.
+	if(a>b){return a.}
+	return b.
+}
+
+func maxIntasRational<rat a, int b> -> rat{
+print "a: ",a,"  and b: ",b,_n_.
+	if(a>b){return a.}
+	return b//13.
+}
+
 exec{
-	var arr := [1//2, 2//3, 3//4, 4//5, 5//6].
-	print arr map double, _n_. 
-	print arr reduce willRoundUp, _n_.
-	print zip arr, reverse arr, makeTuple, _n_.
+	var arr := [1//2, 2//3, 100//7, 3//4, 4//5, 5//6].
+	var arr2 := [1,5,3,7,100,6,7,3,0,1,56,65].
+	# print arr map double, _n_. 
+	# print arr reduce willRoundUp, _n_.
+	# print zip arr, reverse arr, makeTuple, _n_.
 
-	var arr2 := [1,2,3,4,5,6,7,8,9,10].
+	# print _n_, "full: ", arr2, _n_.
+	# print "odds: ", arr2 reduce isOdd, _n_.
+
+	# print _n_, "full: ", arr, _n_.
+	# # print "max: ",_n_, arr fold[20//3] maxRational, _n_.
+	# print "max: ",_n_, arr fold[8] maxRationalAsInt, _n_.
+
 	print _n_, "full: ", arr2, _n_.
-	print "odds: ", arr2 reduce isOdd, _n_.
-
+	# print "max: ",_n_, arr2 fold maxInt, _n_.
+	print "max: ", _n_, arr2 fold[100//3] maxIntasRational, _n_.
 }
 
 # exec{
