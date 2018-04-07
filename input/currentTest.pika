@@ -1,5 +1,5 @@
-func double<float a> -> int {
-	return [a*2|int].
+func double<rat a> -> rat {
+	return a*2.
 }
 
 func isEven<int a> -> bool{
@@ -10,19 +10,23 @@ func isOdd<int a> -> bool{
 	return (a/2)*2 != a.
 }
 
-func willRoundUp<float a> -> bool{
-	return a - [a|int] >= 0.5.
+func willRoundUp<rat a> -> bool{
+	return a > [0.5|rat].
 }
 
-func sumFloat<float a, float b> -> [float]{
+func makeTuple<rat a, rat b> -> [rat]{
 	return [a,b].
 }
 
 exec{
-	var arr := [1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8,9.9,11].
+	var arr := [1//2, 2//3, 3//4, 4//5, 5//6].
 	print arr map double, _n_. 
 	print arr reduce willRoundUp, _n_.
-	print zip arr, reverse arr, sumFloat, _n_.
+	print zip arr, reverse arr, makeTuple, _n_.
+
+	var arr2 := [1,2,3,4,5,6,7,8,9,10].
+	print _n_, "full: ", arr2, _n_.
+	print "odds: ", arr2 reduce isOdd, _n_.
 
 }
 

@@ -219,7 +219,7 @@ public class MapReduceGenerator implements SimpleCodeGenerator {
 		
 		code.add(Label, finalTop);		// [... originalArrayFirstPtr boolRecordFirstPtr]
 		Macros.loadIFrom(code, MAP_REDUCE_LAMBDA);
-		code.add(JumpNeg, finalEnd);
+		code.add(JumpFalse, finalEnd);
 
 		// [... originalArrayFirstPtr boolRecordFirstPtr]
 		code.add(Duplicate);
@@ -234,7 +234,15 @@ public class MapReduceGenerator implements SimpleCodeGenerator {
 		code.add(PushI, originalSubType.getSize());
 		code.add(Add);
 		Macros.storeITo(code, MAP_REDUCE_ARRAY);
-		code.add(Exchange);
+		if(originalSubType == PrimitiveType.RATIONAL) {
+			code.add(Exchange);
+			Macros.storeITo(code, RATIONAL_DENOMINATOR_TEMPORARY);
+			code.add(Exchange);
+			Macros.loadIFrom(code, RATIONAL_DENOMINATOR_TEMPORARY);
+		}
+		else {
+			code.add(Exchange);
+		}
 		ASMCodeGenerator.storeToAddress(code, originalSubType);		// [...  bPtr  oaPtr]
 		code.add(Exchange);
 		Macros.loadIFrom(code, MAP_REDUCE_LAMBDA);
