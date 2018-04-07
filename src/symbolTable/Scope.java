@@ -23,6 +23,12 @@ public class Scope {
 		globalScope = new Scope(programScopeAllocator(), nullInstance());
 		return globalScope;
 	}
+	public static Scope createLocalProgramScope() {
+		return new Scope(new PositiveMemoryAllocator(
+				MemoryAccessMethod.DIRECT_ACCESS_BASE, 
+				RunTime.LOCAL_MEMORY_BLOCK), nullInstance());
+//		return globalScope;
+	}
 	public Scope createSubscope() {
 		return new Scope(allocator, this);
 	}
@@ -95,6 +101,7 @@ public class Scope {
 		else{
 			memoryLocation = allocator.allocate(type.getSize());
 		}
+//		System.out.println("diff: "+globalScope.allocator + " vs "+ allocator);
 		return new Binding(type, textLocation, memoryLocation, lexeme, isStatic, constant);
 	}
 	

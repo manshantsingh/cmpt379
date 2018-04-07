@@ -80,7 +80,11 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		leaveScope(node);
 	}
 	public void visitEnter(BlockStatementsNode node) {
-		if(node.getParent() instanceof LambdaNode) {
+		if(node.getParent() instanceof ProgramNode) {
+			Scope scope = Scope.createLocalProgramScope();
+			node.setScope(scope);
+		}
+		else if(node.getParent() instanceof LambdaNode) {
 			enterProcedurescope(node);
 		}
 		else {
@@ -188,6 +192,13 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		node.setScope(scope);
 	}
 	private void leaveScope(ParseNode node) {
+//		System.out.println("\n\n\n\n\n\n\n"+node.getToken().getLocation());
+//		System.out.println(node.getScope());
+//		for(ParseNode n: node.pathToRoot()) {
+//			if(n.hasScope()) {
+//				System.out.println(n.getScope());
+//			}
+//		}
 		node.getScope().leave();
 	}
 	

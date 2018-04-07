@@ -89,6 +89,8 @@ public class ASMCodeGenerator {
 		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
 		code.add(DLabel, RunTime.GLOBAL_MEMORY_BLOCK);
 		code.add(DataZ, globalBlockSize);
+		code.add(DLabel, RunTime.LOCAL_MEMORY_BLOCK);
+		code.add(DataZ, root.child(root.nChildren()-1).getScope().getAllocatedSize());
 		return code;
 	}
 	private ASMCodeFragment programASM() {
