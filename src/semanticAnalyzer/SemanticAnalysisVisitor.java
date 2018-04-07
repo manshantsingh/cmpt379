@@ -64,13 +64,15 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	// constructs larger than statements
 	@Override
 	public void visitEnter(ProgramNode node) {
+		node.rearrangeChildren();
 		enterProgramScope(node);
 		for(ParseNode child: node.getChildren()) {
-			if(child instanceof DeclarationNode) {
+			if(child instanceof DeclarationNode && child.getToken().isLextant(Keyword.FUNC)) {
 				DeclarationNode func = (DeclarationNode) child;
 				IdentifierNode identifier = (IdentifierNode) func.child(0);
 				Type funcType = func.child(1).getType();
 				addBinding(identifier, funcType, true);
+//				System.out.println(child+"\ntype: "+funcType);
 			}
 		}
 	}
@@ -218,7 +220,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		node.setType(declarationType);		
 		identifier.setType(declarationType);
 
-		if(	!	(node.getParent() instanceof ProgramNode)	) {
+		if(	! node.getToken().isLextant(Keyword.FUNC)	) {
 			addBinding(identifier, declarationType, node.getIsConstant());
 		}
 	}

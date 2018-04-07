@@ -42,8 +42,11 @@ print "a: ",a,"  and b: ",b,_n_.
 	return b//13.
 }
 
+const world := "hello world!!!".
+
 exec{
-	var arr := [1//2, 2//3, 100//7, 3//4, 4//5, 5//6].
+	print world, _n_. 
+	static var arr := [1//2, 2//3, 100//7, 3//4, 4//5, 5//6].
 	var arr2 := [1,5,3,7,100,6,7,3,0,1,56,65].
 	# print arr map double, _n_. 
 	# print arr reduce willRoundUp, _n_.

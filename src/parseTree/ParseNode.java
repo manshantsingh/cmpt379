@@ -13,7 +13,7 @@ import tokens.Token;
 public class ParseNode {
 	public static final ParseNode NO_PARENT = null;
 	
-	List<ParseNode>	children;
+	protected List<ParseNode>	children;
 	ParseNode parent;
 
 	protected Token token;

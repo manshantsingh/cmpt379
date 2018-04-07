@@ -70,7 +70,11 @@ public class Parser {
 			return syntaxErrorNode("program");
 		}
 		ParseNode program = new ProgramNode(nowReading);
-		while(nowReading.isLextant(Keyword.FUNC)) {
+		while(nowReading.isLextant(Keyword.FUNC) || startsDeclaration(nowReading)) {
+			if(startsDeclaration(nowReading)) {
+				program.appendChild(parseDeclaration());
+				continue;
+			}
 			Token funcStart = nowReading;
 			readToken();
 			ParseNode identifier = parseIdentifier();
@@ -90,7 +94,8 @@ public class Parser {
 	}
 	private boolean startsProgram(Token token) {
 		return token.isLextant(Keyword.EXEC) ||
-				token.isLextant(Keyword.FUNC);
+				token.isLextant(Keyword.FUNC) ||
+				startsDeclaration(token);
 	}
 	
 	

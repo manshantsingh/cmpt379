@@ -23,6 +23,6 @@ public class StringConstantToken extends TokenImp {
 
 	@Override
 	protected String rawString() {
-		return "characterConst, \"" + value + "\"";
+		return "stringConst, \"" + value + "\"";
 	}
 }
